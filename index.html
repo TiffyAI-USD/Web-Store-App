@@ -12,8 +12,6 @@
     label {display:block;margin:16px 0 6px;font-weight:bold;color:#d4a373}
     input[type="text"], input[type="url"] {width:100%;padding:12px;background:#222;border:1px solid #444;color:#fff;border-radius:8px;font-size:1rem}
     .item {background:#252525;padding:18px;margin:18px 0;border-radius:10px;border-left:5px solid #d4a373}
-    .preview {text-align:center;margin:16px 0}
-    .preview img {max-width:260px;max-height:260px;border-radius:12px;border:4px solid #d4a373;box-shadow:0 8px 20px rgba(0,0,0,.6)}
     button {background:linear-gradient(180deg,#d4a373,#f1b86b);color:#000;padding:18px 36px;font-size:1.4rem;font-weight:bold;font-family:'Bebas Neue',cursive;letter-spacing:2px;border:none;border-radius:50px;cursor:pointer;display:block;margin:60px auto;box-shadow:0 10px 30px rgba(212,163,115,.4)}
     button:hover {transform:translateY(-4px) scale(1.05)}
   </style>
@@ -28,9 +26,7 @@
     <label>Café Name</label><input type="text" id="cafeName" value="PAPA RON'S CAFÉ">
     <label>Tagline</label><input type="text" id="tagline" value="FOOD • GOOD MUSIC">
     <label>Logo Image URL</label><input type="url" id="logoUrl" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/logo.jpg">
-    <div class="preview"><img id="logoPreview" src="https://tiffyai-usd.github.io/Papa_Rons_Cafe/logo.jpg" alt="Logo"></div>
     <label>Banner Image URL</label><input type="url" id="bannerUrl" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/banner.jpg">
-    <div class="preview"><img id="bannerPreview" src="https://tiffyai-usd.github.io/Papa_Rons_Cafe/banner.jpg" alt="Banner"></div>
     <label>Footer Location</label><input type="text" id="footerLocation" value="COFFEE BAY, MTHATHA">
     <label>Copyright Year</label><input type="text" id="copyrightYear" value="2025">
     <label>WhatsApp Number</label><input type="text" id="whatsapp" value="+27660660088">
@@ -168,6 +164,7 @@
 
   <button onclick="generateAndDownload()">GENERATE & DOWNLOAD NEW SITE</button>
 
+  <!-- ORIGINAL SITE -->
   <header>
     <img src="https://tiffyai-usd.github.io/Papa_Rons_Cafe/logo.jpg" alt="Papa Ron's Logo" class="logo">
     <h1>PAPA RON'S CAFÉ</h1>
@@ -226,9 +223,7 @@
   </footer>
 
   <script>
-    document.getElementById('logoUrl').addEventListener('input', e => document.getElementById('logoPreview').src = e.target.value || 'https://via.placeholder.com/200');
-    document.getElementById('bannerUrl').addEventListener('input', e => document.getElementById('bannerPreview').src = e.target.value || 'https://via.placeholder.com/800x400');
-
+    // Original data – this is the block we will replace
     const pizzas = [
       { name: "SOMETHING MEATY", price: 135, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza.jpg", desc:"Creamy chicken, bacon, mushrooms, cheese" },
       { name: "HAWAIIAN", price: 135, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza1.jpg", desc:"Ham, pineapple, cheese" },
@@ -306,6 +301,7 @@
     renderGroup(breakfast, 'breakfastGrid');
     renderGroup(sides, 'sidesGrid');
 
+    // Quantity and order button code (unchanged from your original)
     const qtyState = {};
 
     document.addEventListener('click', (e) => {
@@ -382,6 +378,7 @@
 
     updateOrderButton();
 
+    // Menu button and lightbox code (unchanged from your original)
     const mainBtn = document.getElementById('mainBtn');
     const actionMenu = document.getElementById('actionMenu');
     const scrollToMenu = document.getElementById('scrollToMenu');
@@ -448,6 +445,7 @@
       }
     }, true);
 
+    // FINAL WORKING GENERATE FUNCTION
     function generateAndDownload() {
       let html = document.documentElement.outerHTML;
 
@@ -459,6 +457,7 @@
       const year = document.getElementById('copyrightYear').value.trim();
       const wa = document.getElementById('whatsapp').value.replace(/[^0-9+]/g, '');
 
+      // Collect product changes
       const items = {pizzas: [], burgers: [], grill: [], snacks: [], breakfast: [], sides: []};
       document.querySelectorAll('input[data-group]').forEach(inp => {
         const group = inp.dataset.group;
@@ -468,6 +467,7 @@
         items[group][index][field] = (field === 'price' && inp.value.trim() === '') ? null : inp.value.trim();
       });
 
+      // Build new data block
       const newData = `const pizzas = ${JSON.stringify(items.pizzas.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
 const burgers = ${JSON.stringify(items.burgers.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
 const grill = ${JSON.stringify(items.grill.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
@@ -475,14 +475,14 @@ const snacks = ${JSON.stringify(items.snacks.map(i => ({name:i.name||'',price:i.
 const breakfast = ${JSON.stringify(items.breakfast.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
 const sides = ${JSON.stringify(items.sides.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};`;
 
-      // More robust data replacement
+      // Replace the entire data block (from the first 'const pizzas = [' to the last '];' before renderGroup)
       const dataStart = html.indexOf('const pizzas = [');
-      const dataEnd = html.indexOf('renderGroup(pizzas, \'pizzasGrid\');');
+      const dataEnd = html.indexOf('function createMenuCard(item, key) {');
       if (dataStart !== -1 && dataEnd !== -1) {
-        const oldData = html.substring(dataStart, dataEnd);
-        html = html.replace(oldData, newData);
+        html = html.substring(0, dataStart) + newData + html.substring(dataEnd);
       }
 
+      // Apply business changes
       html = html
         .replace(/PAPA RON'S CAFÉ/g, cafeName)
         .replace(/FOOD • GOOD MUSIC/g, tagline)
@@ -492,8 +492,14 @@ const sides = ${JSON.stringify(items.sides.map(i => ({name:i.name||'',price:i.pr
         .replace(/2025/g, year)
         .replace(/\+27660660088/g, wa)
         .replace(/WhatsApp your order:[^<]*<a[^>]*>[^<]*<\/a>/g, `WhatsApp your order: <a href="https://wa.me/\( {wa}" style="color:#25D366;"> \){wa.replace('+','')}</a>`)
-        .replace(/https:\/\/wa\.me\/\+27660660088/g, `https://wa.me/${wa}`)
-        .replace(/<h1>CAFÉ WEBSITE PRINTER<\/h1>[\s\S]*?<button onclick="generateAndDownload\(\)">GENERATE & DOWNLOAD NEW SITE<\/button>/, '');
+        .replace(/https:\/\/wa\.me\/\+27660660088/g, `https://wa.me/${wa}`);
+
+      // Remove the entire editor section from the downloaded file
+      const editorStart = html.indexOf('<h1>CAFÉ WEBSITE PRINTER</h1>');
+      const editorEnd = html.indexOf('<button onclick="generateAndDownload()">');
+      if (editorStart !== -1 && editorEnd !== -1) {
+        html = html.substring(0, editorStart) + html.substring(editorEnd + '<button onclick="generateAndDownload()">GENERATE & DOWNLOAD NEW SITE</button>'.length + 50);
+      }
 
       const blob = new Blob([html], {type: 'text/html'});
       const url = URL.createObjectURL(blob);
@@ -505,4 +511,4 @@ const sides = ${JSON.stringify(items.sides.map(i => ({name:i.name||'',price:i.pr
     }
   </script>
 </body>
-</html>
+        </html>
