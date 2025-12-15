@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Café Store</title>
+
+<style>
+:root {
+  --bg:#0e0e0e;
+  --surface:#161616;
+  --text:#ffffff;
+  --muted:#b5b5b5;
+  --primary:#ff9800;
+  --accent:#25d366;
+  --radius:14px;
+  --shadow:0 20px 50px rgba(0,0,0,.4);
+}
+
+* { box-sizing:border-box }
+body {
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font-family:system-ui, sans-serif;
+}
+
+header {
+  padding:30px;
+  text-align:center;
+  background:var(--surface);
+  box-shadow:var(--shadow);
+}
+
+header h1 { margin:0 }
+header p { color:var(--muted) }
+
+main {
+  padding:30px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:20px;
+}
+
+.card {
+  background:var(--surface);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow);
+  display:flex;
+  flex-direction:column;
+}
+
+.card img {
+  width:100%;
+  height:180px;
+  object-fit:cover;
+}
+
+.card .content {
+  padding:16px;
+  flex:1;
+}
+
+.card h3 { margin:0 0 6px 0 }
+.card p { color:var(--muted); font-size:.9rem }
+
+.card button {
+  margin:16px;
+  padding:12px;
+  border:none;
+  border-radius:var(--radius);
+  background:var(--primary);
+  font-weight:bold;
+  cursor:pointer;
+}
+
+#cart {
+  position:fixed;
+  bottom:0;
+  right:0;
+  width:320px;
+  max-height:80vh;
+  background:var(--surface);
+  padding:16px;
+  box-shadow:var(--shadow);
+  overflow-y:auto;
+}
+
+#cart h3 { margin-top:0 }
+
+.cart-item {
+  border-bottom:1px solid #333;
+  padding:8px 0;
+}
+
+.cart-item button {
+  background:none;
+  border:none;
+  color:#ff5252;
+  cursor:pointer;
+}
+
+.checkout {
+  width:100%;
+  margin-top:12px;
+  padding:14px;
+  background:var(--accent);
+  border:none;
+  border-radius:var(--radius);
+  font-weight:bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Papa Ron’s Café</h1>
+  <p>Food • Good Music</p>
+</header>
+
+<main id="productGrid"></main>
+
+<div id="cart">
+  <h3>Your Order</h3>
+  <div id="cartItems"></div>
+  <strong>Total: R<span id="total">0</span></strong>
+  <button class="checkout" onclick="checkout()">📲 Order via WhatsApp</button>
+</div>
+
+<script>
+/* ===== STORE DATA ===== */
+const STORE = {
+  currency:'R',
+  whatsapp:'27766314246',
+  products:[
+    {
+      id:'p1',
+      name:'BBQ Chicken Pizza',
+      price:135,
+      desc:'BBQ sauce, chicken & cheese',
+      img:'https://images.unsplash.com/photo-1601924638867-3ec62f66e7f9'
+    },
+    {
+      id:'p2',
+      name:'Beef Burger',
+      price:95,
+      desc:'Grilled beef, fresh toppings',
+      img:'https://images.unsplash.com/photo-1550547660-d9450f859349'
+    }
+  ],
+  cart:[]
+};
+
+/* ===== RENDER PRODUCTS ===== */
+const grid = document.getElementById('productGrid');
+
+function renderProducts() {
+  grid.innerHTML='';
+  STORE.products.forEach(p=>{
+    grid.innerHTML+=`
+      <div class="card">
+        <img src="${p.img}">
+        <div class="content">
+          <h3>${p.name}</h3>
+          <p>${p.desc}</p>
+          <strong>R${p.price}</strong>
+        </div>
+        <button onclick="addToCart('${p.id}')">🛒 Add to Cart</button>
+      </div>
+    `;
+  });
+}
+
+/* ===== CART LOGIC ===== */
+function addToCart(id) {
+  const p = STORE.products.find(x=>x.id===id);
+  const existing = STORE.cart.find(x=>x.id===id);
+  if(existing) existing.qty++;
+  else STORE.cart.push({...p, qty:1});
+  renderCart();
+}
+
+function removeItem(id) {
+  STORE.cart = STORE.cart.filter(x=>x.id!==id);
+  renderCart();
+}
+
+function renderCart() {
+  const items = document.getElementById('cartItems');
+  const totalEl = document.getElementById('total');
+  items.innerHTML='';
+  let total=0;
+
+  STORE.cart.forEach(i=>{
+    total += i.price*i.qty;
+    items.innerHTML+=`
+      <div class="cart-item">
+        ${i.name} × ${i.qty}<br>
+        R${i.price*i.qty}
+        <button onclick="removeItem('${i.id}')">❌</button>
+      </div>
+    `;
+  });
+  totalEl.textContent=total;
+}
+
+/* ===== WHATSAPP CHECKOUT ===== */
+function checkout() {
+  if(!STORE.cart.length) return alert('Cart empty');
+
+  let msg='Hi 👋 I would like to order:%0A%0A';
+  STORE.cart.forEach(i=>{
+    msg+=`• ${i.name} × ${i.qty} = R${i.price*i.qty}%0A`;
+  });
+  const total = STORE.cart.reduce((t,i)=>t+i.price*i.qty,0);
+  msg+=`%0A💰 Total: R${total}`;
+
+  window.open(`https://wa.me/${STORE.whatsapp}?text=${msg}`,'_blank');
+}
+
+renderProducts();
+</script>
+
+</body>
+</html>
