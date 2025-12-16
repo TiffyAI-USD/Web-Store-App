@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Café Website Printer</title>
+  <style>
+    body {font-family: 'Segoe UI', sans-serif;background:#121212;color:#eee;padding:20px;line-height:1.6;max-width:1200px;margin:auto}
+    h1, h2, h3 {color:#d4a373}
+    h1 {text-align:center}
+    .section {background:#1e1e1e;padding:24px;margin:24px 0;border-radius:12px;border:1px solid #333}
+    label {display:block;margin:16px 0 6px;font-weight:bold;color:#d4a373}
+    input[type="text"], input[type="url"] {width:100%;padding:12px;background:#222;border:1px solid #444;color:#fff;border-radius:8px;font-size:1rem}
+    .item {background:#252525;padding:18px;margin:18px 0;border-radius:10px;border-left:5px solid #d4a373}
+    button {background:linear-gradient(180deg,#d4a373,#f1b86b);color:#000;padding:18px 36px;font-size:1.4rem;font-weight:bold;font-family:'Bebas Neue',cursive;letter-spacing:2px;border:none;border-radius:50px;cursor:pointer;display:block;margin:60px auto;box-shadow:0 10px 30px rgba(212,163,115,.4)}
+    button:hover {transform:translateY(-4px) scale(1.05)}
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <h1>CAFÉ WEBSITE PRINTER</h1>
+  <p style="text-align:center;margin-bottom:40px;">Change everything – business and products – then generate the new site.</p>
+
+  <div class="section">
+    <h2>Business Info</h2>
+    <label>Café Name</label><input type="text" id="cafeName" value="PAPA RON'S CAFÉ">
+    <label>Tagline</label><input type="text" id="tagline" value="FOOD • GOOD MUSIC">
+    <label>Logo Image URL</label><input type="url" id="logoUrl" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/logo.jpg">
+    <label>Banner Image URL</label><input type="url" id="bannerUrl" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/banner.jpg">
+    <label>Footer Location</label><input type="text" id="footerLocation" value="COFFEE BAY, MTHATHA">
+    <label>Copyright Year</label><input type="text" id="copyrightYear" value="2025">
+    <label>WhatsApp Number</label><input type="text" id="whatsapp" value="+27660660088">
+  </div>
+
+  <div class="section">
+    <h2>Products</h2>
+
+    <h3>PIZZAS</h3>
+    <div class="item">
+      <label>Name</label><input data-group="pizzas" data-index="0" data-field="name" value="SOMETHING MEATY">
+      <label>Price (blank for custom)</label><input data-group="pizzas" data-index="0" data-field="price" value="135">
+      <label>Description</label><input data-group="pizzas" data-index="0" data-field="desc" value="Creamy chicken, bacon, mushrooms, cheese">
+      <label>Image URL</label><input data-group="pizzas" data-index="0" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="pizzas" data-index="1" data-field="name" value="HAWAIIAN">
+      <label>Price</label><input data-group="pizzas" data-index="1" data-field="price" value="135">
+      <label>Description</label><input data-group="pizzas" data-index="1" data-field="desc" value="Ham, pineapple, cheese">
+      <label>Image URL</label><input data-group="pizzas" data-index="1" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza1.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="pizzas" data-index="2" data-field="name" value="FLAMING SPARE RIB PIZZA">
+      <label>Price</label><input data-group="pizzas" data-index="2" data-field="price" value="150">
+      <label>Description</label><input data-group="pizzas" data-index="2" data-field="desc" value="Ribs on pizza base with cheese">
+      <label>Image URL</label><input data-group="pizzas" data-index="2" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/ribpizza.jpg">
+    </div>
+
+    <h3>BURGERS</h3>
+    <div class="item">
+      <label>Name</label><input data-group="burgers" data-index="0" data-field="name" value="CHEESE BURGER">
+      <label>Price</label><input data-group="burgers" data-index="0" data-field="price" value="120">
+      <label>Description</label><input data-group="burgers" data-index="0" data-field="desc" value="Served with side chips">
+      <label>Image URL</label><input data-group="burgers" data-index="0" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/burger.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="burgers" data-index="1" data-field="name" value="CHEESY STRIPS">
+      <label>Price</label><input data-group="burgers" data-index="1" data-field="price" value="50">
+      <label>Description</label><input data-group="burgers" data-index="1" data-field="desc" value="5 x Cheesy Strips, served with dip">
+      <label>Image URL</label><input data-group="burgers" data-index="1" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/strip.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="burgers" data-index="2" data-field="name" value="BOERIE ROLL">
+      <label>Price</label><input data-group="burgers" data-index="2" data-field="price" value="50">
+      <label>Description</label><input data-group="burgers" data-index="2" data-field="desc" value="Boerie with chips or salad">
+      <label>Image URL</label><input data-group="burgers" data-index="2" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/boerie.jpeg">
+    </div>
+
+    <h3>GRILL</h3>
+    <div class="item">
+      <label>Name</label><input data-group="grill" data-index="0" data-field="name" value="RUMP STEAK">
+      <label>Price</label><input data-group="grill" data-index="0" data-field="price" value="160">
+      <label>Description</label><input data-group="grill" data-index="0" data-field="desc" value="Loaded with mushroom sauce & chips">
+      <label>Image URL</label><input data-group="grill" data-index="0" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/rump.jpeg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="grill" data-index="1" data-field="name" value="RIB RACK">
+      <label>Price</label><input data-group="grill" data-index="1" data-field="price" value="200">
+      <label>Description</label><input data-group="grill" data-index="1" data-field="desc" value="Full rack with chips">
+      <label>Image URL</label><input data-group="grill" data-index="1" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/ribs.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="grill" data-index="2" data-field="name" value="SCHNITZEL">
+      <label>Price</label><input data-group="grill" data-index="2" data-field="price" value="120">
+      <label>Description</label><input data-group="grill" data-index="2" data-field="desc" value="Chicken schnitzel with chips & sauce">
+      <label>Image URL</label><input data-group="grill" data-index="2" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/snitsel.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="grill" data-index="3" data-field="name" value="PREGO ROLL">
+      <label>Price</label><input data-group="grill" data-index="3" data-field="price" value="50">
+      <label>Description</label><input data-group="grill" data-index="3" data-field="desc" value="Peri-peri steak roll with chips">
+      <label>Image URL</label><input data-group="grill" data-index="3" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/prego.jpg">
+    </div>
+
+    <h3>SNACKS & PLATTERS</h3>
+    <div class="item">
+      <label>Name</label><input data-group="snacks" data-index="0" data-field="name" value="MUNCHIE PLATTER">
+      <label>Price</label><input data-group="snacks" data-index="0" data-field="price" value="350">
+      <label>Description</label><input data-group="snacks" data-index="0" data-field="desc" value="Full varieties of munchies">
+      <label>Image URL</label><input data-group="snacks" data-index="0" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/platters.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="snacks" data-index="1" data-field="name" value="CHEESY POPS">
+      <label>Price</label><input data-group="snacks" data-index="1" data-field="price" value="50">
+      <label>Description</label><input data-group="snacks" data-index="1" data-field="desc" value="Cheesy pops served with dip">
+      <label>Image URL</label><input data-group="snacks" data-index="1" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/pops.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="snacks" data-index="2" data-field="name" value="CHICKEN PERI NACHO">
+      <label>Price</label><input data-group="snacks" data-index="2" data-field="price" value="160">
+      <label>Description</label><input data-group="snacks" data-index="2" data-field="desc" value="Peri-peri chicken, nachos & cheese">
+      <label>Image URL</label><input data-group="snacks" data-index="2" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/nantcho.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="snacks" data-index="3" data-field="name" value="WINGLETS">
+      <label>Price (blank for custom)</label><input data-group="snacks" data-index="3" data-field="price" value="">
+      <label>Description</label><input data-group="snacks" data-index="3" data-field="desc" value="5 for R60 • 10 for R100 — served with dip">
+      <label>Image URL</label><input data-group="snacks" data-index="3" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/buffelowings.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="snacks" data-index="4" data-field="name" value="PLATTER">
+      <label>Price</label><input data-group="snacks" data-index="4" data-field="price" value="350">
+      <label>Description</label><input data-group="snacks" data-index="4" data-field="desc" value="Mixed meat platter for 2">
+      <label>Image URL</label><input data-group="snacks" data-index="4" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/platter.jpg">
+    </div>
+
+    <h3>BREAKFAST</h3>
+    <div class="item">
+      <label>Name</label><input data-group="breakfast" data-index="0" data-field="name" value="BREAKFAST">
+      <label>Price</label><input data-group="breakfast" data-index="0" data-field="price" value="80">
+      <label>Description</label><input data-group="breakfast" data-index="0" data-field="desc" value="Eggs, bacon, toast, coffee — served 8–11 AM">
+      <label>Image URL</label><input data-group="breakfast" data-index="0" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/breakfast.jpg">
+    </div>
+
+    <h3>SIDES</h3>
+    <div class="item">
+      <label>Name</label><input data-group="sides" data-index="0" data-field="name" value="SIDE CHIPS">
+      <label>Price</label><input data-group="sides" data-index="0" data-field="price" value="20">
+      <label>Description</label><input data-group="sides" data-index="0" data-field="desc" value="Crispy golden chips">
+      <label>Image URL</label><input data-group="sides" data-index="0" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/chips.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="sides" data-index="1" data-field="name" value="SIDE SALAD">
+      <label>Price</label><input data-group="sides" data-index="1" data-field="price" value="20">
+      <label>Description</label><input data-group="sides" data-index="1" data-field="desc" value="Fresh garden salad">
+      <label>Image URL</label><input data-group="sides" data-index="1" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/salad.jpg">
+    </div>
+    <div class="item">
+      <label>Name</label><input data-group="sides" data-index="2" data-field="name" value="GREEK SALAD">
+      <label>Price</label><input data-group="sides" data-index="2" data-field="price" value="20">
+      <label>Description</label><input data-group="sides" data-index="2" data-field="desc" value="Feta, olives, tomatoes & dressing">
+      <label>Image URL</label><input data-group="sides" data-index="2" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/greeksalad.jpg">
+    </div>
+  </div>
+
+  <button onclick="generateAndDownload()">GENERATE & DOWNLOAD NEW SITE</button>
+
+  <!-- ORIGINAL SITE BELOW (with full CSS, HTML, and script) -->
+  <!-- The full original Papa Ron's Café site code goes here – header, lightbox, menu section, footer, and the full <script> with data, functions, etc. -->
+
+  <!-- For brevity in this message, I didn't repeat the 700+ lines of your original site, but in the actual file you use, paste your original site code starting from <header> down to the end of the <script> -->
+
+  <!-- The generate function is added at the end of the <script> -->
+
+  <script>
+    // Your original data and functions here (unchanged)
+
+    // ... your full original script ...
+
+    function generateAndDownload() {
+      let html = document.documentElement.outerHTML;
+
+      const cafeName = document.getElementById('cafeName').value.trim().toUpperCase() || 'CAFÉ';
+      const tagline = document.getElementById('tagline').value.trim().toUpperCase() || 'FOOD • GOOD MUSIC';
+      const logo = document.getElementById('logoUrl').value.trim();
+      const banner = document.getElementById('bannerUrl').value.trim();
+      const location = document.getElementById('footerLocation').value.trim();
+      const year = document.getElementById('copyrightYear').value.trim();
+      const wa = document.getElementById('whatsapp').value.replace(/[^0-9+]/g, '');
+
+      const items = {pizzas: [], burgers: [], grill: [], snacks: [], breakfast: [], sides: []};
+      document.querySelectorAll('input[data-group]').forEach(inp => {
+        const group = inp.dataset.group;
+        const index = parseInt(inp.dataset.index);
+        const field = inp.dataset.field;
+        if (!items[group][index]) items[group][index] = {};
+        items[group][index][field] = (field === 'price' && inp.value.trim() === '') ? null : inp.value.trim();
+      });
+
+      const newData = `const pizzas = ${JSON.stringify(items.pizzas.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
+const burgers = ${JSON.stringify(items.burgers.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
+const grill = ${JSON.stringify(items.grill.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
+const snacks = ${JSON.stringify(items.snacks.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
+const breakfast = ${JSON.stringify(items.breakfast.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
+const sides = ${JSON.stringify(items.sides.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};`;
+
+      // Replace data block
+      const dataStart = html.indexOf('const pizzas = [');
+      const dataEnd = html.indexOf('renderGroup(pizzas, \'pizzasGrid\');');
+      if (dataStart !== -1 && dataEnd !== -1) {
+        html = html.substring(0, dataStart) + newData + html.substring(dataEnd - 1);
+      }
+
+      // Apply business changes
+      html = html
+        .replace(/PAPA RON'S CAFÉ/g, cafeName)
+        .replace(/FOOD • GOOD MUSIC/g, tagline)
+        .replace(/https:\/\/tiffyai-usd\.github\.io\/Papa_Rons_Cafe\/logo\.jpg/g, logo)
+        .replace(/url\('https:\/\/tiffyai-usd\.github\.io\/Papa_Rons_Cafe\/banner\.jpg'\)/g, `url('${banner}')`)
+        .replace(/COFFEE BAY, MTHATHA/g, location)
+        .replace(/2025/g, year)
+        .replace(/\+27660660088/g, wa)
+        .replace(/WhatsApp your order:[^<]*<a[^>]*>[^<]*<\/a>/g, `WhatsApp your order: <a href="https://wa.me/\( {wa}" style="color:#25D366;"> \){wa.replace('+','')}</a>`)
+        .replace(/https:\/\/wa\.me\/\+27660660088/g, `https://wa.me/${wa}`);
+
+      // Remove the editor panel completely
+      const editorStart = html.indexOf('<h1>CAFÉ WEBSITE PRINTER</h1>');
+      if (editorStart !== -1) {
+        const editorEnd = html.indexOf('<button onclick="generateAndDownload()">', editorStart) + '<button onclick="generateAndDownload()">GENERATE & DOWNLOAD NEW SITE</button>'.length;
+        html = html.substring(0, editorStart) + html.substring(editorEnd + 50);
+      }
+
+      const blob = new Blob([html], {type: 'text/html'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'my-new-cafe-site.html';
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>
