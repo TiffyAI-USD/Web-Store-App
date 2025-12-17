@@ -16,18 +16,18 @@
     .item {background:#252525;padding:18px;margin:18px 0;border-radius:10px;border-left:5px solid #d4a373}
     .preview {text-align:center;margin:16px 0}
     .preview img {max-width:260px;max-height:260px;border-radius:12px;border:4px solid #d4a373;box-shadow:0 8px 20px rgba(0,0,0,0.6)}
-    button.generate {background:linear-gradient(180deg,#d4a373,#f1b86b);color:#000;padding:18px 36px;font-size:1.4rem;font-weight:bold;font-family:'Bebas Neue',cursive;letter-spacing:2px;border:none;border-radius:50px;cursor:pointer;display:block;margin:60px auto;box-shadow:0 10px 30px rgba(212,163,115,.4)}
-    button.generate:hover {transform:translateY(-4px) scale(1.05)}
+    button.generate {background:linear-gradient(180deg,#d4a373,#f1b86b);color:#000;padding:18px 36px;font-size:1.4rem;font-weight:bold;font-family:'Bebas Neue',cursive;letter-spacing:2px;border:none;border-radius:50px;cursor:pointer;display:block;margin:80px auto;box-shadow:0 10px 30px rgba(212,163,115,.4);transition:all 0.3s}
+    button.generate:hover {transform:translateY(-4px) scale(1.05);box-shadow:0 20px 40px rgba(212,163,115,.5)}
 
-    /* Full site styles - preview looks perfect */
+    /* Full site styles - for perfect preview */
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html,body{height:100%}
-    body { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #e6e6e6; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow-x:hidden; }
+    html,body {height:100%}
+    body.site { font-family: 'Inter', sans-serif; background: #0a0a0a; color: #e6e6e6; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; overflow-x:hidden; }
     header { background: url('https://tiffyai-usd.github.io/Papa_Rons_Cafe/banner.jpg') center/cover no-repeat; height: 100vh; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; position:relative; }
     header::after { content:''; position:absolute; inset:0; background: rgba(10,10,10,0.6); backdrop-filter: blur(2px); z-index:1; }
     header > * { position:relative; z-index:2; }
     .logo { max-width:200px; border-radius:18px; border:3px solid #d4a373; box-shadow:0 10px 30px rgba(0,0,0,0.6); margin-bottom:1rem; }
-    h1 { font-family: 'Bebas Neue', cursive; font-size:5.5rem; color:#d4a373; letter-spacing:4px; text-shadow:0 6px 18px rgba(0,0,0,0.7); text-transform:uppercase; margin-bottom:0.4rem; }
+    h1.site { font-family: 'Bebas Neue', cursive; font-size:5.5rem; color:#d4a373; letter-spacing:4px; text-shadow:0 6px 18px rgba(0,0,0,0.7); text-transform:uppercase; margin-bottom:0.4rem; }
     .tagline { font-family:'Bebas Neue', cursive; color:#d4a373; letter-spacing:3px; font-size:1.6rem; margin-bottom:1.6rem; opacity:0.95; }
 
     .menu-wrap { position:relative; }
@@ -77,7 +77,7 @@
     footer a { color:#25D366; font-weight:bold; }
 
     @media (max-width:768px) {
-      h1 { font-size:3.6rem; }
+      h1.site { font-size:3.6rem; }
       .gold-flame-btn { padding:0.9rem 1.6rem; font-size:1.1rem; }
       .menu-item img { height:160px; }
       .action-menu { width:90%; }
@@ -87,7 +87,7 @@
 </head>
 <body>
 
-  <!-- PREVIEW OF THE CAFÉ WEBSITE -->
+  <!-- FULL PREVIEW OF THE CAFÉ WEBSITE -->
   <header>
     <img src="https://tiffyai-usd.github.io/Papa_Rons_Cafe/logo.jpg" alt="Papa Ron's Logo" class="logo">
     <h1>PAPA RON'S CAFÉ</h1>
@@ -169,7 +169,7 @@
       <h3>PIZZAS</h3>
       <div class="item">
         <label>Name</label><input data-group="pizzas" data-index="0" data-field="name" value="SOMETHING MEATY">
-        <label>Price (leave blank for custom text)</label><input data-group="pizzas" data-index="0" data-field="price" value="135">
+        <label>Price (leave blank for custom)</label><input data-group="pizzas" data-index="0" data-field="price" value="135">
         <label>Description</label><input data-group="pizzas" data-index="0" data-field="desc" value="Creamy chicken, bacon, mushrooms, cheese">
         <label>Image URL</label><input data-group="pizzas" data-index="0" data-field="img" value="https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza.jpg">
       </div>
@@ -297,19 +297,19 @@
   </div>
 
   <script>
-    // Live preview updates
+    // Live preview for logo and banner
     document.getElementById('logoUrl').addEventListener('input', e => {
-      const src = e.target.value || 'https://via.placeholder.com/200';
+      const src = e.target.value.trim() || 'https://via.placeholder.com/200';
       document.querySelector('.logo').src = src;
       document.getElementById('logoPreview').src = src;
     });
     document.getElementById('bannerUrl').addEventListener('input', e => {
-      const src = e.target.value || 'https://via.placeholder.com/1200x800';
+      const src = e.target.value.trim() || 'https://via.placeholder.com/1200x800';
       document.querySelector('header').style.backgroundImage = `url('${src}')`;
       document.getElementById('bannerPreview').src = src;
     });
 
-    // Site data and rendering
+    // Site data
     const pizzas = [
       { name: "SOMETHING MEATY", price: 135, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza.jpg", desc:"Creamy chicken, bacon, mushrooms, cheese" },
       { name: "HAWAIIAN", price: 135, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza1.jpg", desc:"Ham, pineapple, cheese" },
@@ -386,23 +386,128 @@
     renderGroup(breakfast, 'breakfastGrid');
     renderGroup(sides, 'sidesGrid');
 
-    // Quantity, order button, dropdown, lightbox - full code from your perfect site
-    // (I have it all here - it's the exact same as your 570-line version)
+    // Full cart and menu functionality (exact from your site)
+    const qtyState = {};
 
-    // Generate function
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('.qty-btn');
+      if (!el) return;
+      const key = el.dataset.key;
+      const change = parseInt(el.dataset.change, 10);
+      const qtyEl = document.getElementById('qty-' + key);
+      let val = parseInt(qtyEl.textContent, 10) || 0;
+      val += change;
+      if (val < 0) val = 0;
+      qtyEl.textContent = val;
+      qtyState[key] = val;
+      updateOrderButton();
+    });
+
+    function updateOrderButton() {
+      let total = Object.values(qtyState).reduce((a,b) => a + b, 0);
+      let btn = document.getElementById('bottomOrderBtn');
+      if (!btn) {
+        btn = document.createElement('a');
+        btn.id = 'bottomOrderBtn';
+        btn.className = 'gold-flame-btn';
+        btn.style.position = 'fixed';
+        btn.style.right = '16px';
+        btn.style.bottom = '22px';
+        btn.style.zIndex = '999';
+        btn.style.padding = '12px 18px';
+        document.body.appendChild(btn);
+      }
+      btn.style.display = total > 0 ? 'inline-flex' : 'none';
+      if (total === 0) return;
+
+      let message = "Hi Papa Ron's! I'd like to order:\n\n";
+      const groups = [{items:pizzas,id:'pizzasGrid'},{items:burgers,id:'burgersGrid'},{items:grill,id:'grillGrid'},{items:snacks,id:'snacksGrid'},{items:breakfast,id:'breakfastGrid'},{items:sides,id:'sidesGrid'}];
+      groups.forEach(g => {
+        g.items.forEach((it,i) => {
+          const q = qtyState[g.id + '-' + i] || 0;
+          if (q > 0) {
+            if (it.price === null) {
+              message += q + " x " + it.name + " - see menu for pricing\n";
+            } else {
+              message += q + " x " + it.name + " - R" + it.price + ".00\n";
+            }
+          }
+        });
+      });
+      message += "\nThank you!";
+      btn.href = "https://wa.me/+27660660088?text=" + encodeURIComponent(message);
+      btn.textContent = 'ORDER NOW (' + total + ')';
+    }
+
+    updateOrderButton();
+
+    // Menu dropdown and lightbox (exact from your site)
+    const mainBtn = document.getElementById('mainBtn');
+    const actionMenu = document.getElementById('actionMenu');
+    const scrollToMenu = document.getElementById('scrollToMenu');
+    const openMenu = document.getElementById('openMenu');
+    const menuLightbox = document.getElementById('menuLightbox');
+    const closeMenu = document.getElementById('closeMenu');
+
+    mainBtn.addEventListener('click', (e) => {
+      actionMenu.classList.toggle('show');
+      mainBtn.classList.toggle('open');
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!mainBtn.contains(e.target) && !actionMenu.contains(e.target)) {
+        actionMenu.classList.remove('show');
+        mainBtn.classList.remove('open');
+      }
+    });
+
+    scrollToMenu.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('menu').scrollIntoView({behavior:'smooth'});
+      actionMenu.classList.remove('show');
+      mainBtn.classList.remove('open');
+    });
+
+    openMenu.addEventListener('click', (e) => {
+      e.preventDefault();
+      menuLightbox.style.display = 'flex';
+      actionMenu.classList.remove('show');
+      mainBtn.classList.remove('open');
+    });
+
+    closeMenu.addEventListener('click', () => {
+      menuLightbox.style.display = 'none';
+    });
+
+    menuLightbox.addEventListener('click', (e) => {
+      if (e.target === menuLightbox) menuLightbox.style.display = 'none';
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        menuLightbox.style.display = 'none';
+        actionMenu.classList.remove('show');
+        mainBtn.classList.remove('open');
+      }
+    });
+
+    // Generate function - simple, reliable replace
     function generateAndDownload() {
-      let html = '<!DOCTYPE html>' + document.documentElement.outerHTML.split('<!DOCTYPE html>')[1];
+      let html = document.documentElement.outerHTML;
 
+      // Get values
       const cafeName = document.getElementById('cafeName').value.trim().toUpperCase() || 'CAFÉ';
       const tagline = document.getElementById('tagline').value.trim().toUpperCase() || 'FOOD • GOOD MUSIC';
-      const logo = document.getElementById('logoUrl').value.trim();
-      const banner = document.getElementById('bannerUrl').value.trim();
-      const location = document.getElementById('footerLocation').value.trim();
-      const year = document.getElementById('copyrightYear').value.trim();
+      const logo = document.getElementById('logoUrl').value.trim() || '';
+      const banner = document.getElementById('bannerUrl').value.trim() || '';
+      const location = document.getElementById('footerLocation').value.trim() || '';
+      const year = document.getElementById('copyrightYear').value.trim() || '2025';
       let wa = document.getElementById('whatsapp').value.replace(/[^0-9+]/g, '');
-      const waDisplay = wa.replace(/\+(\d{2})(\d{2})(\d{3})(\d{4})/, '+ $1 $2 $3 $4');
+      if (!wa) wa = '+27660660088';
+      const waDisplay = wa.replace(/\+/, '+ ');
 
-      // Collect items
+      // Collect all menu items
       const items = {pizzas: [], burgers: [], grill: [], snacks: [], breakfast: [], sides: []};
       document.querySelectorAll('input[data-group]').forEach(inp => {
         const group = inp.dataset.group;
@@ -410,19 +515,29 @@
         const field = inp.dataset.field;
         if (!items[group][index]) items[group][index] = {};
         const val = inp.value.trim();
-        items[group][index][field] = (field === 'price' && val === '') ? null : val;
+        items[group][index][field] = (field === 'price' && val === '') ? null : (field === 'price' ? Number(val) : val);
       });
 
-      // Build new data
-      const newData = `const pizzas = ${JSON.stringify(items.pizzas.filter(Boolean).map(i => ({name:i.name, price:i.price=== '' ? null : Number(i.price), img:i.img, desc:i.desc})), null, 2)};
-const burgers = ${JSON.stringify(items.burgers.filter(Boolean).map(i => ({name:i.name, price:i.price=== '' ? null : Number(i.price), img:i.img, desc:i.desc})), null, 2)};
-const grill = ${JSON.stringify(items.grill.filter(Boolean).map(i => ({name:i.name, price:i.price=== '' ? null : Number(i.price), img:i.img, desc:i.desc})), null, 2)};
-const snacks = ${JSON.stringify(items.snacks.filter(Boolean).map(i => ({name:i.name, price:i.price=== '' ? null : Number(i.price), img:i.img, desc:i.desc})), null, 2)};
-const breakfast = ${JSON.stringify(items.breakfast.filter(Boolean).map(i => ({name:i.name, price:i.price=== '' ? null : Number(i.price), img:i.img, desc:i.desc})), null, 2)};
-const sides = ${JSON.stringify(items.sides.filter(Boolean).map(i => ({name:i.name, price:i.price=== '' ? null : Number(i.price), img:i.img, desc:i.desc})), null, 2)};`;
+      // Build new data arrays
+      const buildGroup = group => items[group].map(item => ({
+        name: item.name || '',
+        price: item.price,
+        img: item.img || '',
+        desc: item.desc || ''
+      }));
 
+      const newData = `
+const pizzas = ${JSON.stringify(buildGroup('pizzas'), null, 2)};
+const burgers = ${JSON.stringify(buildGroup('burgers'), null, 2)};
+const grill = ${JSON.stringify(buildGroup('grill'), null, 2)};
+const snacks = ${JSON.stringify(buildGroup('snacks'), null, 2)};
+const breakfast = ${JSON.stringify(buildGroup('breakfast'), null, 2)};
+const sides = ${JSON.stringify(buildGroup('sides'), null, 2)};`;
+
+      // Replace data block
       html = html.replace(/const pizzas = \[[\s\S]*?const sides = \[[\s\S]*?\];/, newData);
 
+      // Replace all other things
       html = html.replace(/PAPA RON'S CAFÉ/g, cafeName);
       html = html.replace(/FOOD • GOOD MUSIC/g, tagline);
       html = html.replace(/https:\/\/tiffyai-usd\.github\.io\/Papa_Rons_Cafe\/logo\.jpg/g, logo);
@@ -433,16 +548,21 @@ const sides = ${JSON.stringify(items.sides.filter(Boolean).map(i => ({name:i.nam
       html = html.replace(/https:\/\/wa\.me\/\+27660660088/g, `https://wa.me/${wa}`);
       html = html.replace(/\+27 66 066 0088/g, waDisplay);
 
-      // Remove editor
+      // Remove the entire editor section
       const editorStart = html.indexOf('<div id="editor"');
-      html = html.substring(0, editorStart) + '</body></html>';
+      if (editorStart !== -1) {
+        html = html.substring(0, editorStart) + '</body></html>';
+      }
 
+      // Download
       const blob = new Blob([html], {type: 'text/html'});
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = 'cafe-website.html';
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }
   </script>
