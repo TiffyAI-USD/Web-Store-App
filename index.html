@@ -164,18 +164,288 @@
 
   <button onclick="generateAndDownload()">GENERATE & DOWNLOAD NEW SITE</button>
 
-  <!-- ORIGINAL SITE BELOW (with full CSS, HTML, and script) -->
-  <!-- The full original Papa Ron's Café site code goes here – header, lightbox, menu section, footer, and the full <script> with data, functions, etc. -->
+  <!-- ORIGINAL SITE -->
+  <header>
+    <img src="https://tiffyai-usd.github.io/Papa_Rons_Cafe/logo.jpg" alt="Papa Ron's Logo" class="logo">
+    <h1>PAPA RON'S CAFÉ</h1>
+    <p class="tagline">FOOD • GOOD MUSIC</p>
 
-  <!-- For brevity in this message, I didn't repeat the 700+ lines of your original site, but in the actual file you use, paste your original site code starting from <header> down to the end of the <script> -->
+    <div class="menu-wrap" style="margin-top:18px;">
+      <button id="mainBtn" class="gold-flame-btn" aria-haspopup="true" aria-expanded="false" title="Menu ORDER NOW">
+        <span class="menu-icon" aria-hidden="true">
+          <span class="a"></span><span class="b"></span><span class="c"></span>
+        </span>
+        <span style="margin-left:8px;">MENU ORDER NOW</span>
+      </button>
 
-  <!-- The generate function is added at the end of the <script> -->
+      <div id="actionMenu" class="action-menu" role="menu" aria-hidden="true">
+        <a href="#menu" id="scrollToMenu" class="action-item" role="menuitem">Browse Menu</a>
+        <a href="#" id="openMenu" class="action-item" role="menuitem">View Full Menu</a>
+        <a href="https://tiffyai-usd.github.io/Papa_Rons_Cafe/menu1.pdf" class="action-item" download role="menuitem">Download Menu PDF</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="menuLightbox" class="lightbox" aria-hidden="true">
+    <div class="box">
+      <div class="close" id="closeMenu" title="Close">X</div>
+      <img src="https://tiffyai-usd.github.io/Papa_Rons_Cafe/menu1.jpeg" alt="Full Menu">
+      <div style="margin-top:1rem; color:#d4a373; font-family:'Bebas Neue',cursive; font-size:1.05rem;">
+        WhatsApp your order: <a href="https://wa.me/+27660660088" style="color:#25D366;">+27 66 066 0088</a>
+      </div>
+    </div>
+  </div>
+
+  <section id="menu">
+    <h2 class="section-title">PIZZAS</h2>
+    <div class="menu-grid" id="pizzasGrid"></div>
+
+    <h2 class="section-title">BURGERS</h2>
+    <div class="menu-grid" id="burgersGrid"></div>
+
+    <h2 class="section-title">GRILL</h2>
+    <div class="menu-grid" id="grillGrid"></div>
+
+    <h2 class="section-title">SNACKS & PLATTERS</h2>
+    <div class="menu-grid" id="snacksGrid"></div>
+
+    <h2 class="section-title">BREAKFAST</h2>
+    <div class="menu-grid" id="breakfastGrid"></div>
+
+    <h2 class="section-title">SIDES</h2>
+    <div class="menu-grid" id="sidesGrid"></div>
+  </section>
+
+  <footer>
+    <p>© 2025 PAPA RON'S CAFÉ • COFFEE BAY, MTHATHA</p>
+    <p>WHATSAPP: <a href="https://wa.me/+27660660088">+27 66 066 0088</a></p>
+    <p style="margin-top:1rem; font-size:0.8rem; opacity:0.8;">We’ll call you within 5 mins to confirm & take payment.</p>
+  </footer>
 
   <script>
-    // Your original data and functions here (unchanged)
+    // Original data – this is the block we will replace
+    const pizzas = [
+      { name: "SOMETHING MEATY", price: 135, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza.jpg", desc:"Creamy chicken, bacon, mushrooms, cheese" },
+      { name: "HAWAIIAN", price: 135, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza1.jpg", desc:"Ham, pineapple, cheese" },
+      { name: "FLAMING SPARE RIB PIZZA", price: 150, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/ribpizza.jpg", desc:"Ribs on pizza base with cheese" }
+    ];
 
-    // ... your full original script ...
+    const burgers = [
+      { name: "CHEESE BURGER", price:120, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/burger.jpg", desc:"Served with side chips" },
+      { name: "CHEESY STRIPS", price:50, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/strip.jpg", desc:"5 x Cheesy Strips, served with dip" },
+      { name: "BOERIE ROLL", price:50, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/boerie.jpeg", desc:"Boerie with chips or salad" }
+    ];
 
+    const grill = [
+      { name: "RUMP STEAK", price:160, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/rump.jpeg", desc:"Loaded with mushroom sauce & chips" },
+      { name: "RIB RACK", price:200, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/ribs.jpg", desc:"Full rack with chips" },
+      { name: "SCHNITZEL", price:120, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/snitsel.jpg", desc:"Chicken schnitzel with chips & sauce" },
+      { name: "PREGO ROLL", price:50, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/prego.jpg", desc:"Peri-peri steak roll with chips" }
+    ];
+
+    const snacks = [
+      { name:"MUNCHIE PLATTER", price:350, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/platters.jpg", desc:"Full varieties of munchies" },
+      { name:"CHEESY POPS", price:50, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/pops.jpg", desc:"Cheesy pops served with dip" },
+      { name:"CHICKEN PERI NACHO", price:160, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/nantcho.jpg", desc:"Peri-peri chicken, nachos & cheese" },
+      { name:"WINGLETS", price:null, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/buffelowings.jpg", desc:"5 for R60 • 10 for R100 — served with dip" },
+      { name:"PLATTER", price:350, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/platter.jpg", desc:"Mixed meat platter for 2" }
+    ];
+
+    const breakfast = [
+      { name:"BREAKFAST", price:80, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/breakfast.jpg", desc:"Eggs, bacon, toast, coffee — served 8–11 AM" }
+    ];
+
+    const sides = [
+      { name:"SIDE CHIPS", price:20, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/chips.jpg", desc:"Crispy golden chips" },
+      { name:"SIDE SALAD", price:20, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/salad.jpg", desc:"Fresh garden salad" },
+      { name:"GREEK SALAD", price:20, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/greeksalad.jpg", desc:"Feta, olives, tomatoes & dressing" }
+    ];
+
+    function createMenuCard(item, key) {
+      const div = document.createElement('div');
+      div.className = 'menu-item';
+      const priceHtml = item.price === null ? `<div class="price">5 for R60 · 10 for R100</div>` : `<div class="price">R${item.price}.00</div>`;
+      div.innerHTML = `
+        <img src="\( {item.img}" alt=" \){item.name}" onerror="this.src='https://via.placeholder.com/600x400/333/ccc?text=Image+Missing'">
+        <div class="card">
+          <h3>${item.name}</h3>
+          <p class="desc">${item.desc}</p>
+          ${priceHtml}
+          <div class="row">
+            <a class="drinks-link" href="https://tiffyai-usd.github.io/Papa_Rons_Cafe/drinks-menu.html" target="_blank" rel="noopener">ADD DRINKS</a>
+            <div class="qty-controls">
+              <div class="qty-btn" data-key="${key}" data-change="-1">−</div>
+              <div class="qty-num" id="qty-${key}">0</div>
+              <div class="qty-btn" data-key="${key}" data-change="1">+</div>
+            </div>
+          </div>
+        </div>
+      `;
+      return div;
+    }
+
+    function renderGroup(items, containerId) {
+      const grid = document.getElementById(containerId);
+      grid.innerHTML = '';
+      items.forEach((it, i) => {
+        const key = `\( {containerId}- \){i}`;
+        const card = createMenuCard(it, key);
+        grid.appendChild(card);
+      });
+    }
+
+    renderGroup(pizzas, 'pizzasGrid');
+    renderGroup(burgers, 'burgersGrid');
+    renderGroup(grill, 'grillGrid');
+    renderGroup(snacks, 'snacksGrid');
+    renderGroup(breakfast, 'breakfastGrid');
+    renderGroup(sides, 'sidesGrid');
+
+    // Quantity and order button code (unchanged from your original)
+    const qtyState = {};
+
+    document.addEventListener('click', (e) => {
+      const el = e.target.closest('.qty-btn');
+      if (!el) return;
+      const key = el.dataset.key;
+      const change = parseInt(el.dataset.change, 10);
+      updateQty(key, change);
+    });
+
+    function updateQty(key, change) {
+      const el = document.getElementById(`qty-${key}`);
+      if (!el) return;
+      let val = parseInt(el.textContent, 10) || 0;
+      val += change;
+      if (val < 0) val = 0;
+      el.textContent = val;
+      qtyState[key] = val;
+      updateOrderButton(); 
+    }
+
+    function updateOrderButton() {
+      const all = document.querySelectorAll('[id^="qty-"]');
+      let total = 0;
+      all.forEach(n => {
+        const v = parseInt(n.textContent, 10);
+        if (!isNaN(v)) total += v;
+      });
+
+      let btn = document.getElementById('bottomOrderBtn');
+      if (!btn) {
+        btn = document.createElement('a');
+        btn.id = 'bottomOrderBtn';
+        btn.className = 'gold-flame-btn';
+        btn.style.position = 'fixed';
+        btn.style.right = '16px';
+        btn.style.bottom = '22px';
+        btn.style.zIndex = '999';
+        btn.style.padding = '12px 18px';
+        btn.textContent = 'ORDER NOW';
+        document.body.appendChild(btn);
+      }
+      btn.style.display = total > 0 ? 'inline-flex' : 'none';
+
+      let message = "Hi Papa Ron's! I'd like to order:\n\n";
+      const groups = [
+        {items:pizzas,id:'pizzasGrid'},
+        {items:burgers,id:'burgersGrid'},
+        {items:grill,id:'grillGrid'},
+        {items:snacks,id:'snacksGrid'},
+        {items:breakfast,id:'breakfastGrid'},
+        {items:sides,id:'sidesGrid'}
+      ];
+      groups.forEach(g => {
+        g.items.forEach((it,i) => {
+          const key = `\( {g.id}- \){i}`;
+          const qEl = document.getElementById(`qty-${key}`);
+          if (qEl) {
+            const q = parseInt(qEl.textContent,10) || 0;
+            if (q>0) {
+              if (it.price === null) {
+                message += `\( {q} x \){it.name} - see menu for 5/10 prices\n`;
+              } else {
+                message += `\( {q} x \){it.name} - R${it.price}.00\n`;
+              }
+            }
+          }
+        });
+      });
+      message += `\nThank you!`;
+      const encoded = encodeURIComponent(message);
+      btn.href = "https://wa.me/+27660660088?text=" + encoded;
+    }
+
+    updateOrderButton();
+
+    // Menu button and lightbox code (unchanged from your original)
+    const mainBtn = document.getElementById('mainBtn');
+    const actionMenu = document.getElementById('actionMenu');
+    const scrollToMenu = document.getElementById('scrollToMenu');
+
+    mainBtn.addEventListener('click', (e) => {
+      const open = actionMenu.classList.toggle('show');
+      mainBtn.classList.toggle('open', open);
+      mainBtn.setAttribute('aria-expanded', String(open));
+      actionMenu.setAttribute('aria-hidden', String(!open));
+      e.stopPropagation();
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!mainBtn.contains(e.target) && !actionMenu.contains(e.target)) {
+        actionMenu.classList.remove('show');
+        mainBtn.classList.remove('open');
+        mainBtn.setAttribute('aria-expanded','false');
+        actionMenu.setAttribute('aria-hidden','true');
+      }
+    });
+
+    scrollToMenu.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.getElementById('menu').scrollIntoView({ behavior:'smooth' });
+      actionMenu.classList.remove('show');
+      mainBtn.classList.remove('open');
+    });
+
+    const openMenu = document.getElementById('openMenu');
+    const menuLightbox = document.getElementById('menuLightbox');
+    const closeMenu = document.getElementById('closeMenu');
+
+    openMenu.addEventListener('click', (e) => {
+      e.preventDefault();
+      menuLightbox.style.display = 'flex';
+      menuLightbox.setAttribute('aria-hidden','false');
+      actionMenu.classList.remove('show');
+      mainBtn.classList.remove('open');
+    });
+    closeMenu.addEventListener('click', () => {
+      menuLightbox.style.display = 'none';
+      menuLightbox.setAttribute('aria-hidden','true');
+    });
+    window.addEventListener('click', (e) => {
+      if (e.target === menuLightbox) {
+        menuLightbox.style.display = 'none';
+        menuLightbox.setAttribute('aria-hidden','true');
+      }
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        menuLightbox.style.display = 'none';
+        menuLightbox.setAttribute('aria-hidden','true');
+        actionMenu.classList.remove('show');
+        mainBtn.classList.remove('open');
+      }
+    });
+
+    document.addEventListener('error', function(e){
+      const el = e.target;
+      if (el.tagName && el.tagName.toLowerCase() === 'img') {
+        el.src = 'https://via.placeholder.com/600x400/333/ccc?text=Image+Missing';
+      }
+    }, true);
+
+    // FINAL WORKING GENERATE FUNCTION
     function generateAndDownload() {
       let html = document.documentElement.outerHTML;
 
@@ -187,6 +457,7 @@
       const year = document.getElementById('copyrightYear').value.trim();
       const wa = document.getElementById('whatsapp').value.replace(/[^0-9+]/g, '');
 
+      // Collect product changes
       const items = {pizzas: [], burgers: [], grill: [], snacks: [], breakfast: [], sides: []};
       document.querySelectorAll('input[data-group]').forEach(inp => {
         const group = inp.dataset.group;
@@ -196,6 +467,7 @@
         items[group][index][field] = (field === 'price' && inp.value.trim() === '') ? null : inp.value.trim();
       });
 
+      // Build new data block
       const newData = `const pizzas = ${JSON.stringify(items.pizzas.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
 const burgers = ${JSON.stringify(items.burgers.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
 const grill = ${JSON.stringify(items.grill.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
@@ -203,11 +475,11 @@ const snacks = ${JSON.stringify(items.snacks.map(i => ({name:i.name||'',price:i.
 const breakfast = ${JSON.stringify(items.breakfast.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};
 const sides = ${JSON.stringify(items.sides.map(i => ({name:i.name||'',price:i.price===null?null:+i.price||null,img:i.img||'',desc:i.desc||''})),null,2)};`;
 
-      // Replace data block
+      // Replace the entire data block (from the first 'const pizzas = [' to the last '];' before renderGroup)
       const dataStart = html.indexOf('const pizzas = [');
-      const dataEnd = html.indexOf('renderGroup(pizzas, \'pizzasGrid\');');
+      const dataEnd = html.indexOf('function createMenuCard(item, key) {');
       if (dataStart !== -1 && dataEnd !== -1) {
-        html = html.substring(0, dataStart) + newData + html.substring(dataEnd - 1);
+        html = html.substring(0, dataStart) + newData + html.substring(dataEnd);
       }
 
       // Apply business changes
@@ -222,11 +494,11 @@ const sides = ${JSON.stringify(items.sides.map(i => ({name:i.name||'',price:i.pr
         .replace(/WhatsApp your order:[^<]*<a[^>]*>[^<]*<\/a>/g, `WhatsApp your order: <a href="https://wa.me/\( {wa}" style="color:#25D366;"> \){wa.replace('+','')}</a>`)
         .replace(/https:\/\/wa\.me\/\+27660660088/g, `https://wa.me/${wa}`);
 
-      // Remove the editor panel completely
+      // Remove the entire editor section from the downloaded file
       const editorStart = html.indexOf('<h1>CAFÉ WEBSITE PRINTER</h1>');
-      if (editorStart !== -1) {
-        const editorEnd = html.indexOf('<button onclick="generateAndDownload()">', editorStart) + '<button onclick="generateAndDownload()">GENERATE & DOWNLOAD NEW SITE</button>'.length;
-        html = html.substring(0, editorStart) + html.substring(editorEnd + 50);
+      const editorEnd = html.indexOf('<button onclick="generateAndDownload()">');
+      if (editorStart !== -1 && editorEnd !== -1) {
+        html = html.substring(0, editorStart) + html.substring(editorEnd + '<button onclick="generateAndDownload()">GENERATE & DOWNLOAD NEW SITE</button>'.length + 50);
       }
 
       const blob = new Blob([html], {type: 'text/html'});
@@ -239,4 +511,4 @@ const sides = ${JSON.stringify(items.sides.map(i => ({name:i.name||'',price:i.pr
     }
   </script>
 </body>
-</html>
+        </html>
