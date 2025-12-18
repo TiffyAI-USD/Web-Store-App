@@ -366,7 +366,7 @@
       const grid = document.getElementById(containerId);
       grid.innerHTML = '';
       items.forEach((it, i) => {
-        const key = `\( {containerId}- \){i}`;
+        const key = `${containerId}-${i}`;
         const card = createMenuCard(it, key);
         grid.appendChild(card);
       });
