@@ -344,7 +344,7 @@
       div.className = 'menu-item';
       const priceHtml = item.price === null ? `<div class="price">5 for R60 · 10 for R100</div>` : `<div class="price">R${item.price}.00</div>`;
       div.innerHTML = `
-        <img src="\( {item.img}" alt=" \){item.name}" onerror="this.src='https://via.placeholder.com/600x400/333/ccc?text=Image+Missing'">
+        <img src="\( {item.img}" alt=" \){item.name}">
         <div class="card">
           <h3>${item.name}</h3>
           <p class="desc">${item.desc}</p>
