@@ -412,7 +412,7 @@
       btn.style.display = total > 0 ? 'inline-flex' : 'none';
       if (total === 0) return;
 
-      let message = "Hi ('cafeName')! I'd like to order:\n\n";
+      let message = "Hi! I'd like to order the following:\n\n";
       const groups = [{items:pizzas,id:'pizzasGrid'},{items:burgers,id:'burgersGrid'},{items:grill,id:'grillGrid'},{items:snacks,id:'snacksGrid'},{items:breakfast,id:'breakfastGrid'},{items:sides,id:'sidesGrid'}];
       groups.forEach(g => {
         g.items.forEach((it,i) => {
