@@ -396,41 +396,52 @@
     });
 
     function updateOrderButton() {
-      let total = Object.values(qtyState).reduce((a, b) => a + b, 0);
-      let btn = document.getElementById('bottomOrderBtn');
-      if (!btn) {
-        btn = document.createElement('a');
-        btn.id = 'bottomOrderBtn';
-        btn.className = 'gold-flame-btn';
-        btn.style.position = 'fixed';
-        btn.style.right = '16px';
-        btn.style.bottom = '22px';
-        btn.style.zIndex = '999';
-        btn.style.padding = '12px 18px';
-        document.body.appendChild(btn);
-      }
-      btn.style.display = total > 0 ? 'inline-flex' : 'none';
-      if (total === 0) return;
+  let total = Object.values(qtyState).reduce((a, b) => a + b, 0);
+  let btn = document.getElementById('bottomOrderBtn');
+  if (!btn) {
+    btn = document.createElement('a');
+    btn.id = 'bottomOrderBtn';
+    btn.className = 'gold-flame-btn';
+    btn.style.position = 'fixed';
+    btn.style.right = '16px';
+    btn.style.bottom = '22px';
+    btn.style.zIndex = '999';
+    btn.style.padding = '12px 18px';
+    document.body.appendChild(btn);
+  }
+  btn.style.display = total > 0 ? 'inline-flex' : 'none';
+  if (total === 0) return;
 
-      const cafeName = document.getElementById('cafeName') ? document.getElementById('cafeName').value.trim() || "Papa Ron's" : "Papa Ron's";
-      let message = `Hi ${cafeName}! I'd like to order:\n\n`;
-      const groups = [{items:pizzas,id:'pizzasGrid'},{items:burgers,id:'burgersGrid'},{items:grill,id:'grillGrid'},{items:snacks,id:'snacksGrid'},{items:breakfast,id:'breakfastGrid'},{items:sides,id:'sidesGrid'}];
-      groups.forEach(g => {
-        g.items.forEach((it,i) => {
-          const q = qtyState[g.id + '-' + i] || 0;
-          if (q > 0) {
-            if (it.price === null) {
-              message += q + " x " + it.name + " - see menu for pricing\n";
-            } else {
-              message += q + " x " + it.name + " - R" + it.price + ".00\n";
-            }
-          }
-        });
-      });
-      message += "\nThank you!";
-      btn.href = "https://wa.me/+27660660088?text=" + encodeURIComponent(message);
-      btn.textContent = 'ORDER NOW (' + total + ')';
-    }
+  // Get the current café name from the editor input (fallback to default if not found)
+  const cafeName = document.getElementById('cafeName') 
+    ? document.getElementById('cafeName').value.trim() || "Papa Ron's"
+    : "Papa Ron's";
+
+  let message = `Hi ${cafeName}! I'd like to order:\n\n`;
+  const groups = [
+    {items:pizzas,id:'pizzasGrid'},
+    {items:burgers,id:'burgersGrid'},
+    {items:grill,id:'grillGrid'},
+    {items:snacks,id:'snacksGrid'},
+    {items:breakfast,id:'breakfastGrid'},
+    {items:sides,id:'sidesGrid'}
+  ];
+  groups.forEach(g => {
+    g.items.forEach((it,i) => {
+      const q = qtyState[g.id + '-' + i] || 0;
+      if (q > 0) {
+        if (it.price === null) {
+          message += `\( {q} x \){it.name} - see menu for pricing\n`;
+        } else {
+          message += `\( {q} x \){it.name} - R${it.price}.00\n`;
+        }
+      }
+    });
+  });
+  message += `\nThank you!`;
+  btn.href = "https://wa.me/+27660660088?text=" + encodeURIComponent(message);
+  btn.textContent = 'ORDER NOW (' + total + ')';
+}
 
     updateOrderButton();
 
