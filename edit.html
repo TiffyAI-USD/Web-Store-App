@@ -1,80 +1,219 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
+<meta charset="UTF-8">
+<title>Café Webstore Builder</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Web Store Editor</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600&display=swap" rel="stylesheet">
 
 <style>
-/* === ORIGINAL STYLES UNCHANGED === */
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
-h1,h2,h3{font-family:'Bebas Neue',cursive;color:#d4a373}
+body{
+  font-family:'Inter',sans-serif;
+  background:#0a0a0a;
+  color:#e6e6e6;
+}
 
-.section-title{font-size:2.4rem;margin:2rem 0 1rem}
-.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem}
+/* ===== BRAND ===== */
+:root{
+  --gold:#d4a373;
+  --gold2:#f1b86b;
+}
 
-.menu-item{background:#0f0f0f;border-radius:12px;overflow:hidden;border:1px solid #222}
-.menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid #d4a373}
-.menu-item .card{padding:1rem}
-.menu-item h3{font-size:1.2rem}
-.price{color:#e6b880}
+/* ===== HEADER ===== */
+header{
+  min-height:80vh;
+  background-size:cover;
+  background-position:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  position:relative;
+}
+header::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+}
+header *{position:relative;z-index:2}
 
-#editor{margin-top:80px;padding:40px;background:#0f0f0f;border-top:3px dashed #d4a373}
-.editor-section{background:#1e1e1e;padding:20px;border-radius:12px;margin-bottom:24px}
-.editor-section input{width:100%;padding:10px;margin-top:6px;background:#222;color:#fff;border:1px solid #444;border-radius:6px}
+.logo{
+  max-width:180px;
+  border-radius:16px;
+  border:3px solid var(--gold);
+  margin-bottom:1rem;
+}
+h1{
+  font-family:'Bebas Neue',cursive;
+  font-size:4rem;
+  color:var(--gold);
+  letter-spacing:3px;
+}
+.tagline{
+  font-family:'Bebas Neue',cursive;
+  color:var(--gold);
+  letter-spacing:2px;
+}
 
-.section-header{display:flex;gap:10px;align-items:center}
-.section-header input{flex:1;font-size:1.2rem;font-weight:bold}
-.remove-btn{background:#900;color:#fff;border:none;width:36px;height:36px;border-radius:50%;cursor:pointer}
-.add-btn{background:#d4a373;color:#000;padding:12px 24px;border:none;border-radius:30px;font-size:1.1rem;cursor:pointer}
+/* ===== MENU ===== */
+section#menu{
+  max-width:1200px;
+  margin:auto;
+  padding:4rem 5%;
+}
+.section-title{
+  font-family:'Bebas Neue',cursive;
+  color:var(--gold);
+  font-size:2.3rem;
+  margin:2rem 0 1rem;
+}
+.menu-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.2rem;
+}
+.menu-item{
+  background:#0f0f0f;
+  border-radius:12px;
+  border:1px solid #222;
+  overflow:hidden;
+}
+.menu-item img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-bottom:3px solid var(--gold);
+}
+.menu-item .card{
+  padding:1rem;
+}
+.menu-item h3{
+  font-family:'Bebas Neue',cursive;
+  color:var(--gold);
+}
+.price{
+  font-family:'Bebas Neue';
+  color:var(--gold2);
+}
+
+/* ===== FOOTER ===== */
+footer{
+  background:#000;
+  padding:2rem;
+  text-align:center;
+  border-top:1px solid #222;
+  color:#999;
+}
+
+/* ===== EDITOR ===== */
+#editor{
+  background:#0f0f0f;
+  border-top:3px dashed var(--gold);
+  padding:3rem 5%;
+}
+#editor h2{
+  font-family:'Bebas Neue';
+  color:var(--gold);
+  margin-bottom:1rem;
+}
+.editor-block{
+  background:#1e1e1e;
+  padding:1.5rem;
+  border-radius:12px;
+  margin-bottom:2rem;
+}
+label{
+  display:block;
+  margin-top:1rem;
+  color:var(--gold);
+}
+input{
+  width:100%;
+  padding:10px;
+  background:#222;
+  border:1px solid #444;
+  color:#fff;
+  border-radius:6px;
+}
+button{
+  background:linear-gradient(180deg,var(--gold),var(--gold2));
+  border:none;
+  padding:12px 24px;
+  border-radius:30px;
+  font-family:'Bebas Neue';
+  font-size:1.1rem;
+  cursor:pointer;
+  margin-top:1rem;
+}
+.remove{
+  background:#900;
+  color:#fff;
+}
+.section-head{
+  display:flex;
+  gap:10px;
+  align-items:center;
+}
+.section-head input{flex:1}
 </style>
 </head>
 
 <body>
 
-<header style="padding:60px;text-align:center">
-<h1>PAPA RON'S CAFÉ</h1>
-<p>FOOD • GOOD MUSIC</p>
+<header id="header">
+  <img id="logo" class="logo" src="https://via.placeholder.com/300x300">
+  <h1 id="cafeName">YOUR CAFÉ</h1>
+  <p id="tagline" class="tagline">FOOD • DRINKS • VIBES</p>
 </header>
 
 <section id="menu">
-  <div id="menuSections"></div>
+  <div id="menuRender"></div>
 </section>
+
+<footer>
+  <p id="footerText">© 2026 YOUR CAFÉ • YOUR CITY</p>
+</footer>
+
+<!-- ================= EDITOR ================= -->
+<div id="editor">
+
+<h2>BUSINESS INFO</h2>
+<div class="editor-block">
+  <label>Café Name</label>
+  <input oninput="cafeName.textContent=this.value">
+  <label>Tagline</label>
+  <input oninput="tagline.textContent=this.value">
+  <label>Logo Image URL</label>
+  <input oninput="logo.src=this.value">
+  <label>Banner Image URL</label>
+  <input oninput="header.style.backgroundImage=`url('${this.value}')`">
+  <label>Footer Text</label>
+  <input oninput="footerText.textContent=this.value">
+</div>
+
+<h2>MENU BUILDER</h2>
+<div id="menuEditor"></div>
+
+<button onclick="addSection()">+ ADD SECTION</button>
+
+</div>
+
 <script>
-const menuSections = [
+const menuSections=[
   {
-    title: "PIZZAS",
-    items: [
-      { name:"SOMETHING MEATY", price:135, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/pizza.jpg", desc:"Creamy chicken, bacon, mushrooms, cheese" }
-    ]
-  },
-  {
-    title: "GRILL",
-    items: [
-      { name:"RUMP STEAK", price:160, img:"https://tiffyai-usd.github.io/Papa_Rons_Cafe/rump.jpeg", desc:"Loaded with mushroom sauce & chips" }
+    title:"PIZZAS",
+    items:[
+      {name:"CHEESE PIZZA",price:"120",img:"https://via.placeholder.com/600x400",desc:"Classic cheese pizza"}
     ]
   }
 ];
 
-function createMenuCard(item){
-  const d=document.createElement('div');
-  d.className='menu-item';
-  d.innerHTML=`
-    <img src="${item.img}">
-    <div class="card">
-      <h3>${item.name}</h3>
-      <p>${item.desc}</p>
-      <div class="price">${item.price?`R${item.price}`:''}</div>
-    </div>`;
-  return d;
-}
-
 function renderMenu(){
-  const root=document.getElementById('menuSections');
-  root.innerHTML='';
+  menuRender.innerHTML='';
   menuSections.forEach(sec=>{
     const h2=document.createElement('h2');
     h2.className='section-title';
@@ -82,41 +221,55 @@ function renderMenu(){
 
     const grid=document.createElement('div');
     grid.className='menu-grid';
-    sec.items.forEach(i=>grid.appendChild(createMenuCard(i)));
 
-    root.appendChild(h2);
-    root.appendChild(grid);
+    sec.items.forEach(it=>{
+      const d=document.createElement('div');
+      d.className='menu-item';
+      d.innerHTML=`
+        <img src="${it.img}">
+        <div class="card">
+          <h3>${it.name}</h3>
+          <p>${it.desc}</p>
+          <div class="price">R${it.price}</div>
+        </div>`;
+      grid.appendChild(d);
+    });
+
+    menuRender.appendChild(h2);
+    menuRender.appendChild(grid);
   });
 }
-renderMenu();
-</script>
-<div id="editor">
-<h2>MENU EDITOR</h2>
 
-<div id="editorSections"></div>
-
-<button class="add-btn" onclick="addSection()">+ ADD NEW SECTION</button>
-</div>
-
-<script>
 function renderEditor(){
-  const root=document.getElementById('editorSections');
-  root.innerHTML='';
-  menuSections.forEach((s,i)=>{
-    const div=document.createElement('div');
-    div.className='editor-section';
-    div.innerHTML=`
-      <div class="section-header">
-        <input value="${s.title}" oninput="menuSections[${i}].title=this.value;renderMenu()">
-        <button class="remove-btn" onclick="menuSections.splice(${i},1);renderEditor();renderMenu()">✕</button>
-      </div>`;
-    root.appendChild(div);
+  menuEditor.innerHTML='';
+  menuSections.forEach((sec,s)=>{
+    const block=document.createElement('div');
+    block.className='editor-block';
+    block.innerHTML=`
+      <div class="section-head">
+        <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
+        <button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
+      </div>
+      ${sec.items.map((it,i)=>`
+        <label>Name</label><input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+        <label>Price</label><input value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+        <label>Description</label><input value="${it.desc}" oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">
+        <label>Image</label><input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+        <button class="remove" onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
+      `).join('')}
+      <button onclick="menuSections[${s}].items.push({name:'NEW ITEM',price:'0',img:'',desc:''});renderEditor();renderMenu()">+ ADD ITEM</button>
+    `;
+    menuEditor.appendChild(block);
   });
 }
+
 function addSection(){
   menuSections.push({title:"NEW SECTION",items:[]});
-  renderEditor();renderMenu();
+  renderEditor();
+  renderMenu();
 }
+
+renderMenu();
 renderEditor();
 </script>
 
