@@ -91,7 +91,7 @@ footer{
   margin-bottom:2rem;
 }
 label{display:block;margin-top:1rem;color:var(--gold)}
-input[type="text"],input[type="number"]{
+input,textarea{
   width:100%;
   padding:10px;
   background:#222;
@@ -99,7 +99,7 @@ input[type="text"],input[type="number"]{
   color:#fff;
   border-radius:6px;
 }
-input[type="file"]{margin-top:6px;color:#ccc}
+textarea{resize:vertical}
 button{
   background:linear-gradient(180deg,var(--gold),var(--gold2));
   border:none;
@@ -127,7 +127,6 @@ button{
   font-family:'Bebas Neue';
   font-size:1.2rem;
   text-decoration:none;
-  box-shadow:0 10px 30px rgba(37,211,102,0.4);
 }
 </style>
 </head>
@@ -153,17 +152,17 @@ button{
 
 <div class="editor-block">
   <label>Café Name</label>
-  <input type="text" oninput="cafeName.textContent=this.value">
+  <input oninput="cafeName.textContent=this.value">
   <label>Tagline</label>
-  <input type="text" oninput="tagline.textContent=this.value">
+  <input oninput="tagline.textContent=this.value">
   <label>Logo Upload</label>
-  <input type="file" accept="image/*" onchange="uploadImage(this, img=>logo.src=img)">
+  <input type="file" accept="image/*" onchange="uploadImage(this,img=>logo.src=img)">
   <label>Banner Upload</label>
-  <input type="file" accept="image/*" onchange="uploadImage(this, img=>header.style.backgroundImage=`url('${img}')`)">
+  <input type="file" accept="image/*" onchange="uploadImage(this,img=>header.style.backgroundImage=`url('${img}')`)">
   <label>Footer Text</label>
-  <input type="text" oninput="footerText.textContent=this.value">
+  <input oninput="footerText.textContent=this.value">
   <label>WhatsApp Number</label>
-  <input type="text" value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
+  <input value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
 </div>
 
 <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
@@ -176,15 +175,16 @@ let whatsappNumber="+27660000000";
 const orderState={};
 
 const menuSections=[
-  { title:"PIZZAS", items:[] }
+  { title:"PIZZAS", items:[
+    {name:"CHEESE PIZZA",price:120,desc:"Classic cheese pizza",img:""}
+  ]}
 ];
 
-function uploadImage(input,callback){
-  const file=input.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>callback(e.target.result);
-  reader.readAsDataURL(file);
+function uploadImage(input,cb){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>cb(e.target.result);
+  r.readAsDataURL(f);
 }
 
 function renderMenu(){
@@ -200,11 +200,10 @@ function renderMenu(){
     sec.items.forEach((it,i)=>{
       const key=`${s}-${i}`;
       const qty=orderState[key]||0;
-
       const d=document.createElement('div');
       d.className='menu-item';
       d.innerHTML=`
-        <img src="${it.img||''}">
+        <img src="${it.img}">
         <div class="card">
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
@@ -224,8 +223,8 @@ function renderMenu(){
   renderWhatsapp();
 }
 
-function changeQty(key,delta){
-  orderState[key]=(orderState[key]||0)+delta;
+function changeQty(key,d){
+  orderState[key]=(orderState[key]||0)+d;
   if(orderState[key]<0) orderState[key]=0;
   renderMenu();
 }
@@ -241,8 +240,8 @@ function renderWhatsapp(){
   menuSections.forEach((sec,s)=>{
     sec.items.forEach((it,i)=>{
       const q=orderState[`${s}-${i}`]||0;
-      if(q>0){
-        const t=q*Number(it.price||0);
+      if(q){
+        const t=q*it.price;
         grand+=t;
         msg+=`${q} x ${it.name} – R${t}\n${it.desc}\n\n`;
       }
@@ -270,10 +269,11 @@ function renderEditor(){
         <button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
       </div>
       ${sec.items.map((it,i)=>`
-        <label>Name</label><input type="text" value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+        <label>Name</label><input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
         <label>Price</label><input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
-        <label>Description</label><input type="text" value="${it.desc}" oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">
-        <label>Image Upload</label>
+        <label>Description</label><textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
+        <label>Image URL</label><input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+        <label>OR Upload Image</label>
         <input type="file" accept="image/*" onchange="uploadImage(this,img=>{menuSections[${s}].items[${i}].img=img;renderMenu()})">
         <button class="remove" onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
       `).join('')}
