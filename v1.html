@@ -326,24 +326,15 @@ function downloadHTML(){
     }
   });
 
-  const scripts = doc.querySelectorAll('script');
-const menuData = JSON.stringify(menuSections, null, 2);
-const wa = whatsappNumber;
-
-scripts.forEach(s=>{
-  if (s.textContent.includes('const menuSections')) {
-    s.textContent = s.textContent.replace(
-      /const menuSections\s*=\s*\[[\s\S]*?\];/,
-      `const menuSections = ${menuData};`
-    );
-  }
-  if (s.textContent.includes('let whatsappNumber')) {
-    s.textContent = s.textContent.replace(
-      /let whatsappNumber\s*=\s*["'][^"']*["'];/,
-      `let whatsappNumber = "${wa}";`
-    );
-  }
-});
+// 5. Ensure WhatsApp number is preserved
+  scripts.forEach(s=>{
+    if(s.textContent.includes('let whatsappNumber')) {
+      s.textContent = s.textContent.replace(
+        /let whatsappNumber\s*=\s*["'][^"']*["'];/,
+        `let whatsappNumber = "${whatsappNumber}";`
+      );
+    }
+  });
 
   // 5.5 Ensure menu renders on load in exported file
 scripts.forEach(s=>{
@@ -353,17 +344,6 @@ scripts.forEach(s=>{
     }
   }
 });
-
-  // Append clean runtime bootstrap
-const bootScript = doc.createElement('script');
-bootScript.textContent = `
-  document.addEventListener('DOMContentLoaded', () => {
-    if (typeof renderMenu === 'function') {
-      renderMenu();
-    }
-  });
-`;
-doc.body.appendChild(bootScript);
 
   const html = '<!DOCTYPE html>\n' + doc.outerHTML;
 
