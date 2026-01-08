@@ -246,43 +246,34 @@ function changeQty(key,d){
   if(orderState[key]<0) orderState[key]=0;
   renderMenu();
 }
-  
+
 function renderWhatsapp(){
-  const total = Object.values(orderState).reduce((a,b)=>a+b,0);
-  let btn = document.getElementById('whatsappOrderBtn');
-  if(total === 0){ if(btn) btn.remove(); return; }
+  const total=Object.values(orderState).reduce((a,b)=>a+b,0);
+  let btn=document.getElementById('whatsappOrderBtn');
+  if(total===0){ if(btn) btn.remove(); return; }
 
-  let lines = ["Hi! I'd like to order:"];
+  let msg="Hi! I'd like to order:\n\n";
+  let grand=0;
 
-  let grand = 0;
-  menuSections.forEach((sec, s) => {
-    sec.items.forEach((it, i) => {
-      const q = orderState[`\( {s}- \){i}`] || 0;
-      if (q > 0) {
-        const t = q * it.price;
-        grand += t;
-        lines.push(`${q} × \( {it.name} — R \){t}`);
-        // Optional: only include description if short
-        if (it.desc && it.desc.length < 50) {
-          lines.push(`  ${it.desc}`);
-        }
+  menuSections.forEach((sec,s)=>{
+    sec.items.forEach((it,i)=>{
+      const q=orderState[`${s}-${i}`]||0;
+      if(q){
+        const t=q*it.price;
+        grand+=t;
+        msg+=`${q} x ${it.name} – R${t}\n${it.desc}\n\n`;
       }
     });
   });
+  msg+=`Estimated total: R${grand}`;
 
-  lines.push(`Total: R${grand}`);
-  const msg = lines.join('\n');
-
-  if (!btn) {
-    btn = document.createElement('a');
-    btn.id = 'whatsappOrderBtn';
-    btn.target = "_blank";           // Helps on mobile
-    btn.rel = "noopener noreferrer"; // Security best practice
+  if(!btn){
+    btn=document.createElement('a');
+    btn.id='whatsappOrderBtn';
     document.body.appendChild(btn);
   }
-
-  btn.href = `https://wa.me/\( {whatsappNumber}?text= \){encodeURIComponent(msg)}`;
-  btn.textContent = `ORDER NOW (${total})`;
+  btn.href=`https://wa.me/${whatsappNumber}?text=`+encodeURIComponent(msg);
+  btn.textContent=`ORDER NOW (${total})`;
 }
 
 function renderEditor(){
