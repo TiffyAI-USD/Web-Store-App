@@ -352,25 +352,26 @@ function downloadHTML(){
   try {
     const doc = document.documentElement.cloneNode(true);
 
-    // Remove editor UI
+    // 1. Remove editor UI
     const editor = doc.querySelector('#editor');
     if (editor) editor.remove();
 
-    // Build clean data bootstrap
+    // 2. Inject saved runtime state (NO redeclare)
     const dataScript = doc.createElement('script');
     dataScript.textContent = `
-      const menuSections = ${JSON.stringify(menuSections, null, 2)};
-      let whatsappNumber = "${whatsappNumber}";
-      const orderState = {};
+      window.menuSections = ${JSON.stringify(menuSections, null, 2)};
+      window.whatsappNumber = "${whatsappNumber}";
+      window.orderState = {};
+
       document.addEventListener('DOMContentLoaded', () => {
         if (typeof renderMenu === 'function') {
           renderMenu();
         }
       });
     `;
-
     doc.body.appendChild(dataScript);
 
+    // 3. Export
     const html = '<!DOCTYPE html>\\n' + doc.outerHTML;
     const blob = new Blob([html], { type: 'text/html' });
     const url = URL.createObjectURL(blob);
