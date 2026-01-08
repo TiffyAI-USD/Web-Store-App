@@ -326,15 +326,24 @@ function downloadHTML(){
     }
   });
 
-  // 5. Ensure WhatsApp number is preserved
-  scripts.forEach(s=>{
-    if(s.textContent.includes('let whatsappNumber')) {
-      s.textContent = s.textContent.replace(
-        /let whatsappNumber\s*=\s*["'][^"']*["'];/,
-        `let whatsappNumber = "${whatsappNumber}";`
-      );
-    }
-  });
+  const scripts = doc.querySelectorAll('script');
+const menuData = JSON.stringify(menuSections, null, 2);
+const wa = whatsappNumber;
+
+scripts.forEach(s=>{
+  if (s.textContent.includes('const menuSections')) {
+    s.textContent = s.textContent.replace(
+      /const menuSections\s*=\s*\[[\s\S]*?\];/,
+      `const menuSections = ${menuData};`
+    );
+  }
+  if (s.textContent.includes('let whatsappNumber')) {
+    s.textContent = s.textContent.replace(
+      /let whatsappNumber\s*=\s*["'][^"']*["'];/,
+      `let whatsappNumber = "${wa}";`
+    );
+  }
+});
 
   // 5.5 Ensure menu renders on load in exported file
 scripts.forEach(s=>{
