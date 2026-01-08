@@ -203,6 +203,74 @@ button{
   border:1px solid #444;
   color:#aaa;
 }
+/* ===== PAYMENT MODAL ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+}
+.hidden{display:none}
+
+.modal-glass{
+  width:100%;
+  max-width:420px;
+  padding:2rem;
+  border-radius:22px;
+  background:linear-gradient(
+    145deg,
+    rgba(20,20,20,0.9),
+    rgba(5,5,5,0.95)
+  );
+  border:1px solid rgba(212,163,115,0.4);
+  box-shadow:0 0 60px rgba(212,163,115,0.25);
+  backdrop-filter:blur(18px);
+  color:#eee;
+}
+
+.modal-glass h2{
+  font-family:'Bebas Neue';
+  color:var(--gold);
+  font-size:2.2rem;
+  text-align:center;
+}
+
+.modal-glass .sub{
+  text-align:center;
+  color:#ccc;
+  margin:0.5rem 0 1.5rem;
+  font-size:0.95rem;
+}
+
+.pay-btn{
+  width:100%;
+  padding:14px;
+  border-radius:40px;
+  margin-top:12px;
+  font-family:'Bebas Neue';
+  font-size:1.1rem;
+  cursor:pointer;
+  border:none;
+}
+
+.paypal{
+  background:linear-gradient(180deg,#ffc439,#ffb347);
+  color:#111;
+}
+
+.confirm{
+  background:linear-gradient(180deg,var(--gold),var(--gold2));
+  color:#111;
+}
+
+.ghost{
+  background:transparent;
+  border:1px solid #555;
+  color:#aaa;
+}
 
 </style>
 </head>
@@ -210,37 +278,23 @@ button{
 <body>
 <div id="paymentModal" class="modal hidden">
   <div class="modal-glass">
-    <h2>TiffyAI Web-Store</h2>
+    <h2>TiffyAI Web-Store Builder</h2>
     <p class="sub">
-      First day is free.  
-      <br>R499 once-off unless cancelled within 24 hours.
+      R499 once-off • First day free<br>
+      Hosting covered for 1 year
     </p>
 
-    <label>Payment Type</label>
-    <select id="cardType">
-      <option>Credit Card</option>
-      <option>Debit Card</option>
-    </select>
+    <button class="pay-btn paypal" onclick="payWithPaypal()">
+      Pay with PayPal
+    </button>
 
-    <label>Card Number</label>
-    <input type="text" placeholder="1234 5678 9012 3456">
+    <button class="pay-btn confirm" onclick="confirmManualPayment()">
+      I’ve Paid – Download Now
+    </button>
 
-    <div class="row">
-      <div>
-        <label>Expiry</label>
-        <input type="text" placeholder="MM/YY">
-      </div>
-      <div>
-        <label>CSV</label>
-        <input type="password" placeholder="123">
-      </div>
-    </div>
-
-    <label>Company Name</label>
-    <input type="text" id="companyName">
-
-    <button onclick="confirmMockPayment()">Confirm & Download</button>
-    <button class="ghost" onclick="closePayment()">Cancel</button>
+    <button class="pay-btn ghost" onclick="closePayment()">
+      Cancel
+    </button>
   </div>
 </div>
 
@@ -446,6 +500,7 @@ function addSection(){
   renderEditor();
   renderMenu();
 }
+/* ===== PAYMENT GATE ===== */
 function downloadHTML(){
   document.getElementById('paymentModal').classList.remove('hidden');
 }
@@ -454,34 +509,38 @@ function closePayment(){
   document.getElementById('paymentModal').classList.add('hidden');
 }
 
-function confirmMockPayment(){
-  const company = document.getElementById('companyName').value || 'Unknown Company';
-  const cardType = document.getElementById('cardType').value;
-  const time = new Date().toLocaleString();
-
-  const msg =
-`MOCK PAYMENT – TIFFYAI WEB-STORE
-
-Company: ${company}
-Payment Type: ${cardType}
-Amount: R499 (once-off)
-Trial: First day free
-Time: ${time}
-
-Client downloaded web-store HTML.`;
-
-  const adminNumber = '27766314246'; // your WhatsApp
-  const waUrl = `https://wa.me/${adminNumber}?text=` + encodeURIComponent(msg);
-
-  // Open WhatsApp in new tab
-  window.open(waUrl, '_blank');
-
-  closePayment();
-
-  // Allow download AFTER message trigger
-  setTimeout(actualDownload, 500);
+/* REAL PAYPAL */
+function payWithPaypal(){
+  window.open(
+    'https://paypal.me/CatHostProWebsites/499',
+    '_blank'
+  );
 }
 
+/* CONFIRM + DOWNLOAD */
+function confirmManualPayment(){
+  closePayment();
+
+  // Notify you via WhatsApp
+  const company = document.getElementById('cafeName')?.textContent || 'Unknown';
+  const time = new Date().toLocaleString();
+
+  const msg = `
+TIFFYAI WEB STORE PAYMENT
+Company: ${company}
+Amount: R499
+Time: ${time}
+Method: PayPal (manual confirm)
+  `.trim();
+
+  window.open(
+    'https://wa.me/27766314246?text=' + encodeURIComponent(msg),
+    '_blank'
+  );
+
+  // ACTUAL EXPORT
+  actualDownload();
+}
 
 /* ================== EXPORT ================== */
 function actualDownload(){
