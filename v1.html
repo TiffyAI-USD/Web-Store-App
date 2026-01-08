@@ -346,7 +346,15 @@ function downloadHTML(){
     }
   });
 
-  // 6. Build final HTML
+  // 5.5 Ensure menu renders on load in exported file
+scripts.forEach(s=>{
+  if (s.textContent.includes('function renderMenu')) {
+    if (!s.textContent.includes('renderMenu();')) {
+      s.textContent += '\n\nrenderMenu();';
+    }
+  }
+});
+
   const html = '<!DOCTYPE html>\n' + doc.outerHTML;
 
   // 7. Download
