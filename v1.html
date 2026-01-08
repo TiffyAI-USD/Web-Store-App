@@ -306,16 +306,62 @@ function addSection(){
   renderEditor();renderMenu();
 }
 
+<script>
 function downloadHTML(){
-  const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
-  const blob=new Blob([html],{type:'text/html'});
-  const url=URL.createObjectURL(blob);
-  const a=document.createElement('a');
-  a.href=url;
-  a.download='cafe-webstore.html';
+  // 1. Clone document
+  const doc = document.documentElement.cloneNode(true);
+
+  // 2. Remove editor
+  const editor = doc.querySelector('#editor');
+  if(editor) editor.remove();
+
+  // 3. Remove editor-only scripts that re-render editor
+  const scripts = doc.querySelectorAll('script');
+  scripts.forEach(s=>{
+    if(s.textContent.includes('renderEditor')) {
+      s.textContent = s.textContent
+        .replace(/renderEditor\(\);?/g,'')
+        .replace(/menuEditor\.innerHTML[^;]*;/g,'');
+    }
+  });
+
+  // 4. Serialize CURRENT menuSections
+  const serializedMenu = JSON.stringify(menuSections, null, 2);
+
+  scripts.forEach(s=>{
+    if(s.textContent.includes('const menuSections')) {
+      s.textContent = s.textContent.replace(
+        /const menuSections\s*=\s*\[[\s\S]*?\];/,
+        `const menuSections = ${serializedMenu};`
+      );
+    }
+  });
+
+  // 5. Ensure WhatsApp number is preserved
+  scripts.forEach(s=>{
+    if(s.textContent.includes('let whatsappNumber')) {
+      s.textContent = s.textContent.replace(
+        /let whatsappNumber\s*=\s*["'][^"']*["'];/,
+        `let whatsappNumber = "${whatsappNumber}";`
+      );
+    }
+  });
+
+  // 6. Build final HTML
+  const html = '<!DOCTYPE html>\n' + doc.outerHTML;
+
+  // 7. Download
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'cafe-webstore.html';
+  document.body.appendChild(a);
   a.click();
+  document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+</script>
 
 renderMenu();
 renderEditor();
