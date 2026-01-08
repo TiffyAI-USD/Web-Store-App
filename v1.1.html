@@ -348,32 +348,46 @@ function addSection(){
   renderMenu();
 }
 
-/* ---------- EXPORT (FIXED) ---------- */
 function downloadHTML(){
-  const doc = document.documentElement.cloneNode(true);
+  try {
+    const doc = document.documentElement.cloneNode(true);
 
-  // Remove editor UI
-  const editor = doc.querySelector('#editor');
-  if(editor) editor.remove();
+    // Remove editor UI
+    const editor = doc.querySelector('#editor');
+    if (editor) editor.remove();
 
-  // Inject saved data
-  const scripts = doc.querySelectorAll('script');
-  const menuData = JSON.stringify(menuSections, null, 2);
+    // Build clean data bootstrap
+    const dataScript = doc.createElement('script');
+    dataScript.textContent = `
+      const menuSections = ${JSON.stringify(menuSections, null, 2)};
+      let whatsappNumber = "${whatsappNumber}";
+      const orderState = {};
+      document.addEventListener('DOMContentLoaded', () => {
+        if (typeof renderMenu === 'function') {
+          renderMenu();
+        }
+      });
+    `;
 
-  scripts.forEach(s=>{
-    if(s.textContent.includes('const menuSections')){
-      s.textContent = s.textContent.replace(
-        /const menuSections\s*=\s*\[[\s\S]*?\];/,
-        `const menuSections = ${menuData};`
-      );
-    }
-    if(s.textContent.includes('let whatsappNumber')){
-      s.textContent = s.textContent.replace(
-        /let whatsappNumber\s*=\s*["'][^"']*["'];/,
-        `let whatsappNumber = "${whatsappNumber}";`
-      );
-    }
-  });
+    doc.body.appendChild(dataScript);
+
+    const html = '<!DOCTYPE html>\\n' + doc.outerHTML;
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'cafe-webstore.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+  } catch (e) {
+    alert('Export failed: ' + e.message);
+    console.error(e);
+  }
+}
 
   // Clean boot script (THIS FIXES + / −)
   const boot = doc.createElement('script');
