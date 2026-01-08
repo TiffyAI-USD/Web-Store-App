@@ -314,6 +314,16 @@ function downloadHTML(){
   const editor = doc.querySelector('#editor');
   if(editor) editor.remove();
 
+  // 3. Remove editor-only scripts that re-render editor
+const scripts = doc.querySelectorAll('script');
+scripts.forEach(s=>{
+  if(s.textContent.includes('renderEditor')) {
+    s.textContent = s.textContent
+      .replace(/renderEditor\(\);?/g,'')
+      .replace(/menuEditor\.innerHTML[^;]*;/g,'');
+  }
+});
+
   // 4. Serialize CURRENT menuSections
   const serializedMenu = JSON.stringify(menuSections, null, 2);
 
