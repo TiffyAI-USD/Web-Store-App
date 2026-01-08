@@ -5,9 +5,11 @@
 <title>Café Webstore</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
+<!-- SOCIAL / PWA STAMP -->
 <meta property="og:title" content="Online Café Menu">
 <meta property="og:description" content="Order directly via WhatsApp">
 <meta property="og:image" id="ogImage" content="">
+<meta property="og:type" content="website">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="">
 
@@ -154,62 +156,148 @@ button{
 </footer>
 
 <div id="editor">
-  <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUILDER</h2>
-  <div id="menuEditor"></div>
-  <button onclick="addSection()">+ ADD SECTION</button>
-  <button onclick="exportSite()">DOWNLOAD WEBSITE HTML</button>
+<h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
+
+<div class="editor-block">
+  <label>Café Name</label>
+  <input oninput="cafeName.textContent=this.value">
+  <label>Tagline</label>
+  <input oninput="tagline.textContent=this.value">
+  <label>Logo Upload</label>
+  <input type="file" accept="image/*" onchange="uploadImage(this,img=>logo.src=img)">
+  <label>Banner Upload (Stamp Image)</label>
+  <input type="file" accept="image/*" onchange="uploadImage(this,img=>{
+    header.style.backgroundImage=`url('${img}')`;
+    updateStamp(img);
+  })">
+  <label>Footer Text</label>
+  <input oninput="footerText.textContent=this.value">
+  <label>WhatsApp Number</label>
+  <input value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
+</div>
+
+<h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
+<div id="menuEditor"></div>
+
+<button onclick="addSection()">+ ADD SECTION</button>
+<button onclick="downloadHTML()">DOWNLOAD WEBSITE HTML</button>
 </div>
 
 <script>
 let whatsappNumber="+27660000000";
 const orderState={};
 
-let menuSections=[
-  {title:"PIZZAS",items:[]}
+const menuSections=[
+  { title:"PIZZAS", items:[
+    {name:"CHEESE PIZZA",price:120,desc:"Classic cheese pizza",img:""}
+  ]}
 ];
+
+function updateStamp(img){
+  document.querySelector('meta[property="og:image"]').content = img;
+  document.querySelector('meta[name="twitter:image"]').content = img;
+}
+
+function uploadImage(input,cb){
+  const f=input.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=e=>cb(e.target.result);
+  r.readAsDataURL(f);
+}
 
 function renderMenu(){
   menuRender.innerHTML='';
-  menuSections.forEach(sec=>{
-    const h=document.createElement('h2');
-    h.className='section-title';
-    h.textContent=sec.title;
-    const g=document.createElement('div');
-    g.className='menu-grid';
-    sec.items.forEach(it=>{
-      g.innerHTML+=`
-        <div class="menu-item">
-          <img src="${it.img}">
-          <div class="card">
-            <h3>${it.name}</h3>
-            <p>${it.desc}</p>
-            <div class="price">R${it.price}</div>
+  menuSections.forEach((sec,s)=>{
+    const h2=document.createElement('h2');
+    h2.className='section-title';
+    h2.textContent=sec.title;
+
+    const grid=document.createElement('div');
+    grid.className='menu-grid';
+
+    sec.items.forEach((it,i)=>{
+      const key=`${s}-${i}`;
+      const qty=orderState[key]||0;
+      const d=document.createElement('div');
+      d.className='menu-item';
+      d.innerHTML=`
+        <img src="${it.img}">
+        <div class="card">
+          <h3>${it.name}</h3>
+          <p>${it.desc}</p>
+          <div class="price">R${it.price}</div>
+          <div style="display:flex;gap:10px;margin-top:10px">
+            <button onclick="changeQty('${key}',-1)">−</button>
+            <strong>${qty}</strong>
+            <button onclick="changeQty('${key}',1)">+</button>
           </div>
         </div>`;
+      grid.appendChild(d);
     });
-    menuRender.appendChild(h);
-    menuRender.appendChild(g);
+
+    menuRender.appendChild(h2);
+    menuRender.appendChild(grid);
   });
+  renderWhatsapp();
+}
+
+function changeQty(key,d){
+  orderState[key]=(orderState[key]||0)+d;
+  if(orderState[key]<0) orderState[key]=0;
+  renderMenu();
+}
+
+function renderWhatsapp(){
+  const total=Object.values(orderState).reduce((a,b)=>a+b,0);
+  let btn=document.getElementById('whatsappOrderBtn');
+  if(total===0){ if(btn) btn.remove(); return; }
+
+  let msg="Hi! I'd like to order:\n\n";
+  let grand=0;
+
+  menuSections.forEach((sec,s)=>{
+    sec.items.forEach((it,i)=>{
+      const q=orderState[`${s}-${i}`]||0;
+      if(q){
+        const t=q*it.price;
+        grand+=t;
+        msg+=`${q} x ${it.name} – R${t}\n${it.desc}\n\n`;
+      }
+    });
+  });
+  msg+=`Estimated total: R${grand}`;
+
+  if(!btn){
+    btn=document.createElement('a');
+    btn.id='whatsappOrderBtn';
+    document.body.appendChild(btn);
+  }
+  btn.href=`https://wa.me/${whatsappNumber}?text=`+encodeURIComponent(msg);
+  btn.textContent=`ORDER NOW (${total})`;
 }
 
 function renderEditor(){
   menuEditor.innerHTML='';
   menuSections.forEach((sec,s)=>{
-    const d=document.createElement('div');
-    d.className='editor-block';
-    d.innerHTML=`
-      <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
-      <button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
+    const b=document.createElement('div');
+    b.className='editor-block';
+    b.innerHTML=`
+      <div class="section-head">
+        <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
+        <button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
+      </div>
       ${sec.items.map((it,i)=>`
-        <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
-        <input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
-        <textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
-        <input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+        <label>Name</label><input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+        <label>Price</label><input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+        <label>Description</label><textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
+        <label>Image URL</label><input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+        <label>OR Upload Image</label>
+        <input type="file" accept="image/*" onchange="uploadImage(this,img=>{menuSections[${s}].items[${i}].img=img;renderMenu()})">
         <button class="remove" onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
       `).join('')}
-      <button onclick="menuSections[${s}].items.push({name:'NEW',price:0,desc:'',img:''});renderEditor();renderMenu()">+ ITEM</button>
+      <button onclick="menuSections[${s}].items.push({name:'NEW ITEM',price:0,desc:'',img:''});renderEditor();renderMenu()">+ ADD ITEM</button>
     `;
-    menuEditor.appendChild(d);
+    menuEditor.appendChild(b);
   });
 }
 
@@ -218,27 +306,19 @@ function addSection(){
   renderEditor();renderMenu();
 }
 
-function exportSite(){
-  const clone=document.documentElement.cloneNode(true);
-
-  clone.querySelector('#editor')?.remove();
-
-  const script=[...clone.querySelectorAll('script')].pop();
-  script.textContent=`
-    const menuSections=${JSON.stringify(menuSections)};
-    (${renderMenu.toString()})();
-  `;
-
-  const html='<!DOCTYPE html>'+clone.outerHTML;
+function downloadHTML(){
+  const html='<!DOCTYPE html>\n'+document.documentElement.outerHTML;
   const blob=new Blob([html],{type:'text/html'});
+  const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);
+  a.href=url;
   a.download='cafe-webstore.html';
   a.click();
+  URL.revokeObjectURL(url);
 }
 
-renderEditor();
 renderMenu();
+renderEditor();
 </script>
 
 </body>
