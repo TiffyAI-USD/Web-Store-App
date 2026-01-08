@@ -246,8 +246,7 @@ function changeQty(key,d){
   if(orderState[key]<0) orderState[key]=0;
   renderMenu();
 }
-
-function renderWhatsapp(){
+  
 function renderWhatsapp(){
   const total = Object.values(orderState).reduce((a,b)=>a+b,0);
   let btn = document.getElementById('whatsappOrderBtn');
