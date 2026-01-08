@@ -184,43 +184,51 @@ button{
 </div>
 
 <script>
-let whatsappNumber="+27660000000";
-const orderState={};
+let whatsappNumber = "+27660000000";
+const orderState = {};
 
-const menuSections=[
-  { title:"PIZZAS", items:[
-    {name:"CHEESE PIZZA",price:120,desc:"Classic cheese pizza",img:""}
+const menuSections = [
+  { title: "PIZZAS", items: [
+    { name: "CHEESE PIZZA", price: 120, desc: "Classic cheese pizza", img: "" }
   ]}
 ];
 
+/* ---------- UTILITIES ---------- */
 function updateStamp(img){
   document.querySelector('meta[property="og:image"]').content = img;
   document.querySelector('meta[name="twitter:image"]').content = img;
 }
 
-function uploadImage(input,cb){
-  const f=input.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=e=>cb(e.target.result);
+function uploadImage(input, cb){
+  const f = input.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = e => cb(e.target.result);
   r.readAsDataURL(f);
 }
 
+/* ---------- MENU RENDER ---------- */
 function renderMenu(){
-  menuRender.innerHTML='';
-  menuSections.forEach((sec,s)=>{
-    const h2=document.createElement('h2');
-    h2.className='section-title';
-    h2.textContent=sec.title;
+  const menuRender = document.getElementById('menuRender');
+  if(!menuRender) return;
 
-    const grid=document.createElement('div');
-    grid.className='menu-grid';
+  menuRender.innerHTML = '';
 
-    sec.items.forEach((it,i)=>{
-      const key=`${s}-${i}`;
-      const qty=orderState[key]||0;
-      const d=document.createElement('div');
-      d.className='menu-item';
-      d.innerHTML=`
+  menuSections.forEach((sec, s)=>{
+    const h2 = document.createElement('h2');
+    h2.className = 'section-title';
+    h2.textContent = sec.title;
+
+    const grid = document.createElement('div');
+    grid.className = 'menu-grid';
+
+    sec.items.forEach((it, i)=>{
+      const key = `${s}-${i}`;
+      const qty = orderState[key] || 0;
+
+      const d = document.createElement('div');
+      d.className = 'menu-item';
+      d.innerHTML = `
         <img src="${it.img}">
         <div class="card">
           <h3>${it.name}</h3>
@@ -231,70 +239,103 @@ function renderMenu(){
             <strong>${qty}</strong>
             <button onclick="changeQty('${key}',1)">+</button>
           </div>
-        </div>`;
+        </div>
+      `;
       grid.appendChild(d);
     });
 
     menuRender.appendChild(h2);
     menuRender.appendChild(grid);
   });
+
   renderWhatsapp();
 }
 
-function changeQty(key,d){
-  orderState[key]=(orderState[key]||0)+d;
-  if(orderState[key]<0) orderState[key]=0;
+function changeQty(key, delta){
+  orderState[key] = (orderState[key] || 0) + delta;
+  if(orderState[key] < 0) orderState[key] = 0;
   renderMenu();
 }
 
+/* ---------- WHATSAPP ---------- */
 function renderWhatsapp(){
-  const total=Object.values(orderState).reduce((a,b)=>a+b,0);
-  let btn=document.getElementById('whatsappOrderBtn');
-  if(total===0){ if(btn) btn.remove(); return; }
+  const total = Object.values(orderState).reduce((a,b)=>a+b,0);
+  let btn = document.getElementById('whatsappOrderBtn');
 
-  let msg="Hi! I'd like to order:\n\n";
-  let grand=0;
+  if(total === 0){
+    if(btn) btn.remove();
+    return;
+  }
+
+  let msg = "Hi! I'd like to order:\n\n";
+  let grand = 0;
 
   menuSections.forEach((sec,s)=>{
     sec.items.forEach((it,i)=>{
-      const q=orderState[`${s}-${i}`]||0;
+      const q = orderState[`${s}-${i}`] || 0;
       if(q){
-        const t=q*it.price;
-        grand+=t;
-        msg+=`${q} x ${it.name} – R${t}\n${it.desc}\n\n`;
+        const t = q * it.price;
+        grand += t;
+        msg += `${q} x ${it.name} – R${t}\n${it.desc}\n\n`;
       }
     });
   });
-  msg+=`Estimated total: R${grand}`;
+
+  msg += `Estimated total: R${grand}`;
 
   if(!btn){
-    btn=document.createElement('a');
-    btn.id='whatsappOrderBtn';
+    btn = document.createElement('a');
+    btn.id = 'whatsappOrderBtn';
     document.body.appendChild(btn);
   }
-  btn.href=`https://wa.me/${whatsappNumber}?text=`+encodeURIComponent(msg);
-  btn.textContent=`ORDER NOW (${total})`;
+
+  btn.href = `https://wa.me/${whatsappNumber}?text=` + encodeURIComponent(msg);
+  btn.textContent = `ORDER NOW (${total})`;
 }
 
+/* ---------- EDITOR ---------- */
 function renderEditor(){
-  menuEditor.innerHTML='';
+  const menuEditor = document.getElementById('menuEditor');
+  if(!menuEditor) return;
+
+  menuEditor.innerHTML = '';
+
   menuSections.forEach((sec,s)=>{
-    const b=document.createElement('div');
-    b.className='editor-block';
-    b.innerHTML=`
+    const b = document.createElement('div');
+    b.className = 'editor-block';
+    b.innerHTML = `
       <div class="section-head">
-        <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
-        <button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
+        <input value="${sec.title}"
+          oninput="menuSections[${s}].title=this.value;renderMenu()">
+        <button class="remove"
+          onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
       </div>
+
       ${sec.items.map((it,i)=>`
-        <label>Name</label><input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
-        <label>Price</label><input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
-        <label>Description</label><textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
-        <label>Image URL</label><input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+        <label>Name</label>
+        <input value="${it.name}"
+          oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+
+        <label>Price</label>
+        <input type="number" value="${it.price}"
+          oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+
+        <label>Description</label>
+        <textarea
+          oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
+
+        <label>Image URL</label>
+        <input value="${it.img}"
+          oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+
         <label>OR Upload Image</label>
-        <input type="file" accept="image/*" onchange="uploadImage(this,img=>{menuSections[${s}].items[${i}].img=img;renderMenu()})">
-        <button class="remove" onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
+        <input type="file" accept="image/*"
+          onchange="uploadImage(this,img=>{menuSections[${s}].items[${i}].img=img;renderMenu()})">
+
+        <button class="remove"
+          onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
       `).join('')}
+
       <button onclick="menuSections[${s}].items.push({name:'NEW ITEM',price:0,desc:'',img:''});renderEditor();renderMenu()">+ ADD ITEM</button>
     `;
     menuEditor.appendChild(b);
@@ -303,42 +344,30 @@ function renderEditor(){
 
 function addSection(){
   menuSections.push({title:"NEW SECTION",items:[]});
-  renderEditor();renderMenu();
+  renderEditor();
+  renderMenu();
 }
 
+/* ---------- EXPORT (FIXED) ---------- */
 function downloadHTML(){
-  // 1. Clone document
   const doc = document.documentElement.cloneNode(true);
 
-  // 2. Remove editor
+  // Remove editor UI
   const editor = doc.querySelector('#editor');
   if(editor) editor.remove();
 
-  // 3. Remove editor-only scripts that re-render editor
-const scripts = doc.querySelectorAll('script');
-scripts.forEach(s=>{
-  if(s.textContent.includes('renderEditor')) {
-    s.textContent = s.textContent
-      .replace(/renderEditor\(\);?/g,'')
-      .replace(/menuEditor\.innerHTML[^;]*;/g,'');
-  }
-});
-
-  // 4. Serialize CURRENT menuSections
-  const serializedMenu = JSON.stringify(menuSections, null, 2);
+  // Inject saved data
+  const scripts = doc.querySelectorAll('script');
+  const menuData = JSON.stringify(menuSections, null, 2);
 
   scripts.forEach(s=>{
-    if(s.textContent.includes('const menuSections')) {
+    if(s.textContent.includes('const menuSections')){
       s.textContent = s.textContent.replace(
         /const menuSections\s*=\s*\[[\s\S]*?\];/,
-        `const menuSections = ${serializedMenu};`
+        `const menuSections = ${menuData};`
       );
     }
-  });
-
-// 5. Ensure WhatsApp number is preserved
-  scripts.forEach(s=>{
-    if(s.textContent.includes('let whatsappNumber')) {
+    if(s.textContent.includes('let whatsappNumber')){
       s.textContent = s.textContent.replace(
         /let whatsappNumber\s*=\s*["'][^"']*["'];/,
         `let whatsappNumber = "${whatsappNumber}";`
@@ -346,20 +375,21 @@ scripts.forEach(s=>{
     }
   });
 
-  // 5.5 Ensure menu renders on load in exported file
-scripts.forEach(s=>{
-  if (s.textContent.includes('function renderMenu')) {
-    if (!s.textContent.includes('renderMenu();')) {
-      s.textContent += '\n\nrenderMenu();';
-    }
-  }
-});
+  // Clean boot script (THIS FIXES + / −)
+  const boot = doc.createElement('script');
+  boot.textContent = `
+    document.addEventListener('DOMContentLoaded', () => {
+      if (typeof renderMenu === 'function') {
+        renderMenu();
+      }
+    });
+  `;
+  doc.body.appendChild(boot);
 
-  const html = '<!DOCTYPE html>\n' + doc.outerHTML;
-
-  // 7. Download
-  const blob = new Blob([html], { type: 'text/html' });
+  const html = '<!DOCTYPE html>\\n' + doc.outerHTML;
+  const blob = new Blob([html], { type:'text/html' });
   const url = URL.createObjectURL(blob);
+
   const a = document.createElement('a');
   a.href = url;
   a.download = 'cafe-webstore.html';
@@ -369,6 +399,7 @@ scripts.forEach(s=>{
   URL.revokeObjectURL(url);
 }
 
+/* ---------- INIT ---------- */
 renderMenu();
 renderEditor();
 </script>
