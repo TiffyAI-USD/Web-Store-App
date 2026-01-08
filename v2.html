@@ -455,16 +455,33 @@ function closePayment(){
 }
 
 function confirmMockPayment(){
-  const company = document.getElementById('companyName').value || 'Unknown';
+  const company = document.getElementById('companyName').value || 'Unknown Company';
+  const cardType = document.getElementById('cardType').value;
   const time = new Date().toLocaleString();
 
-  console.log('MOCK PAYMENT');
-  console.log('Company:', company);
-  console.log('Time:', time);
+  const msg =
+`MOCK PAYMENT – TIFFYAI WEB-STORE
+
+Company: ${company}
+Payment Type: ${cardType}
+Amount: R499 (once-off)
+Trial: First day free
+Time: ${time}
+
+Client downloaded web-store HTML.`;
+
+  const adminNumber = '27766314246'; // your WhatsApp
+  const waUrl = `https://wa.me/${adminNumber}?text=` + encodeURIComponent(msg);
+
+  // Open WhatsApp in new tab
+  window.open(waUrl, '_blank');
 
   closePayment();
-  actualDownload();
+
+  // Allow download AFTER message trigger
+  setTimeout(actualDownload, 500);
 }
+
 
 /* ================== EXPORT ================== */
 function actualDownload(){
