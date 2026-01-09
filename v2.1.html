@@ -573,33 +573,69 @@ function addSection(){
 }
 
 /* ================== ACTIVATION ================== */
+
+/*
+  STEP 1: Generate a LONG scrambled request code
+  This is what the client sees and sends to YOU
+*/
 function generateRequestCode(){
   if(localStorage.getItem("tiffyai_request_code")) return;
-  let code = "";
-  while(code.length < 7){
-    code += Math.floor(Math.random()*10);
+
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  let longCode = "";
+
+  for(let i=0;i<18;i++){
+    longCode += chars[Math.floor(Math.random()*chars.length)];
+    if((i+1)%4===0 && i<17) longCode += "-";
   }
-  localStorage.setItem("tiffyai_request_code", code);
+
+  localStorage.setItem("tiffyai_request_code", longCode);
 }
 
+/*
+  STEP 2: Derive the REAL 7-digit key (ONLY YOU KNOW THIS RULE)
+  Rule example: every 2nd character digit converted to numbers
+*/
+function deriveRealKey(longCode){
+  const digits = longCode.replace(/\D/g,'');
+  let key = "";
+
+  for(let i=1;i<digits.length && key.length<7;i+=2){
+    key += digits[i];
+  }
+
+  return key;
+}
+
+/*
+  STEP 3: User enters the 7-digit activation key YOU sent them
+*/
 function submitActivation(){
   const inputs = document.querySelectorAll('.code-inputs input');
   let entered = "";
   inputs.forEach(i=>entered += i.value.trim());
 
-  const request = localStorage.getItem("tiffyai_request_code");
-  if(!request){
-    alert("No activation request found.");
+  if(!/^\d{7}$/.test(entered)){
+    alert("Please enter the 7-digit activation code.");
     return;
   }
 
-  if(entered !== request){
+  const request = localStorage.getItem("tiffyai_request_code");
+  if(!request){
+    alert("Activation request not found.");
+    return;
+  }
+
+  const realKey = deriveRealKey(request);
+
+  if(entered !== realKey){
     alert("Invalid activation code.");
     return;
   }
 
   localStorage.setItem("tiffyai_activated","true");
-  alert("Activation successful. Download starting…");
+  alert("Activation successful. Download unlocked.");
+  document.getElementById("activationPanel")?.remove();
   actualDownload();
 }
 
@@ -613,10 +649,11 @@ function downloadHTML(){
   generateRequestCode();
 
   const code = localStorage.getItem("tiffyai_request_code");
+
   window.open(
     "https://wa.me/27766314246?text=" +
     encodeURIComponent(
-      `ACTIVATION REQUEST\nCode: ${code}\nPlease send activation key.`
+      `TIFFYAI WEBSTORE ACTIVATION REQUEST\n\nRequest Code:\n${code}\n\nPlease send activation key.`
     ),
     "_blank"
   );
