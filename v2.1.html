@@ -662,6 +662,25 @@ function activate(key){
     alert("Invalid activation key");
   }
 }
+function activate(code){
+  // You manually verify the code logic
+  const validCodes = ["A1B2C3D","X7Y8Z9W"]; // example scrambled codes
+  if(!validCodes.includes(code)){
+    alert("Invalid code. Please check and try again.");
+    return;
+  }
+
+  // Code is valid — mark as activated
+  localStorage.setItem("activated","true");
+  alert("Activation successful. Download will start now.");
+
+  // Trigger the actual download
+  actualDownload();
+}
+if(localStorage.getItem("activated") === "true"){
+  const panel = document.getElementById("activationPanel");
+  if(panel) panel.remove();
+}
 
 /* ================== EXPORT ================== */
 function actualDownload(){
