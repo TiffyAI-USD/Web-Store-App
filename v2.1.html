@@ -401,7 +401,7 @@ button{
 <button onclick="downloadHTML()">DOWNLOAD WEBSITE HTML</button>
 </div>
 
-  <script>
+<script>
 /* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
 const orderState = {};
@@ -422,8 +422,10 @@ const menuSections = [
 
 /* ================== HELPERS ================== */
 function updateStamp(img){
-  document.querySelector('meta[property="og:image"]').content = img;
-  document.querySelector('meta[name="twitter:image"]').content = img;
+  const og = document.querySelector('meta[property="og:image"]');
+  const tw = document.querySelector('meta[name="twitter:image"]');
+  if(og) og.content = img;
+  if(tw) tw.content = img;
 }
 
 function uploadImage(input, cb){
@@ -571,25 +573,33 @@ function addSection(){
 }
 
 /* ================== ACTIVATION ================== */
-function isValidActivationCode(code){
-  if(!/^\d{7}$/.test(code)) return false;
-  const sum = code.split('').reduce((a,b)=>a+Number(b),0);
-  return sum % 7 === 0;
+function generateRequestCode(){
+  if(localStorage.getItem("tiffyai_request_code")) return;
+  let code = "";
+  while(code.length < 7){
+    code += Math.floor(Math.random()*10);
+  }
+  localStorage.setItem("tiffyai_request_code", code);
 }
 
 function submitActivation(){
   const inputs = document.querySelectorAll('.code-inputs input');
-  let code = '';
-  inputs.forEach(i=>code+=i.value.trim());
+  let entered = "";
+  inputs.forEach(i=>entered += i.value.trim());
 
-  if(!isValidActivationCode(code)){
+  const request = localStorage.getItem("tiffyai_request_code");
+  if(!request){
+    alert("No activation request found.");
+    return;
+  }
+
+  if(entered !== request){
     alert("Invalid activation code.");
     return;
   }
 
   localStorage.setItem("tiffyai_activated","true");
-  alert("Activation successful. Download starting...");
-  document.getElementById("activationPanel")?.remove();
+  alert("Activation successful. Download starting…");
   actualDownload();
 }
 
@@ -599,26 +609,27 @@ function downloadHTML(){
     actualDownload();
     return;
   }
-  document.getElementById("paymentModal").classList.remove("hidden");
+
+  generateRequestCode();
+
+  const code = localStorage.getItem("tiffyai_request_code");
+  window.open(
+    "https://wa.me/27766314246?text=" +
+    encodeURIComponent(
+      `ACTIVATION REQUEST\nCode: ${code}\nPlease send activation key.`
+    ),
+    "_blank"
+  );
+
+  document.getElementById("paymentModal")?.classList.remove("hidden");
 }
 
 function closePayment(){
-  document.getElementById("paymentModal").classList.add("hidden");
+  document.getElementById("paymentModal")?.classList.add("hidden");
 }
 
 function payWithPaypal(){
   window.open("https://paypal.me/CatHostProWebsites/30","_blank");
-}
-
-function confirmManualPayment(){
-  closePayment();
-  window.open(
-    "https://wa.me/27766314246?text="+encodeURIComponent(
-      "Payment made. Please send my 7-digit activation code."
-    ),
-    "_blank"
-  );
-  document.getElementById("activationPanel")?.classList.remove("hidden");
 }
 
 /* ================== EXPORT ================== */
@@ -661,7 +672,6 @@ function actualDownload(){
 renderMenu();
 renderEditor();
 </script>
-
 
 </body>
 </html>
