@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Café Webstore</title>
+<title>Webstore</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <!-- SOCIAL / PWA STAMP -->
@@ -290,7 +290,7 @@ button{
     </button>
 
     <button class="pay-btn confirm" onclick="confirmManualPayment()">
-      I’ve Paid – Download Now
+      I will send an EFT
     </button>
 
     <button class="pay-btn ghost" onclick="closePayment()">
@@ -301,8 +301,8 @@ button{
 
 <header id="header">
   <img id="logo" class="logo">
-  <h1 id="cafeName">YOUR CAFÉ</h1>
-  <p id="tagline" class="tagline">FOOD • DRINKS • VIBES</p>
+  <h1 id="cafeName">YOUR WEB STORE BUSINESS</h1>
+  <p id="tagline" class="tagline">With Live Preview</p>
 </header>
 
 <section id="menu">
@@ -310,14 +310,14 @@ button{
 </section>
 
 <footer>
-  <p id="footerText">© 2026 YOUR CAFÉ</p>
+  <p id="footerText">© 2026 YOUR BUSINESS</p>
 </footer>
 
 <div id="editor">
 <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
 
 <div class="editor-block">
-  <label>Café Name</label>
+  <label>Business Name</label>
   <input oninput="cafeName.textContent=this.value">
   <label>Tagline</label>
   <input oninput="tagline.textContent=this.value">
@@ -348,9 +348,9 @@ const orderState = {};
 
 const menuSections = [
   {
-    title: "PIZZAS",
+    title: "So what you selling?",
     items: [
-      { name: "CHEESE PIZZA", price: 120, desc: "Classic cheese pizza", img: "" }
+      { name: ""List your product here", price: 120, desc: "Add an awesome description here", img: "" }
     ]
   }
 ];
@@ -527,11 +527,15 @@ function confirmManualPayment(){
   const time = new Date().toLocaleString();
 
   const msg = `
-TIFFYAI WEB STORE PAYMENT
+PLEASE CONFIRM PAYMENT
+YOUR WEBSTORE DOWNLOAD IS READY FOR ACTIVATION
+DOWNLOAD IT AND PLEASE SEND IT TO US FOR PROCESSING 
 Company: ${company}
 Amount: R499
 Time: ${time}
-Method: PayPal (manual confirm)
+An EFT payment will be made to:
+FNB (First National Bank) TiffyAI 62912507433
+Shortly, I will send proof of payment as well as attach my web store DOWNLOAD HTML to be made live. Thank you.
   `.trim();
 
   window.open(
@@ -571,7 +575,7 @@ function actualDownload(){
 
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'cafe-webstore.html';
+  a.download = 'WEB-Store.html';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
