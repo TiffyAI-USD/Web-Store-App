@@ -401,7 +401,7 @@ button{
 <button onclick="downloadHTML()">DOWNLOAD WEBSITE HTML</button>
 </div>
 
-<script>
+  <script>
 /* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
 const orderState = {};
@@ -420,34 +420,6 @@ const menuSections = [
   }
 ];
 
-/* ================== PERSISTENCE ================== */
-function saveProject(){
-  localStorage.setItem("tiffy_project", JSON.stringify({
-    menuSections,
-    whatsappNumber,
-    cafeName: cafeName.textContent,
-    tagline: tagline.textContent,
-    footer: footerText.textContent,
-    logo: logo.src,
-    banner: header.style.backgroundImage,
-    orderCode: localStorage.getItem("orderCode"),
-    activated: localStorage.getItem("activated") === "true"
-  }));
-}
-
-function loadProject(){
-  const data = JSON.parse(localStorage.getItem("tiffy_project") || "null");
-  if(!data) return;
-
-  menuSections.splice(0, menuSections.length, ...data.menuSections);
-  whatsappNumber = data.whatsappNumber || whatsappNumber;
-  cafeName.textContent = data.cafeName || cafeName.textContent;
-  tagline.textContent = data.tagline || tagline.textContent;
-  footerText.textContent = data.footer || footerText.textContent;
-  if(data.logo) logo.src = data.logo;
-  if(data.banner) header.style.backgroundImage = data.banner;
-}
-
 /* ================== HELPERS ================== */
 function updateStamp(img){
   document.querySelector('meta[property="og:image"]').content = img;
@@ -458,31 +430,33 @@ function uploadImage(input, cb){
   const f = input.files[0];
   if (!f) return;
   const r = new FileReader();
-  r.onload = e => { cb(e.target.result); saveProject(); };
+  r.onload = e => cb(e.target.result);
   r.readAsDataURL(f);
 }
 
 /* ================== MENU ================== */
 function renderMenu(){
-  const menuRender = document.getElementById("menuRender");
-  menuRender.innerHTML = "";
+  const menuRender = document.getElementById('menuRender');
+  if(!menuRender) return;
 
-  menuSections.forEach((sec,s)=>{
-    const h2 = document.createElement("h2");
-    h2.className = "section-title";
+  menuRender.innerHTML = '';
+
+  menuSections.forEach((sec, s) => {
+    const h2 = document.createElement('h2');
+    h2.className = 'section-title';
     h2.textContent = sec.title;
 
-    const grid = document.createElement("div");
-    grid.className = "menu-grid";
+    const grid = document.createElement('div');
+    grid.className = 'menu-grid';
 
-    sec.items.forEach((it,i)=>{
+    sec.items.forEach((it, i) => {
       const key = `${s}-${i}`;
       const qty = orderState[key] || 0;
 
-      const card = document.createElement("div");
-      card.className = "menu-item";
+      const card = document.createElement('div');
+      card.className = 'menu-item';
       card.innerHTML = `
-        <img src="${it.img || ""}">
+        <img src="${it.img || ''}">
         <div class="card">
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
@@ -502,11 +476,10 @@ function renderMenu(){
   });
 
   renderWhatsapp();
-  saveProject();
 }
 
-function changeQty(key,d){
-  orderState[key] = (orderState[key] || 0) + d;
+function changeQty(key, delta){
+  orderState[key] = (orderState[key] || 0) + delta;
   if(orderState[key] < 0) orderState[key] = 0;
   renderMenu();
 }
@@ -514,7 +487,7 @@ function changeQty(key,d){
 /* ================== WHATSAPP ORDER ================== */
 function renderWhatsapp(){
   const total = Object.values(orderState).reduce((a,b)=>a+b,0);
-  let btn = document.getElementById("whatsappOrderBtn");
+  let btn = document.getElementById('whatsappOrderBtn');
 
   if(total === 0){
     if(btn) btn.remove();
@@ -538,8 +511,8 @@ function renderWhatsapp(){
   msg += `Estimated total: R${grand}`;
 
   if(!btn){
-    btn = document.createElement("a");
-    btn.id = "whatsappOrderBtn";
+    btn = document.createElement('a');
+    btn.id = 'whatsappOrderBtn';
     document.body.appendChild(btn);
   }
 
@@ -549,13 +522,14 @@ function renderWhatsapp(){
 
 /* ================== EDITOR ================== */
 function renderEditor(){
-  const menuEditor = document.getElementById("menuEditor");
+  const menuEditor = document.getElementById('menuEditor');
   if(!menuEditor) return;
-  menuEditor.innerHTML = "";
+
+  menuEditor.innerHTML = '';
 
   menuSections.forEach((sec,s)=>{
-    const block = document.createElement("div");
-    block.className = "editor-block";
+    const block = document.createElement('div');
+    block.className = 'editor-block';
 
     block.innerHTML = `
       <div class="section-head">
@@ -566,16 +540,23 @@ function renderEditor(){
       ${sec.items.map((it,i)=>`
         <label>Name</label>
         <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+
         <label>Price</label>
         <input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+
         <label>Description</label>
         <textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
+
         <label>Image URL</label>
         <input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+
         <label>Or Upload Image</label>
-        <input type="file" accept="image/*" onchange="uploadImage(this,img=>{menuSections[${s}].items[${i}].img=img;renderMenu()})">
-        <button class="remove" onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
-      `).join("")}
+        <input type="file" accept="image/*"
+          onchange="uploadImage(this,img=>{menuSections[${s}].items[${i}].img=img;renderMenu()})">
+
+        <button class="remove"
+          onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
+      `).join('')}
 
       <button onclick="menuSections[${s}].items.push({name:'NEW ITEM',price:0,desc:'',img:''});renderEditor();renderMenu()">+ ADD ITEM</button>
     `;
@@ -584,113 +565,74 @@ function renderEditor(){
 }
 
 function addSection(){
-  menuSections.push({title:"NEW SECTION",items:[]});
+  menuSections.push({ title:"NEW SECTION", items:[] });
   renderEditor();
   renderMenu();
 }
 
-/* ================== PAYMENT GATE ================== */
-function downloadHTML(){
-  if(localStorage.getItem("activated") !== "true"){
-    document.getElementById("paymentModal").classList.remove("hidden");
+/* ================== ACTIVATION ================== */
+function isValidActivationCode(code){
+  if(!/^\d{7}$/.test(code)) return false;
+  const sum = code.split('').reduce((a,b)=>a+Number(b),0);
+  return sum % 7 === 0;
+}
+
+function submitActivation(){
+  const inputs = document.querySelectorAll('.code-inputs input');
+  let code = '';
+  inputs.forEach(i=>code+=i.value.trim());
+
+  if(!isValidActivationCode(code)){
+    alert("Invalid activation code.");
     return;
   }
+
+  localStorage.setItem("tiffyai_activated","true");
+  alert("Activation successful. Download starting...");
+  document.getElementById("activationPanel")?.remove();
   actualDownload();
+}
+
+/* ================== PAYMENT ================== */
+function downloadHTML(){
+  if(localStorage.getItem("tiffyai_activated")==="true"){
+    actualDownload();
+    return;
+  }
+  document.getElementById("paymentModal").classList.remove("hidden");
 }
 
 function closePayment(){
   document.getElementById("paymentModal").classList.add("hidden");
 }
 
-/* ================== ORDER CODE ================== */
-function generateOrderCode(){
-  const code = Array.from({length:14},()=>Math.floor(Math.random()*10)).join("");
-  localStorage.setItem("orderCode",code);
-  saveProject();
-  return code;
-}
-
-/* ================== PAYPAL ================== */
 function payWithPaypal(){
-  const code = generateOrderCode();
   window.open("https://paypal.me/CatHostProWebsites/30","_blank");
-
-  sendPaymentWhatsApp(code);
 }
 
-/* ================== MANUAL EFT ================== */
 function confirmManualPayment(){
-  const code = generateOrderCode();
   closePayment();
-  sendPaymentWhatsApp(code);
-}
-
-/* ================== WHATSAPP CONFIRM ================== */
-function sendPaymentWhatsApp(code){
-  const company = cafeName.textContent || "Unknown";
-  const time = new Date().toLocaleString();
-
-  const msg = `
-TIFFYAI PAYMENT INITIATED
-
-Company: ${company}
-Order Code: ${code}
-Amount: R499 / $30
-
-Please confirm payment.
-Activation key will be sent after verification.
-`.trim();
-
   window.open(
-    "https://wa.me/27766314246?text=" + encodeURIComponent(msg),
+    "https://wa.me/27766314246?text="+encodeURIComponent(
+      "Payment made. Please send my 7-digit activation code."
+    ),
     "_blank"
   );
-}
-
-/* ================== ACTIVATE ================== */
-function activate(key){
-  const orderCode = localStorage.getItem("orderCode");
-  if(!orderCode) return alert("No order found");
-
-  const real = orderCode.split("").filter((_,i)=>i%2===1).join("");
-
-  if(key === real){
-    localStorage.setItem("activated","true");
-    saveProject();
-    alert("Activated! Download unlocked.");
-  }else{
-    alert("Invalid activation key");
-  }
-}
-function activate(code){
-  // You manually verify the code logic
-  const validCodes = ["A1B2C3D","X7Y8Z9W"]; // example scrambled codes
-  if(!validCodes.includes(code)){
-    alert("Invalid code. Please check and try again.");
-    return;
-  }
-
-  // Code is valid — mark as activated
-  localStorage.setItem("activated","true");
-  alert("Activation successful. Download will start now.");
-
-  // Trigger the actual download
-  actualDownload();
-}
-if(localStorage.getItem("activated") === "true"){
-  const panel = document.getElementById("activationPanel");
-  if(panel) panel.remove();
+  document.getElementById("activationPanel")?.classList.remove("hidden");
 }
 
 /* ================== EXPORT ================== */
 function actualDownload(){
   const doc = document.documentElement.cloneNode(true);
-  const editor = doc.querySelector("#editor");
-  if(editor) editor.remove();
 
-  const scripts = doc.querySelectorAll("script");
+  ['#editor','#paymentModal','#activationPanel'].forEach(id=>{
+    const el = doc.querySelector(id);
+    if(el) el.remove();
+  });
+
+  const scripts = doc.querySelectorAll('script');
   scripts.forEach(s=>{
-    if(s.textContent.includes("const menuSections")){
+    if(s.textContent.includes('const menuSections')){
       s.textContent = s.textContent.replace(
         /const menuSections\s*=\s*\[[\s\S]*?\];/,
         `const menuSections = ${JSON.stringify(menuSections,null,2)};`
@@ -702,13 +644,13 @@ function actualDownload(){
     }
   });
 
-  const html = "<!DOCTYPE html>\n" + doc.outerHTML;
-  const blob = new Blob([html],{type:"text/html"});
+  const html = '<!DOCTYPE html>\n'+doc.outerHTML;
+  const blob = new Blob([html],{type:'text/html'});
   const url = URL.createObjectURL(blob);
 
-  const a = document.createElement("a");
+  const a = document.createElement('a');
   a.href = url;
-  a.download = "WEB-Store.html";
+  a.download = 'TiffyAI-WebStore.html';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
@@ -716,35 +658,10 @@ function actualDownload(){
 }
 
 /* ================== INIT ================== */
-loadProject();
 renderMenu();
 renderEditor();
-
-function submitActivation(){
-  const inputs = document.querySelectorAll('.code-inputs input');
-  let key = '';
-  inputs.forEach(i => key += i.value.trim());
-
-  if(key.length !== 7){
-    alert("Please enter all 7 digits");
-    return;
-  }
-
-  activate(key);
-
-  if(localStorage.getItem("activated") === "true"){
-    document.getElementById("activationPanel").remove();
-  }
-}
-
-/* Hide panel if already activated */
-document.addEventListener("DOMContentLoaded",()=>{
-  if(localStorage.getItem("activated") === "true"){
-    const panel = document.getElementById("activationPanel");
-    if(panel) panel.remove();
-  }
-});
 </script>
+
 
 </body>
 </html>
