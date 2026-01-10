@@ -412,6 +412,21 @@ button{
 /* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
 const orderState = {};
+/* ===== CURRENCY STATE ===== */
+let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
+
+const currencyMap = {
+  ZAR: { symbol: 'R', rate: 1 },
+  USD: { symbol: '$', rate: 0.054 }, // adjust later or auto
+  EUR: { symbol: '€', rate: 0.050 },
+  GBP: { symbol: '£', rate: 0.043 }
+};
+
+function setCurrency(code){
+  activeCurrency = code;
+  localStorage.setItem('tiffyai_currency', code);
+  renderMenu();
+}
 
 const menuSections = [
   {
@@ -460,7 +475,10 @@ function renderMenu(){
         <div class="card">
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
-          <div class="price">R${it.price}</div>
+          <div class="price">
+  ${currencyMap[activeCurrency].symbol}
+  ${(it.price * currencyMap[activeCurrency].rate).toFixed(2)}
+</div>
           <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
             <button onclick="changeQty('${key}', -1)">−</button>
             <strong>${qty}</strong>
