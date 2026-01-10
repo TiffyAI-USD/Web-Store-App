@@ -92,15 +92,16 @@ footer{
 
 /* EDITOR */
 #editor{
-  background:#0f0f0f;
+  background:url('silky.jpeg') center / cover no-repeat;
   border-top:3px dashed var(--gold);
   padding:3rem 5%;
 }
 .editor-block{
-  background:#1e1e1e;
+  background:rgba(20,20,20,0.92);
   padding:1.5rem;
-  border-radius:12px;
+  border-radius:14px;
   margin-bottom:2rem;
+  box-shadow:0 10px 30px rgba(0,0,0,0.6);
 }
 label{display:block;margin-top:1rem;color:var(--gold)}
 input,textarea{
@@ -405,6 +406,21 @@ button{
 /* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
 const orderState = {};
+/* ===== CURRENCY STATE ===== */
+let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
+
+const currencyMap = {
+  ZAR: { symbol: 'R', rate: 1 },
+  USD: { symbol: '$', rate: 0.054 }, // adjust later or auto
+  EUR: { symbol: '€', rate: 0.050 },
+  GBP: { symbol: '£', rate: 0.043 }
+};
+
+function setCurrency(code){
+  activeCurrency = code;
+  localStorage.setItem('tiffyai_currency', code);
+  renderMenu();
+}
 
 const menuSections = [
   {
@@ -453,7 +469,10 @@ function renderMenu(){
         <div class="card">
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
-          <div class="price">R${it.price}</div>
+          <div class="price">
+  ${currencyMap[activeCurrency].symbol}
+  ${(it.price * currencyMap[activeCurrency].rate).toFixed(2)}
+</div>
           <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
             <button onclick="changeQty('${key}', -1)">−</button>
             <strong>${qty}</strong>
