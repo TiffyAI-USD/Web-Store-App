@@ -321,7 +321,7 @@ button{
     <h2>TiffyAI Web-Store Builder</h2>
     <p class="sub">
   $30 USD (≈ R499) once-off<br>
-  First day free • Hosting covered for 1 year
+  • Hosting covered for 1 year
 </p>
 
 
@@ -356,8 +356,8 @@ button{
 <div id="activationPanel" class="activation">
   <h3>Activate Your Web-Store</h3>
   <p>
-    Enter the 7-digit activation key you received after payment.
-    <br>Do not close this page – your progress is saved.
+    Enter the 7-digit activation key you received from the admin, this will give you 100 Web-Store-App downloads.
+    <br>Do not close this page – your progress will be lost.
   </p>
 
   <div class="code-inputs">
@@ -584,8 +584,10 @@ Company: ${company}
 Order Code: ${orderCode}
 Amount: R499 / $30
 
-Please confirm payment.
-Activation key will be sent after verification.
+Please confirm payment. Screenshot will do.
+Your 7 Digit Activation key will be sent after proof of payment verification.
+
+Download your New Web Store with the activation key you will receive and send your html file to us here on WhatsApp to connect live on Google and TiffyAI marketplace. We are always here for support. So don't hesitate to contact us.
   `.trim();
 
   // Send WhatsApp message WITH CODE
@@ -621,19 +623,21 @@ function confirmManualPayment(){
   const time = new Date().toLocaleString();
 
   const msg = `
-PAYMENT CONFIRMATION RECEIVED
+PAYMENT CONFIRMATION IN PROGRESS
 
 Company: ${company}
 Amount: R499
 Time: ${time}
 
-EFT DETAILS:
+EFT DETAILS:Please write this down)
 FNB (First National Bank)
 Account Name: TiffyAI
 Account Number: 62912507433
 
-Please attach proof of payment.
+Please attach proof of payment. Screenshot accepted.
 Your 7-digit activation key will be sent after verification.
+
+Then just Download your New Web Store with the activation key you will receive and send your html to us here on WhatsApp to connect live on Google and TiffyAI marketplace. We are always here for support, so don't hesitate to contact us.
   `.trim();
 
   window.open(
