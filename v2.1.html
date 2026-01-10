@@ -644,9 +644,89 @@ function actualDownload(){
   URL.revokeObjectURL(url);
 }
 
+/* ================== TIFFYAI ACTIVATION MODULE ================== */
+
+/* --- Generate long masked request code --- */
+function generateRequestCode(){
+  const digits = Array.from({length:14},()=>Math.floor(Math.random()*10)).join('');
+  localStorage.setItem("tiffyai_digits", digits);
+
+  // Masked readable code (client-safe)
+  const masked = digits.replace(/(.{4})/g,'$1-').slice(0,-1);
+  localStorage.setItem("tiffyai_request_code", masked);
+}
+
+/* --- Extract real 7-digit activation key (every 2nd digit) --- */
+function getRealActivationKey(){
+  const digits = localStorage.getItem("tiffyai_digits") || "";
+  return digits.split('').filter((_,i)=>i%2===1).join('');
+}
+
+/* --- Override download button logic safely --- */
+const _originalDownloadHTML = downloadHTML;
+downloadHTML = function(){
+  if(localStorage.getItem("tiffyai_activated")==="true"){
+    actualDownload();
+    return;
+  }
+
+  generateRequestCode();
+
+  const company =
+    document.getElementById('cafeName')?.textContent || "UNKNOWN BUSINESS";
+  const orderCode = localStorage.getItem("tiffyai_request_code");
+
+  const msg = `
+TIFFYAI PAYMENT INITIATED
+
+Company: ${company}
+Order Code: ${orderCode}
+Amount: R499 / $30
+
+Please confirm payment.
+Activation key will be sent after verification.
+`.trim();
+
+  window.open(
+    "https://wa.me/27766314246?text="+encodeURIComponent(msg),
+    "_blank"
+  );
+
+  document.getElementById("paymentModal")?.classList.remove("hidden");
+};
+
+/* --- Activation input handler --- */
+function submitActivation(){
+  const inputs = document.querySelectorAll(".code-inputs input");
+  let entered = "";
+  inputs.forEach(i=>entered+=i.value.trim());
+
+  if(entered.length !== 7){
+    alert("Please enter the 7-digit activation key.");
+    return;
+  }
+
+  if(entered === getRealActivationKey()){
+    localStorage.setItem("tiffyai_activated","true");
+    alert("Activation successful. Download unlocked.");
+    document.getElementById("activationPanel")?.remove();
+    actualDownload();
+  } else {
+    alert("Invalid activation key.");
+  }
+}
+
+/* --- Hide activation UI if already activated --- */
+document.addEventListener("DOMContentLoaded",()=>{
+  if(localStorage.getItem("tiffyai_activated")==="true"){
+    document.getElementById("activationPanel")?.remove();
+  }
+});
+
 /* ================== INIT ================== */
 renderMenu();
 renderEditor();
+  
 </script>
 </body>
 </html>
