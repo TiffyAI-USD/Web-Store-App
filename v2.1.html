@@ -563,11 +563,43 @@ function addSection(){
 }
 /* ===== PAYMENT GATE ===== */
 function downloadHTML(){
-  document.getElementById('paymentModal').classList.remove('hidden');
+
+  // If already activated, allow download
+  if(localStorage.getItem('tiffyai_activated') === 'true'){
+    actualDownload();
+    return;
+  }
+
+  // Generate request code (14 digits, stored)
+  const orderCode = generateRequestCode();
+
+  const company =
+    document.getElementById('cafeName')?.textContent ||
+    'YOUR WEB STORE BUSINESS';
+
+  const msg = `
+TIFFYAI PAYMENT INITIATED
+
+Company: ${company}
+Order Code: ${orderCode}
+Amount: R499 / $30
+
+Please confirm payment.
+Activation key will be sent after verification.
+  `.trim();
+
+  // Send WhatsApp message WITH CODE
+  window.open(
+    'https://wa.me/27766314246?text=' + encodeURIComponent(msg),
+    '_blank'
+  );
+
+  // Show payment options
+  document.getElementById('paymentModal')?.classList.remove('hidden');
 }
 
 function closePayment(){
-  document.getElementById('paymentModal').classList.add('hidden');
+  document.getElementById('paymentModal')?.classList.add('hidden');
 }
 
 /* REAL PAYPAL */
@@ -578,33 +610,36 @@ function payWithPaypal(){
   );
 }
 
-/* CONFIRM + DOWNLOAD */
+/* EFT / MANUAL PAYMENT CONFIRM */
 function confirmManualPayment(){
   closePayment();
 
-  // Notify you via WhatsApp
-  const company = document.getElementById('cafeName')?.textContent || 'Unknown';
+  const company =
+    document.getElementById('cafeName')?.textContent ||
+    'YOUR WEB STORE BUSINESS';
+
   const time = new Date().toLocaleString();
 
   const msg = `
-PLEASE CONFIRM PAYMENT
-YOUR WEBSTORE DOWNLOAD IS READY FOR ACTIVATION
-DOWNLOAD IT AND PLEASE SEND IT TO US FOR PROCESSING 
+PAYMENT CONFIRMATION RECEIVED
+
 Company: ${company}
 Amount: R499
 Time: ${time}
-Make an EFT payment to:
-FNB (First National Bank) TiffyAI 62912507433
-Attach proof of payment
-Attach your WEB-Store.html
-Within The Next Hour Your Web Store Will Be Live.
+
+EFT DETAILS:
+FNB (First National Bank)
+Account Name: TiffyAI
+Account Number: 62912507433
+
+Please attach proof of payment.
+Your 7-digit activation key will be sent after verification.
   `.trim();
 
   window.open(
     'https://wa.me/27766314246?text=' + encodeURIComponent(msg),
     '_blank'
   );
-
 }
 
 /* ================== EXPORT ================== */
@@ -612,7 +647,13 @@ function actualDownload(){
   const doc = document.documentElement.cloneNode(true);
 
   const editor = doc.querySelector('#editor');
-  if (editor) editor.remove();
+  if(editor) editor.remove();
+
+  const payment = doc.querySelector('#paymentModal');
+  if(payment) payment.remove();
+
+  const activation = doc.querySelector('#activationPanel');
+  if(activation) activation.remove();
 
   const scripts = doc.querySelectorAll('script');
 
@@ -642,9 +683,9 @@ function actualDownload(){
   URL.revokeObjectURL(url);
 }
 
-/* ================== TIFFYAI ACTIVATION CORE (FIXED) ================== */
+/* ================== TIFFYAI ACTIVATION CORE ================== */
 
-/* Ensure store exists */
+/* Storage helpers */
 function getRequestStore(){
   return JSON.parse(localStorage.getItem('tiffyai_requests') || '[]');
 }
@@ -653,7 +694,7 @@ function saveRequestStore(arr){
   localStorage.setItem('tiffyai_requests', JSON.stringify(arr));
 }
 
-/* Generate EXACTLY 14 digits */
+/* Generate EXACTLY 14 digits and store */
 function generateRequestCode(){
   let digits = '';
   while(digits.length < 14){
@@ -667,7 +708,7 @@ function generateRequestCode(){
   return digits.match(/.{1,4}/g).join('-');
 }
 
-/* Extract 7-digit activation key (index 0,2,4...) */
+/* Extract activation key: every SECOND digit (0,2,4...) */
 function deriveActivationKey(digits){
   let key = '';
   for(let i = 0; i < digits.length; i += 2){
@@ -682,24 +723,24 @@ function validateActivation(input){
   return store.some(d => deriveActivationKey(d) === input);
 }
 
-/* Submit activation */
+/* Activation submit */
 function submitActivation(){
   const inputs = document.querySelectorAll('.code-inputs input');
   let entered = '';
   inputs.forEach(i => entered += i.value.trim());
 
   if(entered.length !== 7){
-    alert("Please enter all 7 digits.");
+    alert('Please enter all 7 digits.');
     return;
   }
 
   if(!validateActivation(entered)){
-    alert("Invalid activation key.");
+    alert('Invalid activation key.');
     return;
   }
 
   localStorage.setItem('tiffyai_activated', 'true');
-  alert("Activation successful. Download starting…");
+  alert('Activation successful. Download starting…');
 
   document.getElementById('activationPanel')?.classList.add('hidden');
   actualDownload();
