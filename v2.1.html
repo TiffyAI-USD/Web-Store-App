@@ -605,8 +605,6 @@ Within The Next Hour Your Web Store Will Be Live.
     '_blank'
   );
 
-  // ACTUAL EXPORT
-  actualDownload();
 }
 
 /* ================== EXPORT ================== */
@@ -644,84 +642,68 @@ function actualDownload(){
   URL.revokeObjectURL(url);
 }
 
-/* ================== TIFFYAI ACTIVATION MODULE ================== */
+/* ================== TIFFYAI ACTIVATION CORE (FIXED) ================== */
 
-/* --- Generate long masked request code --- */
+/* Ensure store exists */
+function getRequestStore(){
+  return JSON.parse(localStorage.getItem('tiffyai_requests') || '[]');
+}
+
+function saveRequestStore(arr){
+  localStorage.setItem('tiffyai_requests', JSON.stringify(arr));
+}
+
+/* Generate EXACTLY 14 digits */
 function generateRequestCode(){
-  const digits = Array.from({length:14},()=>Math.floor(Math.random()*10)).join('');
-  localStorage.setItem("tiffyai_digits", digits);
-
-  // Masked readable code (client-safe)
-  const masked = digits.replace(/(.{4})/g,'$1-').slice(0,-1);
-  localStorage.setItem("tiffyai_request_code", masked);
-}
-
-/* --- Extract real 7-digit activation key (every 2nd digit) --- */
-function getRealActivationKey(){
-  const digits = localStorage.getItem("tiffyai_digits") || "";
-  return digits.split('').filter((_,i)=>i%2===1).join('');
-}
-
-/* --- Override download button logic safely --- */
-const _originalDownloadHTML = downloadHTML;
-downloadHTML = function(){
-  if(localStorage.getItem("tiffyai_activated")==="true"){
-    actualDownload();
-    return;
+  let digits = '';
+  while(digits.length < 14){
+    digits += Math.floor(Math.random() * 10);
   }
 
-  generateRequestCode();
+  const store = getRequestStore();
+  store.push(digits);
+  saveRequestStore(store);
 
-  const company =
-    document.getElementById('cafeName')?.textContent || "UNKNOWN BUSINESS";
-  const orderCode = localStorage.getItem("tiffyai_request_code");
+  return digits.match(/.{1,4}/g).join('-');
+}
 
-  const msg = `
-TIFFYAI PAYMENT INITIATED
+/* Extract 7-digit activation key (index 0,2,4...) */
+function deriveActivationKey(digits){
+  let key = '';
+  for(let i = 0; i < digits.length; i += 2){
+    key += digits[i];
+  }
+  return key; // ALWAYS 7 digits
+}
 
-Company: ${company}
-Order Code: ${orderCode}
-Amount: R499 / $30
+/* Validate against ALL issued codes */
+function validateActivation(input){
+  const store = getRequestStore();
+  return store.some(d => deriveActivationKey(d) === input);
+}
 
-Please confirm payment.
-Activation key will be sent after verification.
-`.trim();
-
-  window.open(
-    "https://wa.me/27766314246?text="+encodeURIComponent(msg),
-    "_blank"
-  );
-
-  document.getElementById("paymentModal")?.classList.remove("hidden");
-};
-
-/* --- Activation input handler --- */
+/* Submit activation */
 function submitActivation(){
-  const inputs = document.querySelectorAll(".code-inputs input");
-  let entered = "";
-  inputs.forEach(i=>entered+=i.value.trim());
+  const inputs = document.querySelectorAll('.code-inputs input');
+  let entered = '';
+  inputs.forEach(i => entered += i.value.trim());
 
   if(entered.length !== 7){
-    alert("Please enter the 7-digit activation key.");
+    alert("Please enter all 7 digits.");
     return;
   }
 
-  if(entered === getRealActivationKey()){
-    localStorage.setItem("tiffyai_activated","true");
-    alert("Activation successful. Download unlocked.");
-    document.getElementById("activationPanel")?.remove();
-    actualDownload();
-  } else {
+  if(!validateActivation(entered)){
     alert("Invalid activation key.");
+    return;
   }
-}
 
-/* --- Hide activation UI if already activated --- */
-document.addEventListener("DOMContentLoaded",()=>{
-  if(localStorage.getItem("tiffyai_activated")==="true"){
-    document.getElementById("activationPanel")?.remove();
-  }
-});
+  localStorage.setItem('tiffyai_activated', 'true');
+  alert("Activation successful. Download starting…");
+
+  document.getElementById('activationPanel')?.classList.add('hidden');
+  actualDownload();
+}
 
 /* ================== INIT ================== */
 renderMenu();
