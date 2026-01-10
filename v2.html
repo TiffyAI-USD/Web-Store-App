@@ -538,6 +538,17 @@ function renderEditor(){
   if (!menuEditor) return;
 
   menuEditor.innerHTML = '';
+menuEditor.innerHTML += `
+  <div class="editor-block">
+    <label>Currency</label>
+    <select onchange="setCurrency(this.value)">
+      <option value="ZAR" ${activeCurrency==='ZAR'?'selected':''}>ZAR (R)</option>
+      <option value="USD" ${activeCurrency==='USD'?'selected':''}>USD ($)</option>
+      <option value="EUR" ${activeCurrency==='EUR'?'selected':''}>EUR (€)</option>
+      <option value="GBP" ${activeCurrency==='GBP'?'selected':''}>GBP (£)</option>
+    </select>
+  </div>
+`;
 
   menuSections.forEach((sec, s)=>{
     const block = document.createElement('div');
