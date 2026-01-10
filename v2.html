@@ -755,5 +755,50 @@ renderMenu();
 renderEditor();
   
 </script>
+  <script>
+/* ================== TIFFYAI PERSISTENCE + LIMITER ================== */
+
+const TIFFYAI_MAX_DOWNLOADS = 100;
+
+/* Ensure counters exist */
+function initTiffyAIState(){
+  if(!localStorage.getItem('tiffyai_download_count')){
+    localStorage.setItem('tiffyai_download_count', '0');
+  }
+
+  // If activated, remove activation UI permanently
+  if(localStorage.getItem('tiffyai_activated') === 'true'){
+    const panel = document.getElementById('activationPanel');
+    if(panel) panel.remove();
+  }
+}
+
+/* Wrap actualDownload with limiter */
+const _originalActualDownload = actualDownload;
+
+actualDownload = function(){
+  let count = Number(localStorage.getItem('tiffyai_download_count') || 0);
+
+  if(count >= TIFFYAI_MAX_DOWNLOADS){
+    alert(
+      'Download limit reached.\n\n' +
+      'Please request a new activation key to continue.'
+    );
+
+    localStorage.removeItem('tiffyai_activated');
+    document.getElementById('activationPanel')?.classList.remove('hidden');
+    return;
+  }
+
+  count++;
+  localStorage.setItem('tiffyai_download_count', String(count));
+
+  _originalActualDownload();
+};
+
+/* Init on load */
+document.addEventListener('DOMContentLoaded', initTiffyAIState);
+</script>
+
 </body>
 </html>
