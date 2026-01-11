@@ -472,9 +472,8 @@ function renderMenu(){
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
           <div class="price">
-  ${currencyMap[activeCurrency].symbol}
-  ${(it.price * currencyMap[activeCurrency].rate).toFixed(2)}
-</div>
+            ${currencyMap[activeCurrency].symbol}${it.price}
+          </div>
           <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
             <button onclick="changeQty('${key}', -1)">−</button>
             <strong>${qty}</strong>
