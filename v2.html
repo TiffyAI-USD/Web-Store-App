@@ -544,13 +544,11 @@ menuEditor.innerHTML += `
   <div class="editor-block">
     <label>Currency</label>
     <select onchange="setCurrency(this.value)">
-      <option value="ZAR" ${activeCurrency==='ZAR'?'selected':''}>ZAR (R)</option>
-      <option value="USD" ${activeCurrency==='USD'?'selected':''}>USD ($)</option>
-      <option value="EUR" ${activeCurrency==='EUR'?'selected':''}>EUR (€)</option>
-      <option value="GBP" ${activeCurrency==='GBP'?'selected':''}>GBP (£)</option>
-      <option value="INR" ${activeCurrency==='INR'?'selected':''}>INR (₹)</option>
-      <option value="CNY" ${activeCurrency==='CNY'?'selected':''}>CNY (¥)</option>
-      <option value="JPY" ${activeCurrency==='JPY'?'selected':''}>JPY (¥)</option>
+      ${Object.entries(currencyMap).map(([code, c]) => `
+        <option value="${code}" ${activeCurrency===code?'selected':''}>
+          ${c.label}
+        </option>
+      `).join('')}
     </select>
   </div>
 `;
