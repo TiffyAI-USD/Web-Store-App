@@ -742,7 +742,6 @@ function generateRequestCode(){
   return digits.match(/.{1,4}/g).join('-');
 }
 
-/* Extract activation key: every SECOND digit (0,2,4...) */
 function deriveActivationKey(digits){
   let key = '';
   for(let i = 0; i < digits.length; i += 2){
