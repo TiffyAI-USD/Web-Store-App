@@ -789,6 +789,7 @@ function submitActivation(){
   }
 
   localStorage.setItem('tiffyai_activated', 'true');
+  localStorage.setItem('tiffyai_download_count', '0');
   alert('Activation successful. Download starting…');
 
   document.getElementById('activationPanel')?.classList.add('hidden');
