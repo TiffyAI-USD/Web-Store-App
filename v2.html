@@ -406,17 +406,16 @@ button{
 /* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
 const orderState = {};
-/* ===== CURRENCY STATE ===== */
+/* ===== CURRENCY STATE (DISPLAY ONLY) ===== */
 let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
 
 const currencyMap = {
-  ZAR: { symbol: 'R', rate: 1 },
-  USD: { symbol: '$', rate: 0.055 },
-  EUR: { symbol: '€', rate: 0.050 },
-  GBP: { symbol: '£', rate: 0.043 },
-  INR: { symbol: '₹', rate: 4.6 },
-  CNY: { symbol: '¥', rate: 0.40 },
-  JPY: { symbol: '¥', rate: 8.2 }
+  ZAR: { symbol: 'R', label: 'ZAR (R)' },
+  USD: { symbol: '$', label: 'USD ($)' },
+  EUR: { symbol: '€', label: 'EUR (€)' },
+  GBP: { symbol: '£', label: 'GBP (£)' },
+  INR: { symbol: '₹', label: 'INR (₹)' },
+  CNY: { symbol: '¥', label: 'CNY (¥)' }
 };
 
 function setCurrency(code){
