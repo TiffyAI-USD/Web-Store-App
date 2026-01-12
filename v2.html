@@ -467,6 +467,22 @@ function renderMenu(){
       const key = `${s}-${i}`;
       const qty = orderState[key] || 0;
 
+      const noPrice = activeCurrency === 'NONE' || !it.price;
+
+      const actionButton = noPrice
+        ? `<img src="WhatsApp.png"
+              style="width:42px;height:42px;cursor:pointer"
+              onclick="changeQty('${key}',1)">`
+        : `
+            <button onclick="changeQty('${key}', -1)">−</button>
+            <strong>${qty}</strong>
+            <button onclick="changeQty('${key}', 1)">+</button>
+          `;
+
+      const priceHTML = noPrice
+        ? `<div class="price">Negotiable</div>`
+        : `<div class="price">${currencyMap[activeCurrency].symbol}${it.price}</div>`;
+
       const card = document.createElement('div');
       card.className = 'menu-item';
       card.innerHTML = `
@@ -474,16 +490,13 @@ function renderMenu(){
         <div class="card">
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
-          <div class="price">
-            ${currencyMap[activeCurrency].symbol}${it.price}
-          </div>
-          <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
-            <button onclick="changeQty('${key}', -1)">−</button>
-            <strong>${qty}</strong>
-            <button onclick="changeQty('${key}', 1)">+</button>
+          ${priceHTML}
+          <div style="display:flex;gap:10px;margin-top:10px;align-items:center;justify-content:center">
+            ${actionButton}
           </div>
         </div>
       `;
+
       grid.appendChild(card);
     });
 
@@ -496,7 +509,7 @@ function renderMenu(){
 
 function changeQty(key, delta){
   orderState[key] = (orderState[key] || 0) + delta;
-  if (orderState[key] < 0) orderState[key] = 0;
+  if(orderState[key] < 0) orderState[key] = 0;
   renderMenu();
 }
 
