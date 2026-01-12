@@ -446,10 +446,13 @@ button{
 <script>
 /* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
+let logoUrl = '';
+let bannerUrl = '';
 const orderState = {};
 /* ===== CURRENCY STATE ===== */
 let activeCurrency =
   localStorage.getItem('tiffyai_currency') || 'ZAR';
+
 
 const currencyMap = {
   NONE: { symbol: '' },
