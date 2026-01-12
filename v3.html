@@ -704,17 +704,23 @@ function actualDownload(){
   const scripts = doc.querySelectorAll('script');
 
   scripts.forEach(s=>{
-    if(s.textContent.includes('const menuSections')){
-      s.textContent = s.textContent.replace(
-        /const menuSections\s*=\s*\[[\s\S]*?\];/,
-        `const menuSections = ${JSON.stringify(menuSections, null, 2)};`
-      );
-      s.textContent = s.textContent.replace(
-        /let whatsappNumber\s*=\s*["'][^"']*["'];/,
-        `let whatsappNumber = "${whatsappNumber}";`
-      );
-    }
-  });
+  if(s.textContent.includes('const menuSections')){
+    s.textContent = s.textContent.replace(
+      /const menuSections\s*=\s*\[[\s\S]*?\];/,
+      `const menuSections = ${JSON.stringify(menuSections, null, 2)};`
+    );
+
+    s.textContent = s.textContent.replace(
+      /let whatsappNumber\s*=\s*["'][^"']*["'];/,
+      `let whatsappNumber = "${whatsappNumber}";`
+    );
+
+    s.textContent = s.textContent.replace(
+      /let activeCurrency\s*=\s*["'][^"']*["'];/,
+      `let activeCurrency = "${activeCurrency}";`
+    );
+  }
+});
 
   const html = '<!DOCTYPE html>\n' + doc.outerHTML;
   const blob = new Blob([html], { type: 'text/html' });
