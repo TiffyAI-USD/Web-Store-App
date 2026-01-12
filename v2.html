@@ -573,12 +573,14 @@ function renderWhatsapp(){
       if(q){
         const t = q * it.price;
         grand += t;
-        msg += `${q} x ${it.name} – R${t}\n${it.desc}\n\n`;
+        const symbol = currencyMap[activeCurrency].symbol || '';
+
+msg += `${q} x ${it.name} – ${symbol}${t}\n${it.desc}\n\n`;
       }
     });
   });
 
-  msg += `Estimated total: R${grand}`;
+  msg += `Estimated total: ${symbol}${grand}`;
 
   if(!btn){
     btn = document.createElement('a');
