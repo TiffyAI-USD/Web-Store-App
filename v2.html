@@ -375,24 +375,66 @@ button{
 </div>
   
 <div id="editor">
-<h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
+  <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
 
-<div class="editor-block">
-  <label>Business Name</label>
-  <input oninput="cafeName.textContent=this.value">
-  <label>Tagline</label>
-  <input oninput="tagline.textContent=this.value">
-  <label>Logo Upload</label>
-  <input type="file" accept="image/*" onchange="uploadImage(this,img=>logo.src=img)">
-  <label>Banner Upload (Stamp Image)</label>
-  <input type="file" accept="image/*" onchange="uploadImage(this,img=>{
-    header.style.backgroundImage=`url('${img}')`;
-    updateStamp(img);
-  })">
-  <label>Footer Text</label>
-  <input oninput="footerText.textContent=this.value">
-  <label>WhatsApp Number</label>
-  <input value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
+  <div class="editor-block">
+
+    <label>Business Name</label>
+    <input oninput="cafeName.textContent=this.value">
+
+    <label>Tagline</label>
+    <input oninput="tagline.textContent=this.value">
+
+    <!-- LOGO -->
+    <label>Logo Upload</label>
+    <input
+      type="file"
+      accept="image/*"
+      onchange="uploadImage(this,img=>{ logo.src=img; logoUrl=''; })"
+    >
+
+    <label>Logo Image URL (optional)</label>
+    <input
+      type="url"
+      placeholder="https://example.com/logo.png"
+      oninput="logoUrl=this.value; if(logoUrl){logo.src=logoUrl}"
+    >
+
+    <!-- BANNER -->
+    <label>Banner Upload (Stamp Image)</label>
+    <input
+      type="file"
+      accept="image/*"
+      onchange="uploadImage(this,img=>{
+        header.style.backgroundImage=`url('${img}')`;
+        bannerUrl='';
+        updateStamp(img);
+      })"
+    >
+
+    <label>Banner Image URL (optional)</label>
+    <input
+      type="url"
+      placeholder="https://example.com/banner.jpg"
+      oninput="
+        bannerUrl=this.value;
+        if(bannerUrl){
+          header.style.backgroundImage=`url('${bannerUrl}')`;
+          updateStamp(bannerUrl);
+        }
+      "
+    >
+
+    <label>Footer Text</label>
+    <input oninput="footerText.textContent=this.value">
+
+    <label>WhatsApp Number</label>
+    <input
+      value="+27660000000"
+      oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')"
+    >
+
+  </div>
 </div>
 
 <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
