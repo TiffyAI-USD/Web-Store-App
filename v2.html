@@ -375,66 +375,24 @@ button{
 </div>
   
 <div id="editor">
-  <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
+<h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
 
-  <div class="editor-block">
-
-    <label>Business Name</label>
-    <input oninput="cafeName.textContent=this.value">
-
-    <label>Tagline</label>
-    <input oninput="tagline.textContent=this.value">
-
-    <!-- LOGO -->
-    <label>Logo Upload</label>
-    <input
-      type="file"
-      accept="image/*"
-      onchange="uploadImage(this,img=>{ logo.src=img; logoUrl=''; })"
-    >
-
-    <label>Logo Image URL (optional)</label>
-    <input
-      type="url"
-      placeholder="https://example.com/logo.png"
-      oninput="logoUrl=this.value; if(logoUrl){logo.src=logoUrl}"
-    >
-
-    <!-- BANNER -->
-    <label>Banner Upload (Stamp Image)</label>
-    <input
-      type="file"
-      accept="image/*"
-      onchange="uploadImage(this,img=>{
-        header.style.backgroundImage=`url('${img}')`;
-        bannerUrl='';
-        updateStamp(img);
-      })"
-    >
-
-    <label>Banner Image URL (optional)</label>
-    <input
-      type="url"
-      placeholder="https://example.com/banner.jpg"
-      oninput="
-        bannerUrl=this.value;
-        if(bannerUrl){
-          header.style.backgroundImage=`url('${bannerUrl}')`;
-          updateStamp(bannerUrl);
-        }
-      "
-    >
-
-    <label>Footer Text</label>
-    <input oninput="footerText.textContent=this.value">
-
-    <label>WhatsApp Number</label>
-    <input
-      value="+27660000000"
-      oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')"
-    >
-
-  </div>
+<div class="editor-block">
+  <label>Business Name</label>
+  <input oninput="cafeName.textContent=this.value">
+  <label>Tagline</label>
+  <input oninput="tagline.textContent=this.value">
+  <label>Logo Upload</label>
+  <input type="file" accept="image/*" onchange="uploadImage(this,img=>logo.src=img)">
+  <label>Banner Upload (Stamp Image)</label>
+  <input type="file" accept="image/*" onchange="uploadImage(this,img=>{
+    header.style.backgroundImage=`url('${img}')`;
+    updateStamp(img);
+  })">
+  <label>Footer Text</label>
+  <input oninput="footerText.textContent=this.value">
+  <label>WhatsApp Number</label>
+  <input value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
 </div>
 
 <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
@@ -442,27 +400,22 @@ button{
 
 <button onclick="addSection()">+ ADD SECTION</button>
 <button onclick="downloadHTML()">DOWNLOAD WEBSITE HTML</button>
+</div>
 
 <script>
 /* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
-let logoUrl = '';
-let bannerUrl = '';
 const orderState = {};
-/* ===== CURRENCY STATE ===== */
-let activeCurrency =
-  localStorage.getItem('tiffyai_currency') || 'ZAR';
-
+/* ===== CURRENCY STATE (DISPLAY ONLY) ===== */
+let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
 
 const currencyMap = {
-  NONE: { symbol: '' },
-  ZAR: { symbol: 'R' },
-  USD: { symbol: '$' },
-  EUR: { symbol: '€' },
-  GBP: { symbol: '£' },
-  INR: { symbol: '₹' },
-  CNY: { symbol: '¥' },
-  JPY: { symbol: '¥' }
+  ZAR: { symbol: 'R', label: 'ZAR (R)' },
+  USD: { symbol: '$', label: 'USD ($)' },
+  EUR: { symbol: '€', label: 'EUR (€)' },
+  GBP: { symbol: '£', label: 'GBP (£)' },
+  INR: { symbol: '₹', label: 'INR (₹)' },
+  CNY: { symbol: '¥', label: 'CNY (¥)' }
 };
 
 function setCurrency(code){
@@ -511,22 +464,6 @@ function renderMenu(){
       const key = `${s}-${i}`;
       const qty = orderState[key] || 0;
 
-      const noPrice = activeCurrency === 'NONE' || !it.price;
-
-      const actionButton = noPrice
-        ? `<img src="WhatsApp.png"
-              style="width:42px;height:42px;cursor:pointer"
-              onclick="changeQty('${key}',1)">`
-        : `
-            <button onclick="changeQty('${key}', -1)">−</button>
-            <strong>${qty}</strong>
-            <button onclick="changeQty('${key}', 1)">+</button>
-          `;
-
-      const priceHTML = noPrice
-        ? `<div class="price">Negotiable</div>`
-        : `<div class="price">${currencyMap[activeCurrency].symbol}${it.price}</div>`;
-
       const card = document.createElement('div');
       card.className = 'menu-item';
       card.innerHTML = `
@@ -534,13 +471,16 @@ function renderMenu(){
         <div class="card">
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
-          ${priceHTML}
-          <div style="display:flex;gap:10px;margin-top:10px;align-items:center;justify-content:center">
-            ${actionButton}
+          <div class="price">
+            ${currencyMap[activeCurrency].symbol}${it.price}
+          </div>
+          <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+            <button onclick="changeQty('${key}', -1)">−</button>
+            <strong>${qty}</strong>
+            <button onclick="changeQty('${key}', 1)">+</button>
           </div>
         </div>
       `;
-
       grid.appendChild(card);
     });
 
@@ -553,7 +493,7 @@ function renderMenu(){
 
 function changeQty(key, delta){
   orderState[key] = (orderState[key] || 0) + delta;
-  if(orderState[key] < 0) orderState[key] = 0;
+  if (orderState[key] < 0) orderState[key] = 0;
   renderMenu();
 }
 
@@ -576,14 +516,12 @@ function renderWhatsapp(){
       if(q){
         const t = q * it.price;
         grand += t;
-        const symbol = currencyMap[activeCurrency].symbol || '';
-
-msg += `${q} x ${it.name} – ${symbol}${t}\n${it.desc}\n\n`;
+        msg += `${q} x ${it.name} – R${t}\n${it.desc}\n\n`;
       }
     });
   });
 
-  msg += `Estimated total: ${symbol}${grand}`;
+  msg += `Estimated total: R${grand}`;
 
   if(!btn){
     btn = document.createElement('a');
@@ -605,16 +543,11 @@ menuEditor.innerHTML += `
   <div class="editor-block">
     <label>Currency</label>
     <select onchange="setCurrency(this.value)">
-      <option value="NONE" ${activeCurrency==='NONE'?'selected':''}>
-        No price / Negotiation
-      </option>
-      <option value="ZAR" ${activeCurrency==='ZAR'?'selected':''}>ZAR (R)</option>
-      <option value="USD" ${activeCurrency==='USD'?'selected':''}>USD ($)</option>
-      <option value="EUR" ${activeCurrency==='EUR'?'selected':''}>EUR (€)</option>
-      <option value="GBP" ${activeCurrency==='GBP'?'selected':''}>GBP (£)</option>
-      <option value="INR" ${activeCurrency==='INR'?'selected':''}>INR (₹)</option>
-      <option value="CNY" ${activeCurrency==='CNY'?'selected':''}>CNY (¥)</option>
-      <option value="JPY" ${activeCurrency==='JPY'?'selected':''}>JPY (¥)</option>
+      ${Object.entries(currencyMap).map(([code, c]) => `
+        <option value="${code}" ${activeCurrency===code?'selected':''}>
+          ${c.label}
+        </option>
+      `).join('')}
     </select>
   </div>
 `;
