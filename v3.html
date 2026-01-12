@@ -716,9 +716,9 @@ function actualDownload(){
     );
 
     s.textContent = s.textContent.replace(
-      /let activeCurrency\s*=\s*["'][^"']*["'];/,
-      `let activeCurrency = "${activeCurrency}";`
-    );
+  /let activeCurrency\s*=\s*[^;]*;/,
+  `let activeCurrency = "${activeCurrency}";`
+);
   }
 });
 
