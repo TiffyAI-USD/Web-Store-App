@@ -141,6 +141,22 @@ button{
   font-size:1.2rem;
   text-decoration:none;
 }
+.item-whatsapp-btn {
+  background: #25D366;
+  border: none;
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 8px;
+}
+.item-whatsapp-btn img {
+  width: 24px;
+  height: 24px;
+}
   .modal{
   position:fixed;
   inset:0;
@@ -313,6 +329,12 @@ button{
   color:#fff;
 }
 
+.negotiate-text {
+  font-family: 'Bebas Neue';
+  color: var(--gold2);
+  font-size: 1.4rem;
+}
+
 </style>
 </head>
 
@@ -384,11 +406,15 @@ button{
   <input oninput="tagline.textContent=this.value">
   <label>Logo Upload</label>
   <input type="file" accept="image/*" onchange="uploadImage(this,img=>logo.src=img)">
+  <label>Logo URL (preferred for export)</label>
+  <input id="logoUrl" placeholder="https://example.com/logo.png" oninput="updateLogoUrl(this.value)">
   <label>Banner Upload (Stamp Image)</label>
   <input type="file" accept="image/*" onchange="uploadImage(this,img=>{
     header.style.backgroundImage=`url('${img}')`;
     updateStamp(img);
   })">
+  <label>Banner URL (preferred for export)</label>
+  <input id="bannerUrl" placeholder="https://example.com/banner.jpg" oninput="updateBannerUrl(this.value)">
   <label>Footer Text</label>
   <input oninput="footerText.textContent=this.value">
   <label>WhatsApp Number</label>
@@ -403,19 +429,17 @@ button{
 </div>
 
 <script>
-/* ================== GLOBAL STATE ================== */
+/* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
 let logoUrl = "";
 let bannerUrl = "";
 const orderState = {};
-
-/* ================== CURRENCY ================== */
+/* ===== CURRENCY STATE (DISPLAY ONLY) ===== */
 let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
 
 const currencyMap = {
-  NONE: { symbol: '', label: 'No price / Negotiation' },
   ZAR: { symbol: 'R', label: 'ZAR (R)' },
-  USD: { symbol: '$', label: 'USD ($)' },
+  USD: { symbol: '\( ', label: 'USD ( \))' },
   EUR: { symbol: '€', label: 'EUR (€)' },
   GBP: { symbol: '£', label: 'GBP (£)' },
   INR: { symbol: '₹', label: 'INR (₹)' },
@@ -428,36 +452,48 @@ function setCurrency(code){
   renderMenu();
 }
 
-/* ================== DATA ================== */
 const menuSections = [
   {
     title: "Products go here",
     items: [
-      { name: "List your products", price: 120, desc: "Add an awesome description", img: "" }
+      { name: 'List your products', price: 120, desc: "Add an awesome description", img: "" }
     ]
   }
 ];
 
 /* ================== HELPERS ================== */
+function updateStamp(img){
+  document.querySelector('meta[property="og:image"]').content = img;
+  document.querySelector('meta[name="twitter:image"]').content = img;
+}
+
 function uploadImage(input, cb){
   const f = input.files[0];
-  if(!f) return;
+  if (!f) return;
   const r = new FileReader();
   r.onload = e => cb(e.target.result);
   r.readAsDataURL(f);
 }
 
-function updateStamp(img){
-  document.querySelector('meta[property="og:image"]')?.setAttribute('content', img);
-  document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', img);
+function updateLogoUrl(val) {
+  logoUrl = val.trim();
+  if (logoUrl) logo.src = logoUrl;
 }
 
-/* ================== MENU ================== */
-function renderMenu(){
-  const wrap = document.getElementById('menuRender');
-  wrap.innerHTML = '';
+function updateBannerUrl(val) {
+  bannerUrl = val.trim();
+  if (bannerUrl) {
+    header.style.backgroundImage = `url('${bannerUrl}')`;
+    updateStamp(bannerUrl);
+  }
+}
 
-  menuSections.forEach((sec,s)=>{
+/* ================== MENU RENDER ================== */
+function renderMenu(){
+  const menuRender = document.getElementById('menuRender');
+  menuRender.innerHTML = '';
+
+  menuSections.forEach((sec, s) => {
     const h2 = document.createElement('h2');
     h2.className = 'section-title';
     h2.textContent = sec.title;
@@ -465,11 +501,10 @@ function renderMenu(){
     const grid = document.createElement('div');
     grid.className = 'menu-grid';
 
-    sec.items.forEach((it,i)=>{
-      const key = `${s}-${i}`;
+    sec.items.forEach((it, i) => {
+      const key = `\( {s}- \){i}`;
       const qty = orderState[key] || 0;
-
-      const showPrice = activeCurrency !== 'NONE' && Number(it.price) > 0;
+      const isNegotiable = it.price == 0 || it.price === "" || it.price == null;
 
       const card = document.createElement('div');
       card.className = 'menu-item';
@@ -478,76 +513,70 @@ function renderMenu(){
         <div class="card">
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
-
-          <div class="price">
-            ${showPrice ? currencyMap[activeCurrency].symbol + it.price : 'Contact for price'}
-          </div>
-
-          ${
-            showPrice
-            ? `
-              <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
-                <button onclick="changeQty('${key}',-1)">−</button>
-                <strong>${qty}</strong>
-                <button onclick="changeQty('${key}',1)">+</button>
-              </div>
-            `
-            : `
-              <div style="margin-top:10px;text-align:center">
-                <img src="WhatsApp.png"
-                     style="width:42px;cursor:pointer"
-                     onclick="changeQty('${key}',1)">
-              </div>
-            `
+          ${isNegotiable 
+            ? `<div class="price negotiate-text">Negotiate / Open for negotiation</div>`
+            : `<div class="price">\( {currencyMap[activeCurrency].symbol} \){it.price}</div>`
           }
+          <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+            ${isNegotiable 
+              ? `<button class="item-whatsapp-btn" onclick="contactItem('\( {it.name}', ' \){it.desc}')">
+                   <img src="./WhatsApp.png" alt="WhatsApp">
+                 </button>`
+              : `
+                <button onclick="changeQty('${key}', -1)">−</button>
+                <strong>${qty}</strong>
+                <button onclick="changeQty('${key}', 1)">+</button>
+              `
+            }
+          </div>
         </div>
       `;
       grid.appendChild(card);
     });
 
-    wrap.appendChild(h2);
-    wrap.appendChild(grid);
+    menuRender.appendChild(h2);
+    menuRender.appendChild(grid);
   });
 
   renderWhatsapp();
 }
 
+function contactItem(name, desc) {
+  const msg = `Hi! I'm interested in: \( {name}\n \){desc ? desc + '\n' : ''}Can we negotiate / discuss price?`;
+  window.open(`https://wa.me/\( {whatsappNumber}?text= \){encodeURIComponent(msg)}`, '_blank');
+}
+
 function changeQty(key, delta){
-  orderState[key] = Math.max(0,(orderState[key]||0)+delta);
+  orderState[key] = (orderState[key] || 0) + delta;
+  if (orderState[key] < 0) orderState[key] = 0;
   renderMenu();
 }
 
-/* ================== WHATSAPP ================== */
+/* ================== WHATSAPP CART BUTTON ================== */
 function renderWhatsapp(){
   const total = Object.values(orderState).reduce((a,b)=>a+b,0);
   let btn = document.getElementById('whatsappOrderBtn');
 
-  if(total === 0){
-    btn?.remove();
+  if (total === 0){
+    if (btn) btn.remove();
     return;
   }
 
   let msg = "Hi! I'd like to order:\n\n";
   let grand = 0;
 
-  menuSections.forEach((sec,s)=>{
-    sec.items.forEach((it,i)=>{
-      const q = orderState[`${s}-${i}`] || 0;
-      if(!q) return;
-
-      if(activeCurrency === 'NONE' || !it.price){
-        msg += `${q} x ${it.name}\n${it.desc}\n\n`;
-      } else {
+  menuSections.forEach((sec, s)=>{
+    sec.items.forEach((it, i)=>{
+      const q = orderState[`\( {s}- \){i}`] || 0;
+      if(q){
         const t = q * it.price;
         grand += t;
-        msg += `${q} x ${it.name} – ${currencyMap[activeCurrency].symbol}${t}\n${it.desc}\n\n`;
+        msg += `${q} x \( {it.name} – R \){t}\n${it.desc}\n\n`;
       }
     });
   });
 
-  if(activeCurrency !== 'NONE'){
-    msg += `Estimated total: ${currencyMap[activeCurrency].symbol}${grand}`;
-  }
+  msg += `Estimated total: R${grand}`;
 
   if(!btn){
     btn = document.createElement('a');
@@ -561,76 +590,291 @@ function renderWhatsapp(){
 
 /* ================== EDITOR ================== */
 function renderEditor(){
-  const ed = document.getElementById('menuEditor');
-  ed.innerHTML = `
-    <div class="editor-block">
-      <label>Currency</label>
-      <select onchange="setCurrency(this.value)">
-        ${Object.entries(currencyMap).map(([k,v])=>`
-          <option value="${k}" ${k===activeCurrency?'selected':''}>${v.label}</option>
-        `).join('')}
-      </select>
-    </div>
-  `;
+  const menuEditor = document.getElementById('menuEditor');
+  if (!menuEditor) return;
 
-  menuSections.forEach((sec,s)=>{
-    const b = document.createElement('div');
-    b.className = 'editor-block';
-    b.innerHTML = `
-      <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
+  menuEditor.innerHTML = '';
+  menuEditor.innerHTML += `
+  <div class="editor-block">
+    <label>Currency</label>
+    <select onchange="setCurrency(this.value)">
+      ${Object.entries(currencyMap).map(([code, c]) => `
+        <option value="${code}" ${activeCurrency===code?'selected':''}>
+          ${c.label}
+        </option>
+      `).join('')}
+    </select>
+  </div>
+`;
+
+  menuSections.forEach((sec, s)=>{
+    const block = document.createElement('div');
+    block.className = 'editor-block';
+
+    block.innerHTML = `
+      <div class="section-head">
+        <input value="\( {sec.title}" oninput="menuSections[ \){s}].title=this.value;renderMenu()">
+        <button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
+      </div>
+
       ${sec.items.map((it,i)=>`
         <label>Name</label>
-        <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+        <input value="\( {it.name}" oninput="menuSections[ \){s}].items[${i}].name=this.value;renderMenu()">
 
-        <label>Price (0 = negotiate)</label>
-        <input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+        <label>Price</label>
+        <input type="number" value="\( {it.price}" oninput="menuSections[ \){s}].items[${i}].price=this.value;renderMenu()">
+
+        <label>Description</label>
+        <textarea oninput="menuSections[\( {s}].items[ \){i}].desc=this.value;renderMenu()">${it.desc}</textarea>
 
         <label>Image URL</label>
-        <input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+        <input value="\( {it.img}" oninput="menuSections[ \){s}].items[${i}].img=this.value;renderMenu()">
 
-        <label>Upload Image</label>
-        <input type="file" accept="image/*"
-          onchange="uploadImage(this,img=>{menuSections[${s}].items[${i}].img=img;renderMenu()})">
+        <label>Or Upload Image</label>
+        <input type="file" accept="image/*" onchange="uploadImage(this,img=>{menuSections[\( {s}].items[ \){i}].img=img;renderMenu()})">
+
+        <button class="remove" onclick="menuSections[\( {s}].items.splice( \){i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
       `).join('')}
+
+      <button onclick="menuSections[${s}].items.push({name:'NEW ITEM',price:0,desc:'',img:''});renderEditor();renderMenu()">+ ADD ITEM</button>
     `;
-    ed.appendChild(b);
+
+    menuEditor.appendChild(block);
   });
 }
 
-/* ================== DOWNLOAD (FIXED) ================== */
+function addSection(){
+  menuSections.push({ title: "NEW SECTION", items: [] });
+  renderEditor();
+  renderMenu();
+}
+/* ===== PAYMENT GATE ===== */
 function downloadHTML(){
-  actualDownload();
+
+  // If already activated, allow download
+  if(localStorage.getItem('tiffyai_activated') === 'true'){
+    actualDownload();
+    return;
+  }
+
+  // Generate request code (14 digits, stored)
+  const orderCode = generateRequestCode();
+
+  const company =
+    document.getElementById('cafeName')?.textContent ||
+    'YOUR WEB STORE BUSINESS';
+
+  const msg = `
+TIFFYAI PAYMENT INITIATED
+
+Company: ${company}
+Order Code: ${orderCode}
+Amount: R499 / $30
+Methods:PayPal, EFT, Crypto Currencies or eWallet to +27766314246
+
+EFT DETAILS:Please write this down)
+FNB (First National Bank)
+Account Name: TiffyAI
+Account Number: 62912507433
+Branch code: 250655
+Swift Code: FIRNZAJJ
+
+Please confirm payment. Screenshot will do.
+Your 7 Digit Activation key will be sent by the admin after proof of payment verification.
+
+Download your New Web Store with the activation key you will receive after payment and send your html file to us here on WhatsApp to connect live on Google and TiffyAI marketplace. We are always here for support. So don't hesitate to contact us.
+  `.trim();
+
+  // Send WhatsApp message WITH CODE
+  window.open(
+    'https://wa.me/27766314246?text=' + encodeURIComponent(msg),
+    '_blank'
+  );
+
+  // Show payment options
+  document.getElementById('paymentModal')?.classList.remove('hidden');
 }
 
+function closePayment(){
+  document.getElementById('paymentModal')?.classList.add('hidden');
+}
+
+/* REAL PAYPAL */
+function payWithPaypal(){
+  window.open(
+    'https://paypal.me/CatHostProWebsites/30',
+    '_blank'
+  );
+}
+
+/* EFT / MANUAL PAYMENT CONFIRM */
+function confirmManualPayment(){
+  closePayment();
+
+  const company =
+    document.getElementById('cafeName')?.textContent ||
+    'YOUR WEB STORE BUSINESS';
+
+  const time = new Date().toLocaleString();
+
+  const msg = `
+PAYMENT CONFIRMATION IN PROGRESS
+
+Company: ${company}
+Amount: R499
+Time: ${time}
+
+EFT DETAILS:Please write this down)
+FNB (First National Bank)
+Account Name: TiffyAI
+Account Number: 62912507433
+Branch code: 250655
+Swift Code: FIRNZAJJ
+
+Please attach proof of payment. Screenshot accepted.
+Your 7-digit activation key will be sent after verification.
+
+Then just Download your New Web Store with the activation key and send your html to us here on WhatsApp to connect live on Google and TiffyAI marketplace. We are always here for support, so don't hesitate to contact us.
+  `.trim();
+
+  window.open(
+    'https://wa.me/27766314246?text=' + encodeURIComponent(msg),
+    '_blank'
+  );
+}
+
+/* ================== EXPORT ================== */
 function actualDownload(){
-  const clone = document.documentElement.cloneNode(true);
-  clone.querySelector('#editor')?.remove();
+  // Force use of URL if provided (prevents blob in export)
+  if (logoUrl) document.getElementById('logo').src = logoUrl;
+  if (bannerUrl) {
+    document.getElementById('header').style.backgroundImage = `url('${bannerUrl}')`;
+    updateStamp(bannerUrl);
+  }
 
-  clone.querySelectorAll('script').forEach(s=>{
-    if(s.textContent.includes('menuSections')){
-      s.textContent = s.textContent
-        .replace(/const menuSections[\s\S]*?];/, `const menuSections = ${JSON.stringify(menuSections,null,2)};`)
-        .replace(/let whatsappNumber\s*=\s*["'][^"']*["'];/, `let whatsappNumber = "${whatsappNumber}";`)
-        .replace(/let activeCurrency\s*=\s*[^;]*;/, `let activeCurrency = "${activeCurrency}";`)
-        .replace(/let logoUrl\s*=\s*["'][^"']*["'];/, `let logoUrl = "${logoUrl}";`)
-        .replace(/let bannerUrl\s*=\s*["'][^"']*["'];/, `let bannerUrl = "${bannerUrl}";`);
-    }
-  });
+  const doc = document.documentElement.cloneNode(true);
 
-  const blob = new Blob(['<!DOCTYPE html>\n'+clone.outerHTML],{type:'text/html'});
+  const editor = doc.querySelector('#editor');
+  if(editor) editor.remove();
+
+  const payment = doc.querySelector('#paymentModal');
+  if(payment) payment.remove();
+
+  const activation = doc.querySelector('#activationPanel');
+  if(activation) activation.remove();
+
+  const scripts = doc.querySelectorAll('script');
+
+  scripts.forEach(s=>{
+  if(s.textContent.includes('const menuSections')){
+    s.textContent = s.textContent.replace(
+      /const menuSections\s*=\s*\[[\s\S]*?\];/,
+      `const menuSections = ${JSON.stringify(menuSections, null, 2)};`
+    );
+
+    s.textContent = s.textContent.replace(
+      /let whatsappNumber\s*=\s*["'][^"']*["'];/,
+      `let whatsappNumber = "${whatsappNumber}";`
+    );
+
+    s.textContent = s.textContent.replace(
+      /let activeCurrency\s*=\s*[^;]*;/,
+      `let activeCurrency = "${activeCurrency}";`
+    );
+
+    // Preserve our new top-level vars in export
+    s.textContent = s.textContent.replace(
+      /let logoUrl\s*=\s*["']?[^;]*["']?;/,
+      `let logoUrl = "${logoUrl}";`
+    );
+    s.textContent = s.textContent.replace(
+      /let bannerUrl\s*=\s*["']?[^;]*["']?;/,
+      `let bannerUrl = "${bannerUrl}";`
+    );
+  }
+});
+
+  const html = '<!DOCTYPE html>\n' + doc.outerHTML;
+  const blob = new Blob([html], { type: 'text/html' });
+  const url = URL.createObjectURL(blob);
+
   const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
+  a.href = url;
   a.download = 'WEB-Store.html';
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(a.href);
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+/* ================== TIFFYAI ACTIVATION CORE ================== */
+
+/* Storage helpers */
+function getRequestStore(){
+  return JSON.parse(localStorage.getItem('tiffyai_requests') || '[]');
+}
+
+function saveRequestStore(arr){
+  localStorage.setItem('tiffyai_requests', JSON.stringify(arr));
+}
+
+/* Generate EXACTLY 14 digits and store */
+function generateRequestCode(){
+  let digits = '';
+  while(digits.length < 14){
+    digits += Math.floor(Math.random() * 10);
+  }
+
+  const store = getRequestStore();
+  store.push(digits);
+  saveRequestStore(store);
+
+  return digits.match(/.{1,4}/g).join('-');
+}
+
+function deriveActivationKey(digits){
+  let key = '';
+  for(let i = 0; i < digits.length; i += 2){
+    key += digits[i];
+  }
+  return key; // ALWAYS 7 digits
+}
+
+/* Validate against ALL issued codes */
+function validateActivation(input){
+  const store = getRequestStore();
+  return store.some(d => deriveActivationKey(d) === input);
+}
+
+/* Activation submit */
+function submitActivation(){
+  const inputs = document.querySelectorAll('.code-inputs input');
+  let entered = '';
+  inputs.forEach(i => entered += i.value.trim());
+
+  if(entered.length !== 7){
+    alert('Please enter all 7 digits.');
+    return;
+  }
+
+  if(!validateActivation(entered)){
+    alert('Invalid activation key.');
+    return;
+  }
+
+  localStorage.setItem('tiffyai_activated', 'true');
+  localStorage.setItem('tiffyai_download_count', '0');
+  alert('Activation successful. Download starting…');
+
+  document.getElementById('activationPanel')?.classList.add('hidden');
+  actualDownload();
 }
 
 /* ================== INIT ================== */
 renderMenu();
 renderEditor();
+  
 </script>
-
-
   <script>
 /* ================== TIFFYAI PERSISTENCE + LIMITER ================== */
 
