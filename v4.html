@@ -403,11 +403,13 @@ button{
 </div>
 
 <script>
-/* ================== STATE ================== */
+/* ================== GLOBAL STATE ================== */
 let whatsappNumber = "+27660000000";
+let logoUrl = "";
+let bannerUrl = "";
 const orderState = {};
 
-/* ===== CURRENCY STATE (DISPLAY ONLY) ===== */
+/* ================== CURRENCY ================== */
 let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
 
 const currencyMap = {
@@ -426,29 +428,17 @@ function setCurrency(code){
   renderMenu();
 }
 
-/* ================== MENU DATA ================== */
+/* ================== DATA ================== */
 const menuSections = [
   {
     title: "Products go here",
     items: [
-      {
-        name: "List your products",
-        price: 120,
-        desc: "Add an awesome description",
-        img: ""
-      }
+      { name: "List your products", price: 120, desc: "Add an awesome description", img: "" }
     ]
   }
 ];
 
 /* ================== HELPERS ================== */
-function updateStamp(img){
-  const og = document.querySelector('meta[property="og:image"]');
-  const tw = document.querySelector('meta[name="twitter:image"]');
-  if(og) og.content = img;
-  if(tw) tw.content = img;
-}
-
 function uploadImage(input, cb){
   const f = input.files[0];
   if(!f) return;
@@ -457,12 +447,17 @@ function uploadImage(input, cb){
   r.readAsDataURL(f);
 }
 
-/* ================== MENU RENDER ================== */
-function renderMenu(){
-  const menuRender = document.getElementById('menuRender');
-  menuRender.innerHTML = '';
+function updateStamp(img){
+  document.querySelector('meta[property="og:image"]')?.setAttribute('content', img);
+  document.querySelector('meta[name="twitter:image"]')?.setAttribute('content', img);
+}
 
-  menuSections.forEach((sec, s)=>{
+/* ================== MENU ================== */
+function renderMenu(){
+  const wrap = document.getElementById('menuRender');
+  wrap.innerHTML = '';
+
+  menuSections.forEach((sec,s)=>{
     const h2 = document.createElement('h2');
     h2.className = 'section-title';
     h2.textContent = sec.title;
@@ -470,58 +465,55 @@ function renderMenu(){
     const grid = document.createElement('div');
     grid.className = 'menu-grid';
 
-    sec.items.forEach((it, i)=>{
+    sec.items.forEach((it,i)=>{
       const key = `${s}-${i}`;
       const qty = orderState[key] || 0;
 
+      const showPrice = activeCurrency !== 'NONE' && Number(it.price) > 0;
+
       const card = document.createElement('div');
       card.className = 'menu-item';
-
       card.innerHTML = `
         <img src="${it.img || ''}">
         <div class="card">
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
 
-          ${
-            activeCurrency === 'NONE' || !it.price
-            ? `<div class="price">Contact for price</div>`
-            : `<div class="price">${currencyMap[activeCurrency].symbol}${it.price}</div>`
-          }
+          <div class="price">
+            ${showPrice ? currencyMap[activeCurrency].symbol + it.price : 'Contact for price'}
+          </div>
 
           ${
-            activeCurrency === 'NONE' || !it.price
+            showPrice
             ? `
-              <div style="margin-top:10px;text-align:center">
-                <img src="WhatsApp.png"
-                     style="width:42px;height:42px;cursor:pointer"
-                     onclick="changeQty('${key}',1)">
+              <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+                <button onclick="changeQty('${key}',-1)">−</button>
+                <strong>${qty}</strong>
+                <button onclick="changeQty('${key}',1)">+</button>
               </div>
             `
             : `
-              <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
-                <button onclick="changeQty('${key}', -1)">−</button>
-                <strong>${qty}</strong>
-                <button onclick="changeQty('${key}', 1)">+</button>
+              <div style="margin-top:10px;text-align:center">
+                <img src="WhatsApp.png"
+                     style="width:42px;cursor:pointer"
+                     onclick="changeQty('${key}',1)">
               </div>
             `
           }
         </div>
       `;
-
       grid.appendChild(card);
     });
 
-    menuRender.appendChild(h2);
-    menuRender.appendChild(grid);
+    wrap.appendChild(h2);
+    wrap.appendChild(grid);
   });
 
   renderWhatsapp();
 }
 
 function changeQty(key, delta){
-  orderState[key] = (orderState[key] || 0) + delta;
-  if(orderState[key] < 0) orderState[key] = 0;
+  orderState[key] = Math.max(0,(orderState[key]||0)+delta);
   renderMenu();
 }
 
@@ -531,7 +523,7 @@ function renderWhatsapp(){
   let btn = document.getElementById('whatsappOrderBtn');
 
   if(total === 0){
-    if(btn) btn.remove();
+    btn?.remove();
     return;
   }
 
@@ -569,99 +561,63 @@ function renderWhatsapp(){
 
 /* ================== EDITOR ================== */
 function renderEditor(){
-  const menuEditor = document.getElementById('menuEditor');
-  if(!menuEditor) return;
-
-  menuEditor.innerHTML = `
+  const ed = document.getElementById('menuEditor');
+  ed.innerHTML = `
     <div class="editor-block">
       <label>Currency</label>
       <select onchange="setCurrency(this.value)">
-        ${Object.entries(currencyMap).map(([code,c])=>`
-          <option value="${code}" ${activeCurrency===code?'selected':''}>
-            ${c.label}
-          </option>
+        ${Object.entries(currencyMap).map(([k,v])=>`
+          <option value="${k}" ${k===activeCurrency?'selected':''}>${v.label}</option>
         `).join('')}
       </select>
     </div>
   `;
 
   menuSections.forEach((sec,s)=>{
-    const block = document.createElement('div');
-    block.className = 'editor-block';
-
-    block.innerHTML = `
-      <div class="section-head">
-        <input value="${sec.title}"
-          oninput="menuSections[${s}].title=this.value;renderMenu()">
-        <button class="remove"
-          onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
-      </div>
-
+    const b = document.createElement('div');
+    b.className = 'editor-block';
+    b.innerHTML = `
+      <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
       ${sec.items.map((it,i)=>`
         <label>Name</label>
-        <input value="${it.name}"
-          oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+        <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
 
-        <label>Price (0 = no price)</label>
-        <input type="number" value="${it.price}"
-          oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
-
-        <label>Description</label>
-        <textarea
-          oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
+        <label>Price (0 = negotiate)</label>
+        <input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
 
         <label>Image URL</label>
-        <input value="${it.img}"
-          oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+        <input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
 
-        <label>Or Upload Image</label>
+        <label>Upload Image</label>
         <input type="file" accept="image/*"
           onchange="uploadImage(this,img=>{menuSections[${s}].items[${i}].img=img;renderMenu()})">
-
-        <button class="remove"
-          onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">
-          REMOVE ITEM
-        </button>
       `).join('')}
-
-      <button onclick="
-        menuSections[${s}].items.push({name:'NEW ITEM',price:0,desc:'',img:''});
-        renderEditor();renderMenu();">
-        + ADD ITEM
-      </button>
     `;
-
-    menuEditor.appendChild(block);
+    ed.appendChild(b);
   });
 }
 
-function addSection(){
-  menuSections.push({ title: "NEW SECTION", items: [] });
-  renderEditor();
-  renderMenu();
+/* ================== DOWNLOAD (FIXED) ================== */
+function downloadHTML(){
+  actualDownload();
 }
 
-/* ================== EXPORT ================== */
 function actualDownload(){
-  const doc = document.documentElement.cloneNode(true);
+  const clone = document.documentElement.cloneNode(true);
+  clone.querySelector('#editor')?.remove();
 
-  doc.querySelector('#editor')?.remove();
-  doc.querySelector('#paymentModal')?.remove();
-  doc.querySelector('#activationPanel')?.remove();
-
-  doc.querySelectorAll('script').forEach(s=>{
-    if(s.textContent.includes('const menuSections')){
+  clone.querySelectorAll('script').forEach(s=>{
+    if(s.textContent.includes('menuSections')){
       s.textContent = s.textContent
-        .replace(/const menuSections\s*=\s*\[[\s\S]*?\];/,
-          `const menuSections = ${JSON.stringify(menuSections, null, 2)};`)
-        .replace(/let whatsappNumber\s*=\s*["'][^"']*["'];/,
-          `let whatsappNumber = "${whatsappNumber}";`)
-        .replace(/let activeCurrency\s*=\s*[^;]*;/,
-          `let activeCurrency = "${activeCurrency}";`);
+        .replace(/const menuSections[\s\S]*?];/, `const menuSections = ${JSON.stringify(menuSections,null,2)};`)
+        .replace(/let whatsappNumber\s*=\s*["'][^"']*["'];/, `let whatsappNumber = "${whatsappNumber}";`)
+        .replace(/let activeCurrency\s*=\s*[^;]*;/, `let activeCurrency = "${activeCurrency}";`)
+        .replace(/let logoUrl\s*=\s*["'][^"']*["'];/, `let logoUrl = "${logoUrl}";`)
+        .replace(/let bannerUrl\s*=\s*["'][^"']*["'];/, `let bannerUrl = "${bannerUrl}";`);
     }
   });
 
-  const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], {type:'text/html'});
+  const blob = new Blob(['<!DOCTYPE html>\n'+clone.outerHTML],{type:'text/html'});
   const a = document.createElement('a');
   a.href = URL.createObjectURL(blob);
   a.download = 'WEB-Store.html';
@@ -673,6 +629,7 @@ function actualDownload(){
 renderMenu();
 renderEditor();
 </script>
+
 
   <script>
 /* ================== TIFFYAI PERSISTENCE + LIMITER ================== */
