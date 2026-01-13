@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -395,7 +395,7 @@ button{
 
   <button onclick="submitActivation()">Activate & Unlock Download</button>
 </div>
-  
+ 
 <div id="editor">
 <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
 
@@ -502,7 +502,7 @@ function renderMenu(){
     grid.className = 'menu-grid';
 
     sec.items.forEach((it, i) => {
-      const key = `\( {s}- \){i}`;
+      const key = `${s}- ){i}`;
       const qty = orderState[key] || 0;
       const isNegotiable = it.price == 0 || it.price === "" || it.price == null;
 
@@ -513,13 +513,13 @@ function renderMenu(){
         <div class="card">
           <h3>${it.name}</h3>
           <p>${it.desc}</p>
-          ${isNegotiable 
+          ${isNegotiable
             ? `<div class="price negotiate-text">Negotiate / Open for negotiation</div>`
-            : `<div class="price">\( {currencyMap[activeCurrency].symbol} \){it.price}</div>`
+            : `<div class="price">${currencyMap[activeCurrency].symbol}{it.price}</div>`
           }
           <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
-            ${isNegotiable 
-              ? `<button class="item-whatsapp-btn" onclick="contactItem('\( {it.name}', ' \){it.desc}')">
+            ${isNegotiable
+              ? `<button class="item-whatsapp-btn" onclick="contactItem('${it.name}', ' ){it.desc}')">
                    <img src="./WhatsApp.png" alt="WhatsApp">
                  </button>`
               : `
@@ -542,8 +542,8 @@ function renderMenu(){
 }
 
 function contactItem(name, desc) {
-  const msg = `Hi! I'm interested in: \( {name}\n \){desc ? desc + '\n' : ''}Can we negotiate / discuss price?`;
-  window.open(`https://wa.me/\( {whatsappNumber}?text= \){encodeURIComponent(msg)}`, '_blank');
+  const msg = `Hi! I'm interested in: ${name}\n ){desc ? desc + '\n' : ''}Can we negotiate / discuss price?`;
+  window.open(`https://wa.me/${whatsappNumber}?text= ){encodeURIComponent(msg)}`, '_blank');
 }
 
 function changeQty(key, delta){
@@ -567,11 +567,11 @@ function renderWhatsapp(){
 
   menuSections.forEach((sec, s)=>{
     sec.items.forEach((it, i)=>{
-      const q = orderState[`\( {s}- \){i}`] || 0;
+      const q = orderState[`${s}- ){i}`] || 0;
       if(q){
         const t = q * it.price;
         grand += t;
-        msg += `${q} x \( {it.name} – R \){t}\n${it.desc}\n\n`;
+        msg += `${q} x ${it.name} – R ){t}\n${it.desc}\n\n`;
       }
     });
   });
@@ -613,27 +613,27 @@ function renderEditor(){
 
     block.innerHTML = `
       <div class="section-head">
-        <input value="\( {sec.title}" oninput="menuSections[ \){s}].title=this.value;renderMenu()">
+        <input value="${sec.title}" oninput="menuSections[ ){s}].title=this.value;renderMenu()">
         <button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
       </div>
 
       ${sec.items.map((it,i)=>`
         <label>Name</label>
-        <input value="\( {it.name}" oninput="menuSections[ \){s}].items[${i}].name=this.value;renderMenu()">
+        <input value="${it.name}" oninput="menuSections[ ){s}].items[${i}].name=this.value;renderMenu()">
 
         <label>Price</label>
-        <input type="number" value="\( {it.price}" oninput="menuSections[ \){s}].items[${i}].price=this.value;renderMenu()">
+        <input type="number" value="${it.price}" oninput="menuSections[ ){s}].items[${i}].price=this.value;renderMenu()">
 
         <label>Description</label>
-        <textarea oninput="menuSections[\( {s}].items[ \){i}].desc=this.value;renderMenu()">${it.desc}</textarea>
+        <textarea oninput="menuSections[${s}].items[ ){i}].desc=this.value;renderMenu()">${it.desc}</textarea>
 
         <label>Image URL</label>
-        <input value="\( {it.img}" oninput="menuSections[ \){s}].items[${i}].img=this.value;renderMenu()">
+        <input value="${it.img}" oninput="menuSections[ ){s}].items[${i}].img=this.value;renderMenu()">
 
         <label>Or Upload Image</label>
-        <input type="file" accept="image/*" onchange="uploadImage(this,img=>{menuSections[\( {s}].items[ \){i}].img=img;renderMenu()})">
+        <input type="file" accept="image/*" onchange="uploadImage(this,img=>{menuSections[${s}].items[ ){i}].img=img;renderMenu()})">
 
-        <button class="remove" onclick="menuSections[\( {s}].items.splice( \){i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
+        <button class="remove" onclick="menuSections[${s}].items.splice( ){i},1);renderEditor();renderMenu()">REMOVE ITEM</button>
       `).join('')}
 
       <button onclick="menuSections[${s}].items.push({name:'NEW ITEM',price:0,desc:'',img:''});renderEditor();renderMenu()">+ ADD ITEM</button>
@@ -873,7 +873,7 @@ function submitActivation(){
 /* ================== INIT ================== */
 renderMenu();
 renderEditor();
-  
+ 
 </script>
   <script>
 /* ================== TIFFYAI PERSISTENCE + LIMITER ================== */
