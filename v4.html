@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- SOCIAL / LINK PREVIEW -->
+<meta property="og:title" content="TiffyAI Web-Store Builder">
+<meta property="og:description" content="Create your own web-store with live preview. Order via WhatsApp. Ready in minutes.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tiffyai-usd.github.io/Web-Store-App/v2.html">
+
+<meta property="og:image" content="https://tiffyai-usd.github.io/Web-Store-App/WebApp.gif">
+<meta property="og:image:secure_url" content="https://tiffyai-usd.github.io/Web-Store-App/WebApp.gif">
+<meta property="og:image:type" content="image/gif">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://tiffyai-usd.github.io/Web-Store-App/WebApp.gif">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+:root{--gold:#d4a373;--gold2:#f1b86b}
+
+/* HEADER */
+header{
+  min-height:80vh;
+  background-size:cover;
+  background-position:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  position:relative;
+}
+header::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+}
+header *{position:relative;z-index:2}
+.logo{
+  max-width:180px;
+  border-radius:16px;
+  border:3px solid var(--gold);
+  margin-bottom:1rem;
+}
+h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
+.tagline{font-family:'Bebas Neue';color:var(--gold)}
+
+/* MENU */
+#menu{max-width:1200px;margin:auto;padding:4rem 5%}
+.section-title{
+  font-family:'Bebas Neue';
+  font-size:2.4rem;
+  color:var(--gold);
+  margin:2rem 0 1rem;
+}
+.menu-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.2rem;
+}
+.menu-item{
+  background:#0f0f0f;
+  border-radius:12px;
+  border:1px solid #222;
+  overflow:hidden;
+}
+.menu-item img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-bottom:3px solid var(--gold);
+}
+.card{padding:1rem}
+.menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
+.price{font-family:'Bebas Neue';color:var(--gold2)}
+
+/* FOOTER */
+footer{
+  background:#000;
+  padding:2rem;
+  text-align:center;
+  border-top:1px solid #222;
+  color:#999;
+}
+
+/* EDITOR */
+#editor{
+  background:url('silky.jpeg') center / cover no-repeat;
+  border-top:3px dashed var(--gold);
+  padding:3rem 5%;
+}
+.editor-block{
+  background:rgba(20,20,20,0.92);
+  padding:1.5rem;
+  border-radius:14px;
+  margin-bottom:2rem;
+  box-shadow:0 10px 30px rgba(0,0,0,0.6);
+}
+label{display:block;margin-top:1rem;color:var(--gold)}
+input,textarea{
+  width:100%;
+  padding:10px;
+  background:#222;
+  border:1px solid #444;
+  color:#fff;
+  border-radius:6px;
+}
+textarea{resize:vertical}
+button{
+  background:linear-gradient(180deg,var(--gold),var(--gold2));
+  border:none;
+  padding:10px 18px;
+  border-radius:30px;
+  font-family:'Bebas Neue';
+  font-size:1.1rem;
+  cursor:pointer;
+  margin-top:10px;
+}
+.remove{background:#900;color:#fff}
+.section-head{display:flex;gap:10px;align-items:center}
+.section-head input{flex:1}
+
+/* WHATSAPP */
+#whatsappOrderBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:999;
+  background:linear-gradient(180deg,#25D366,#1ebe5d);
+  color:#071010;
+  padding:14px 22px;
+  border-radius:40px;
+  font-family:'Bebas Neue';
+  font-size:1.2rem;
+  text-decoration:none;
+}
+  .modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+}
+.hidden{display:none}
+
+.modal-glass{
+  width:90%;
+  max-width:420px;
+  background:rgba(20,20,20,0.85);
+  backdrop-filter:blur(14px);
+  border:1px solid rgba(212,163,115,0.4);
+  border-radius:20px;
+  padding:2rem;
+  color:#fff;
+  box-shadow:0 0 40px rgba(212,163,115,0.25);
+}
+
+.modal-glass h2{
+  font-family:'Bebas Neue';
+  color:var(--gold);
+  text-align:center;
+  font-size:2.4rem;
+}
+
+.modal-glass .sub{
+  text-align:center;
+  color:#ccc;
+  margin-bottom:1.5rem;
+}
+
+.modal-glass label{
+  margin-top:1rem;
+  display:block;
+  color:var(--gold);
+}
+
+.modal-glass input,
+.modal-glass select{
+  width:100%;
+  padding:10px;
+  background:#111;
+  border:1px solid #333;
+  color:#fff;
+  border-radius:8px;
+}
+
+.modal-glass .row{
+  display:flex;
+  gap:10px;
+}
+
+.modal-glass button{
+  width:100%;
+  margin-top:1rem;
+}
+
+.modal-glass .ghost{
+  background:none;
+  border:1px solid #444;
+  color:#aaa;
+}
+/* ===== PAYMENT MODAL ===== */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.75);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:2000;
+}
+.hidden{display:none}
+
+.modal-glass{
+  width:100%;
+  max-width:420px;
+  padding:2rem;
+  border-radius:22px;
+  background:linear-gradient(
+    145deg,
+    rgba(20,20,20,0.9),
+    rgba(5,5,5,0.95)
+  );
+  border:1px solid rgba(212,163,115,0.4);
+  box-shadow:0 0 60px rgba(212,163,115,0.25);
+  backdrop-filter:blur(18px);
+  color:#eee;
+}
+
+.modal-glass h2{
+  font-family:'Bebas Neue';
+  color:var(--gold);
+  font-size:2.2rem;
+  text-align:center;
+}
+
+.modal-glass .sub{
+  text-align:center;
+  color:#ccc;
+  margin:0.5rem 0 1.5rem;
+  font-size:0.95rem;
+}
+
+.pay-btn{
+  width:100%;
+  padding:14px;
+  border-radius:40px;
+  margin-top:12px;
+  font-family:'Bebas Neue';
+  font-size:1.1rem;
+  cursor:pointer;
+  border:none;
+}
+
+.paypal{
+  background:linear-gradient(180deg,#ffc439,#ffb347);
+  color:#111;
+}
+
+.confirm{
+  background:linear-gradient(180deg,var(--gold),var(--gold2));
+  color:#111;
+}
+
+.ghost{
+  background:transparent;
+  border:1px solid #555;
+  color:#aaa;
+}
+.activation{
+  max-width:600px;
+  margin:3rem auto;
+  padding:2rem;
+  border-top:1px dashed var(--gold);
+  text-align:center;
+}
+
+.activation h3{
+  font-family:'Bebas Neue';
+  color:var(--gold);
+  font-size:2rem;
+}
+
+.activation p{
+  color:#ccc;
+  margin:0.5rem 0 1.5rem;
+}
+
+.code-inputs{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:1.5rem;
+}
+
+.code-inputs input{
+  width:42px;
+  height:52px;
+  text-align:center;
+  font-size:1.4rem;
+  border-radius:8px;
+  background:#111;
+  border:1px solid #444;
+  color:#fff;
+}
+
+</style>
+</head>
+
+<body>
+<div id="paymentModal" class="modal hidden">
+  <div class="modal-glass">
+    <h2>TiffyAI Web-Store Builder</h2>
+    <p class="sub">
+  $30 USD (≈ R499) once-off<br>
+  • Hosting covered for 1 year
+</p>
+
+
+    <button class="pay-btn paypal" onclick="payWithPaypal()">
+      Pay with PayPal
+    </button>
+
+    <button class="pay-btn confirm" onclick="confirmManualPayment()">
+      I will send an EFT
+    </button>
+
+    <button class="pay-btn ghost" onclick="closePayment()">
+      Cancel
+    </button>
+  </div>
+</div>
+
+<header id="header">
+  <img id="logo" class="logo">
+  <h1 id="cafeName">YOUR WEB STORE BUSINESS</h1>
+  <p id="tagline" class="tagline">With Live Preview</p>
+</header>
+
+<section id="menu">
+  <div id="menuRender"></div>
+</section>
+
+<footer>
+  <p id="footerText">© 2026 YOUR BUSINESS</p>
+</footer>
+
+<div id="activationPanel" class="activation">
+  <h3>Activate Your Web-Store</h3>
+  <p>
+    Enter the 7-digit activation key you will receive from the admin when you click or tap on DOWNLOAD WEBSITE HTML (@ the very bottom), this will give YOU exactly 100 Web-Store-App downloads.
+    <br>Do not close this page – Your progress will be lost. Request an activation key to save your current progress as a downloaded file.
+  </p>
+
+  <div class="code-inputs">
+    <input maxlength="1">
+    <input maxlength="1">
+    <input maxlength="1">
+    <input maxlength="1">
+    <input maxlength="1">
+    <input maxlength="1">
+    <input maxlength="1">
+  </div>
+
+  <button onclick="submitActivation()">Activate & Unlock Download</button>
+</div>
+  
+<div id="editor">
+<h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
+
+<div class="editor-block">
+  <label>Business Name</label>
+  <input oninput="cafeName.textContent=this.value">
+  <label>Tagline</label>
+  <input oninput="tagline.textContent=this.value">
+  <label>Logo Upload</label>
+  <input type="file" accept="image/*" onchange="uploadImage(this,img=>logo.src=img)">
+  <label>Banner Upload (Stamp Image)</label>
+  <input type="file" accept="image/*" onchange="uploadImage(this,img=>{
+    header.style.backgroundImage=`url('${img}')`;
+    updateStamp(img);
+  })">
+  <label>Footer Text</label>
+  <input oninput="footerText.textContent=this.value">
+  <label>WhatsApp Number</label>
+  <input value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
+</div>
+
+<h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
+<div id="menuEditor"></div>
+
+<button onclick="addSection()">+ ADD SECTION</button>
+<button onclick="downloadHTML()">DOWNLOAD WEBSITE HTML</button>
+</div>
+
+<script>
+/* ================== STATE ================== */
+let whatsappNumber = "+27660000000";
+const orderState = {};
+
+/* ===== CURRENCY STATE (DISPLAY ONLY) ===== */
+let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
+
+const currencyMap = {
+  NONE: { symbol: '', label: 'No price / Negotiation' },
+  ZAR: { symbol: 'R', label: 'ZAR (R)' },
+  USD: { symbol: '$', label: 'USD ($)' },
+  EUR: { symbol: '€', label: 'EUR (€)' },
+  GBP: { symbol: '£', label: 'GBP (£)' },
+  INR: { symbol: '₹', label: 'INR (₹)' },
+  CNY: { symbol: '¥', label: 'CNY (¥)' }
+};
+
+function setCurrency(code){
+  activeCurrency = code;
+  localStorage.setItem('tiffyai_currency', code);
+  renderMenu();
+}
+
+/* ================== MENU DATA ================== */
+const menuSections = [
+  {
+    title: "Products go here",
+    items: [
+      {
+        name: "List your products",
+        price: 120,
+        desc: "Add an awesome description",
+        img: ""
+      }
+    ]
+  }
+];
+
+/* ================== HELPERS ================== */
+function updateStamp(img){
+  const og = document.querySelector('meta[property="og:image"]');
+  const tw = document.querySelector('meta[name="twitter:image"]');
+  if(og) og.content = img;
+  if(tw) tw.content = img;
+}
+
+function uploadImage(input, cb){
+  const f = input.files[0];
+  if(!f) return;
+  const r = new FileReader();
+  r.onload = e => cb(e.target.result);
+  r.readAsDataURL(f);
+}
+
+/* ================== MENU RENDER ================== */
+function renderMenu(){
+  const menuRender = document.getElementById('menuRender');
+  menuRender.innerHTML = '';
+
+  menuSections.forEach((sec, s)=>{
+    const h2 = document.createElement('h2');
+    h2.className = 'section-title';
+    h2.textContent = sec.title;
+
+    const grid = document.createElement('div');
+    grid.className = 'menu-grid';
+
+    sec.items.forEach((it, i)=>{
+      const key = `${s}-${i}`;
+      const qty = orderState[key] || 0;
+
+      const card = document.createElement('div');
+      card.className = 'menu-item';
+
+      card.innerHTML = `
+        <img src="${it.img || ''}">
+        <div class="card">
+          <h3>${it.name}</h3>
+          <p>${it.desc}</p>
+
+          ${
+            activeCurrency === 'NONE' || !it.price
+            ? `<div class="price">Contact for price</div>`
+            : `<div class="price">${currencyMap[activeCurrency].symbol}${it.price}</div>`
+          }
+
+          ${
+            activeCurrency === 'NONE' || !it.price
+            ? `
+              <div style="margin-top:10px;text-align:center">
+                <img src="WhatsApp.png"
+                     style="width:42px;height:42px;cursor:pointer"
+                     onclick="changeQty('${key}',1)">
+              </div>
+            `
+            : `
+              <div style="display:flex;gap:10px;margin-top:10px;align-items:center">
+                <button onclick="changeQty('${key}', -1)">−</button>
+                <strong>${qty}</strong>
+                <button onclick="changeQty('${key}', 1)">+</button>
+              </div>
+            `
+          }
+        </div>
+      `;
+
+      grid.appendChild(card);
+    });
+
+    menuRender.appendChild(h2);
+    menuRender.appendChild(grid);
+  });
+
+  renderWhatsapp();
+}
+
+function changeQty(key, delta){
+  orderState[key] = (orderState[key] || 0) + delta;
+  if(orderState[key] < 0) orderState[key] = 0;
+  renderMenu();
+}
+
+/* ================== WHATSAPP ================== */
+function renderWhatsapp(){
+  const total = Object.values(orderState).reduce((a,b)=>a+b,0);
+  let btn = document.getElementById('whatsappOrderBtn');
+
+  if(total === 0){
+    if(btn) btn.remove();
+    return;
+  }
+
+  let msg = "Hi! I'd like to order:\n\n";
+  let grand = 0;
+
+  menuSections.forEach((sec,s)=>{
+    sec.items.forEach((it,i)=>{
+      const q = orderState[`${s}-${i}`] || 0;
+      if(!q) return;
+
+      if(activeCurrency === 'NONE' || !it.price){
+        msg += `${q} x ${it.name}\n${it.desc}\n\n`;
+      } else {
+        const t = q * it.price;
+        grand += t;
+        msg += `${q} x ${it.name} – ${currencyMap[activeCurrency].symbol}${t}\n${it.desc}\n\n`;
+      }
+    });
+  });
+
+  if(activeCurrency !== 'NONE'){
+    msg += `Estimated total: ${currencyMap[activeCurrency].symbol}${grand}`;
+  }
+
+  if(!btn){
+    btn = document.createElement('a');
+    btn.id = 'whatsappOrderBtn';
+    document.body.appendChild(btn);
+  }
+
+  btn.href = `https://wa.me/${whatsappNumber}?text=` + encodeURIComponent(msg);
+  btn.textContent = `ORDER NOW (${total})`;
+}
+
+/* ================== EDITOR ================== */
+function renderEditor(){
+  const menuEditor = document.getElementById('menuEditor');
+  if(!menuEditor) return;
+
+  menuEditor.innerHTML = `
+    <div class="editor-block">
+      <label>Currency</label>
+      <select onchange="setCurrency(this.value)">
+        ${Object.entries(currencyMap).map(([code,c])=>`
+          <option value="${code}" ${activeCurrency===code?'selected':''}>
+            ${c.label}
+          </option>
+        `).join('')}
+      </select>
+    </div>
+  `;
+
+  menuSections.forEach((sec,s)=>{
+    const block = document.createElement('div');
+    block.className = 'editor-block';
+
+    block.innerHTML = `
+      <div class="section-head">
+        <input value="${sec.title}"
+          oninput="menuSections[${s}].title=this.value;renderMenu()">
+        <button class="remove"
+          onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button>
+      </div>
+
+      ${sec.items.map((it,i)=>`
+        <label>Name</label>
+        <input value="${it.name}"
+          oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+
+        <label>Price (0 = no price)</label>
+        <input type="number" value="${it.price}"
+          oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+
+        <label>Description</label>
+        <textarea
+          oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
+
+        <label>Image URL</label>
+        <input value="${it.img}"
+          oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+
+        <label>Or Upload Image</label>
+        <input type="file" accept="image/*"
+          onchange="uploadImage(this,img=>{menuSections[${s}].items[${i}].img=img;renderMenu()})">
+
+        <button class="remove"
+          onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">
+          REMOVE ITEM
+        </button>
+      `).join('')}
+
+      <button onclick="
+        menuSections[${s}].items.push({name:'NEW ITEM',price:0,desc:'',img:''});
+        renderEditor();renderMenu();">
+        + ADD ITEM
+      </button>
+    `;
+
+    menuEditor.appendChild(block);
+  });
+}
+
+function addSection(){
+  menuSections.push({ title: "NEW SECTION", items: [] });
+  renderEditor();
+  renderMenu();
+}
+
+/* ================== EXPORT ================== */
+function actualDownload(){
+  const doc = document.documentElement.cloneNode(true);
+
+  doc.querySelector('#editor')?.remove();
+  doc.querySelector('#paymentModal')?.remove();
+  doc.querySelector('#activationPanel')?.remove();
+
+  doc.querySelectorAll('script').forEach(s=>{
+    if(s.textContent.includes('const menuSections')){
+      s.textContent = s.textContent
+        .replace(/const menuSections\s*=\s*\[[\s\S]*?\];/,
+          `const menuSections = ${JSON.stringify(menuSections, null, 2)};`)
+        .replace(/let whatsappNumber\s*=\s*["'][^"']*["'];/,
+          `let whatsappNumber = "${whatsappNumber}";`)
+        .replace(/let activeCurrency\s*=\s*[^;]*;/,
+          `let activeCurrency = "${activeCurrency}";`);
+    }
+  });
+
+  const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'WEB-Store.html';
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+
+/* ================== INIT ================== */
+renderMenu();
+renderEditor();
+</script>
+
+  <script>
+/* ================== TIFFYAI PERSISTENCE + LIMITER ================== */
+
+const TIFFYAI_MAX_DOWNLOADS = 100;
+
+/* Ensure counters exist */
+function initTiffyAIState(){
+  if(!localStorage.getItem('tiffyai_download_count')){
+    localStorage.setItem('tiffyai_download_count', '0');
+  }
+
+  // If activated, remove activation UI permanently
+  if(localStorage.getItem('tiffyai_activated') === 'true'){
+    const panel = document.getElementById('activationPanel');
+    if(panel) panel.remove();
+  }
+}
+
+/* Wrap actualDownload with limiter */
+const _originalActualDownload = actualDownload;
+
+actualDownload = function(){
+  let count = Number(localStorage.getItem('tiffyai_download_count') || 0);
+
+  if(count >= TIFFYAI_MAX_DOWNLOADS){
+    alert(
+      'Download limit reached.\n\n' +
+      'Please request a new activation key to continue.'
+    );
+
+    localStorage.removeItem('tiffyai_activated');
+    document.getElementById('activationPanel')?.classList.remove('hidden');
+    return;
+  }
+
+  count++;
+  localStorage.setItem('tiffyai_download_count', String(count));
+
+  _originalActualDownload();
+};
+
+/* Init on load */
+document.addEventListener('DOMContentLoaded', initTiffyAIState);
+</script>
+
+</body>
+</html>
