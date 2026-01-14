@@ -153,11 +153,15 @@ h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
 .bulk-panel { background: rgba(37, 211, 102, 0.1); border: 1px solid var(--whatsapp); padding: 15px; border-radius: 12px; margin-top: 20px; }
 
 /* RECEIPT PRINTING */
-.receipt-wrap { background: #fff; color: #000; padding: 20px; width: 300px; margin: auto; display: none; font-family: 'Courier New', monospace; font-size: 0.85rem; }
-@media print {
-  body * { display: none !important; }
-  .receipt-wrap { display: block !important; }
-  .receipt-wrap * { display: block !important; }
+.receipt-wrap { 
+  background: #fff; 
+  color: #000; 
+  padding: 20px; 
+  width: 300px; 
+  margin: auto; 
+  display: none; 
+  font-family: 'Courier New', monospace; 
+  font-size: 0.85rem; 
 }
 
 /* FOOTER */
@@ -170,18 +174,41 @@ footer{
 }
 
 /* EDITOR */
-#editor{
-  background:rgba(10, 10, 10, 0.9);
-  border-top:3px dashed var(--gold);
-  padding:3rem 5%;
+#editor {
+  position: relative;
+  border-top: 3px dashed var(--gold);
+  padding: 3rem 5%;
+  background-color: #0a0a0a;
+  background-image: url('silky.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
 }
-.editor-block{
-  background:rgba(20,20,20,0.92);
-  padding:1.5rem;
-  border-radius:14px;
-  margin-bottom:2rem;
-  box-shadow:0 10px 30px rgba(0,0,0,0.6);
+
+#editor::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 10, 10, 0.8);
+  z-index: 1;
 }
+
+.editor-block {
+  position: relative;
+  z-index: 2;
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1.5rem;
+  border-radius: 14px;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+#editor h2 {
+  position: relative;
+  z-index: 2;
+}
+
 label{display:block;margin-top:1rem;color:var(--gold)}
 input,textarea,select{
   width:100%;
@@ -201,6 +228,8 @@ button{
   font-size:1.1rem;
   cursor:pointer;
   margin-top:10px;
+  position: relative;
+  z-index: 2;
 }
 .remove{background:#900;color:#fff}
 .cloud-btn { background: #3498db; color: white; margin-bottom: 5px; font-size: 0.8rem; }
@@ -352,6 +381,8 @@ button{
 
 <canvas id="statusCanvas" width="1080" height="1920" style="display:none;"></canvas>
 
+<iframe id="printFrame" style="display:none;"></iframe>
+
 <script>
 /* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
@@ -393,7 +424,6 @@ function downloadHTML(){
 
 function payWithPaypal(){
   window.open('https://paypal.me/CatHostProWebsites/30', '_blank');
-  // Trigger EFT process as backup for manual activation link
   confirmManualPayment();
 }
 
@@ -475,10 +505,12 @@ function renderWhatsapp(){
   if(!btn){
     btn = document.createElement('a'); btn.id = 'whatsappOrderBtn'; document.body.appendChild(btn);
     qBtn = document.createElement('button'); qBtn.id = 'quoteBtn'; qBtn.className = 'quote-btn';
-    qBtn.textContent = "📄 PRINT QUOTE"; qBtn.onclick = () => { printReceipt({date: new Date().toLocaleString(), total: grand, msg: msg}); };
+    qBtn.textContent = "📄 PRINT QUOTE";
     document.body.appendChild(qBtn);
   }
-  btn.onclick = () => logSale(msg, grand);
+  
+  qBtn.onclick = () => { printReceipt({date: new Date().toLocaleString(), total: grand, msg: msg}); };
+  btn.onclick = () => { logSale(msg, grand); };
   btn.href = `https://wa.me/${whatsappNumber}?text=` + encodeURIComponent(msg);
   btn.textContent = `ORDER NOW (${total})`;
 }
@@ -496,17 +528,44 @@ function renderSalesLog() {
     log.innerHTML = sales.map(s => `
         <div class="log-entry">
             <span>${s.date} <br> <strong>${currencyMap[activeCurrency].symbol}${s.total}</strong></span>
-            <button onclick='printReceipt(${JSON.stringify(s)})' style="padding:2px 10px; font-size:0.7rem;">PRINT</button>
+            <button onclick='printReceipt(${JSON.stringify(s)})' style="padding:2px 10px; font-size:0.7rem; color:#000;">PRINT</button>
         </div>
     `).join('') || '<p style="color:#666">No sales recorded.</p>';
 }
 
+/* FIXED PRINT LOGIC - NO LONGER FREEZES */
 function printReceipt(s) {
-    document.getElementById('r-biz').textContent = document.getElementById('cafeName').textContent;
-    document.getElementById('r-date').textContent = s.date;
-    document.getElementById('r-items').innerText = s.msg;
-    document.getElementById('r-total').textContent = "TOTAL: " + currencyMap[activeCurrency].symbol + s.total;
-    window.print();
+    const biz = document.getElementById('cafeName').textContent || "WEB STORE";
+    const frame = document.getElementById('printFrame');
+    const doc = frame.contentWindow.document;
+    const sym = currencyMap[activeCurrency].symbol;
+
+    doc.open();
+    doc.write(`
+        <html>
+        <head><style>
+            body { font-family: 'Courier New', monospace; padding: 20px; color: #000; }
+            center { text-align: center; }
+            hr { border: none; border-top: 1px dashed #000; }
+            .total { text-align: right; font-weight: bold; }
+        </style></head>
+        <body>
+            <center><h2>${biz}</h2><p>${s.date}</p></center>
+            <hr>
+            <div style="margin:20px 0;">${s.msg.replace(/\n/g, '<br>')}</div>
+            <hr>
+            <p class="total">TOTAL: ${sym}${s.total}</p>
+            <center><p style="font-size:10px; margin-top:30px;">Powered by TiffyAI</p></center>
+        </body>
+        </html>
+    `);
+    doc.close();
+
+    // Small delay to let images/fonts load in frame
+    setTimeout(() => {
+        frame.contentWindow.focus();
+        frame.contentWindow.print();
+    }, 500);
 }
 
 function startBulk() {
@@ -525,7 +584,7 @@ function nextInQueue() {
 function shareItem(name, price, desc) {
   const sym = currencyMap[activeCurrency].symbol;
   const text = `🔥 ${name}\n💰 ${sym}${price}\n\n${desc}\n\n🛒 Shop: ${window.location.href}`;
-  if (navigator.share) { navigator.share({ title: name, text: text, url: window.location.href }); }
+  if (navigator.share) { navigator.share({ title: name, text: text }); }
   else { navigator.clipboard.writeText(text); alert("Marketing info copied!"); }
 }
 
