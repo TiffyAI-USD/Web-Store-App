@@ -278,6 +278,20 @@ button{
 .activation{ max-width:600px; margin:3rem auto; padding:2rem; border-top:1px dashed var(--gold); text-align:center; }
 .code-inputs{ display:flex; justify-content:center; gap:10px; margin-bottom:1.5rem; }
 .code-inputs input{ width:42px; height:52px; text-align:center; font-size:1.4rem; border-radius:8px; background:#111; border:1px solid #444; color:#fff; }
+
+/* SUPPORT BUTTON */
+.support-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  z-index: 3000;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+  transition: transform 0.3s ease;
+}
+.support-btn:hover { transform: scale(1.1); }
 </style>
 </head>
 
@@ -291,6 +305,8 @@ button{
     <button class="pay-btn ghost" style="background:none; color:#aaa; width:100%; margin-top:10px; border:none; cursor:pointer;" onclick="closePayment()">Cancel</button>
   </div>
 </div>
+
+<img src="support.png" class="support-btn" onclick="triggerPaymentFlow()" alt="Support">
 
 <header id="header">
   <img id="logo" class="logo">
@@ -431,16 +447,19 @@ function updateCreditDisplay() {
     }
 }
 
+function triggerPaymentFlow() {
+  document.getElementById('paymentModal').classList.remove('hidden');
+}
+
 function downloadHTML(){
   if(localStorage.getItem('tiffyai_activated') === 'true' && downloadCredits > 0){ 
     actualDownload(); 
   } else {
-    document.getElementById('paymentModal').classList.remove('hidden');
+    triggerPaymentFlow();
   }
 }
 
 function actualDownload(){
-  // Deduct Credit
   downloadCredits--;
   localStorage.setItem('tiffyai_credits', downloadCredits);
   updateCreditDisplay();
@@ -449,6 +468,7 @@ function actualDownload(){
   doc.querySelector('#editor')?.remove(); 
   doc.querySelector('#paymentModal')?.remove(); 
   doc.querySelector('#activationPanel')?.remove();
+  doc.querySelector('.support-btn')?.remove(); // Hide support in final export
   
   const script = Array.from(doc.querySelectorAll('script')).find(s => s.textContent.includes('const menuSections'));
   if(script){
@@ -468,7 +488,7 @@ function payWithPaypal(){
 
 function confirmManualPayment(){
   const code = generateRequestCode();
-  const msg = `TIFFYAI CREDIT REFILL\nCode: ${code}\nFNB\nAcc: 62912507433\nBranch: 250655\nSwift: FIRNZAJJ`;
+  const msg = `TIFFYAI CREDIT REQUEST\nCode: ${code}\nFNB\nAcc: 62912507433\nBranch: 250655\nSwift: FIRNZAJJ`;
   window.open('https://wa.me/27766314246?text=' + encodeURIComponent(msg), '_blank');
 }
 
@@ -687,7 +707,7 @@ function submitActivation(){
   const s = JSON.parse(localStorage.getItem('tiffyai_r') || '[]');
   if(s.some(d => { let k=''; for(let i=0; i<d.length; i+=2) k+=d[i]; return k===ent; })){
     localStorage.setItem('tiffyai_activated', 'true');
-    localStorage.setItem('tiffyai_credits', 100); // REFILL TO 100
+    localStorage.setItem('tiffyai_credits', 100); 
     location.reload();
   } else { alert('Invalid Key'); }
 }
