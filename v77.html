@@ -426,12 +426,16 @@ async function publishToCloud() {
     const isActivated = localStorage.getItem('tiffyai_activated') === 'true';
     const syncBtn = document.getElementById('cloudSyncBtn');
     
+    // 1. DYNAMIC CONSTANTS (Update these with your specific Render URL)
+    const RENDER_API = "https://webstore-api-m8sr.onrender.com/api";
+    const MASK_VIEWER = "https://webstore-api-m8sr.onrender.com/view/";
+
     // LINK MASK: Uses local storage to remember site alias
     let handle = localStorage.getItem('webstore_cloud_handle');
     if (!handle) {
-        const input = prompt("Choose your Store Handle (e.g. coffee-hub):");
+        const input = prompt("Choose your Store Handle (e.g., coffee-hub):");
         if (!input) return;
-        handle = input.toLowerCase().replace(/\s+/g, '-');
+        handle = input.toLowerCase().replace(/[^a-z0-9-]/g, '-'); // Sanitizes input
         localStorage.setItem('webstore_cloud_handle', handle);
     }
 
@@ -464,16 +468,22 @@ async function publishToCloud() {
         // 7-DAY SUBSCRIPTION GUARD
         if (res.status === 'expired') {
             alert("⚠️ Your 7-Day Free Cloud Trial has expired.");
-            triggerPaymentFlow(); 
+            if (typeof triggerPaymentFlow === 'function') triggerPaymentFlow(); 
             return;
         }
 
         if (res.success) {
-            const maskedLink = MASK_BASE + handle;
-            alert(`🚀 LIVE!\n\nSite Masked At:\n${maskedLink}\n\nTrial: ${res.trialDaysLeft || '∞'} days left.`);
+            const maskedLink = MASK_VIEWER + handle;
+            
+            // 2. IMPROVED POP-UP: Allows easy copying on mobile
+            const message = `🚀 LIVE!\n\nTrial: ${res.trialDaysLeft} days left.\n\nYour Masked Link:`;
+            window.prompt(message, maskedLink); 
+            
+            console.log("Cloud Sync Successful:", res);
         }
     } catch (err) {
-        alert("Server is waking up. Try again in 1 minute.");
+        console.error("Sync Error:", err);
+        alert("Server is waking up (Render spin-up). Please wait 30 seconds and try one more time.");
     } finally {
         syncBtn.textContent = "☁️ CLOUD SYNC (SMART PUBLISH)";
     }
