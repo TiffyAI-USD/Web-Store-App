@@ -23,6 +23,21 @@
 body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
 :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
 
+/* ADDED: Cloud & Auto-Save Indicators */
+#autoSaveStatus {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 5000;
+  font-size: 0.7rem;
+  background: rgba(0,0,0,0.7);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  display: none;
+}
+
 /* HEADER */
 header{
   min-height:80vh;
@@ -296,6 +311,8 @@ button{
 </head>
 
 <body>
+<div id="autoSaveStatus">Saved Draft</div>
+
 <div id="paymentModal" class="modal hidden">
   <div class="modal-glass">
     <h2 style="font-family:'Bebas Neue'; color:var(--gold); text-align:center; font-size:2rem;">TiffyAI Developer License</h2>
@@ -334,11 +351,11 @@ button{
 <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
 <div class="editor-block">
   <label>Business Name</label>
-  <input oninput="document.getElementById('cafeName').textContent=this.value">
+  <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value">
   <label>Tagline</label>
-  <input oninput="document.getElementById('tagline').textContent=this.value">
+  <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value">
   <label>Footer Copyright</label>
-  <input oninput="document.getElementById('footerText').textContent=this.value" value="© 2026 YOUR BUSINESS">
+  <input id="editFooter" oninput="document.getElementById('footerText').textContent=this.value" value="© 2026 YOUR BUSINESS">
   
   <label>Logo (URL or Upload)</label>
   <button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD LOGO</button>
@@ -351,9 +368,9 @@ button{
   <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; document.getElementById('bannerURL').value=img;})">
 
   <label>WhatsApp Number</label>
-  <input value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
+  <input id="editWA" value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
   <label>Currency</label>
-  <select onchange="setCurrency(this.value)">
+  <select id="editCurr" onchange="setCurrency(this.value)">
       <option value="ZAR">ZAR (R)</option>
       <option value="INR">INR (₹)</option>
       <option value="USD">USD ($)</option>
@@ -384,6 +401,7 @@ button{
 <div id="menuEditor"></div>
 <button onclick="addSection()">+ ADD SECTION</button>
 <button id="downloadBtn" onclick="downloadHTML()">DOWNLOAD WEBSITE HTML (0/100 Left)</button>
+<button id="cloudSyncBtn" onclick="publishToCloud()" style="background:#3498db; width:100%; margin-top:10px;">☁️ CLOUD SYNC (SMART PUBLISH)</button>
 </div>
 
 <div id="receiptArea" class="receipt-wrap">
@@ -406,6 +424,7 @@ let marketingMode = false;
 let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
 let downloadCredits = parseInt(localStorage.getItem('tiffyai_credits')) || 0;
 let promoQueue = [];
+let autoSaveTimer;
 const orderState = {};
 
 const currencyMap = {
@@ -414,6 +433,88 @@ const currencyMap = {
 };
 
 let menuSections = [{ title: "Products", items: [{ name: 'Sample Item', price: 100, desc: "Description here", img: "", rating: 5, badge: 'none', stock: 5 }] }];
+
+/* ================== AUTOMATION LOGIC (NEW) ================== */
+
+function saveDraft() {
+    const indicator = document.getElementById('autoSaveStatus');
+    indicator.style.display = 'block';
+    indicator.textContent = "Saving Draft...";
+
+    const storeData = {
+        businessName: document.getElementById('cafeName').textContent,
+        tagline: document.getElementById('tagline').textContent,
+        footer: document.getElementById('footerText').textContent,
+        logo: document.getElementById('logoURL').value,
+        banner: document.getElementById('bannerURL').value,
+        wa: whatsappNumber,
+        curr: activeCurrency,
+        menu: menuSections,
+        ts: new Date().getTime()
+    };
+    localStorage.setItem('webstore_pro_draft', JSON.stringify(storeData));
+    
+    setTimeout(() => { 
+        indicator.textContent = "Draft Saved Locally"; 
+        setTimeout(() => indicator.style.display = 'none', 1500);
+    }, 500);
+}
+
+function loadDraft() {
+    const saved = localStorage.getItem('webstore_pro_draft');
+    if (!saved) return;
+    const d = JSON.parse(saved);
+
+    if (confirm("Restore your saved work from " + new Date(d.ts).toLocaleTimeString() + "?")) {
+        menuSections = d.menu;
+        activeCurrency = d.curr;
+        whatsappNumber = d.wa;
+        
+        document.getElementById('cafeName').textContent = d.businessName;
+        document.getElementById('tagline').textContent = d.tagline;
+        document.getElementById('footerText').textContent = d.footer;
+        document.getElementById('logoURL').value = d.logo;
+        document.getElementById('bannerURL').value = d.banner;
+        document.getElementById('logo').src = d.logo;
+        document.getElementById('header').style.backgroundImage = `url(${d.banner})`;
+        
+        // Update input field values too
+        document.getElementById('editName').value = d.businessName;
+        document.getElementById('editTag').value = d.tagline;
+        document.getElementById('editFooter').value = d.footer;
+        document.getElementById('editWA').value = d.wa;
+        document.getElementById('editCurr').value = d.curr;
+
+        renderMenu();
+        renderEditor();
+    }
+}
+
+async function publishToCloud() {
+    const handle = prompt("Enter your unique Store Name (e.g., tiffys-coffee):");
+    if (!handle) return;
+
+    const payload = {
+        handle: handle.toLowerCase().replace(/\s+/g, '-'),
+        configData: {
+            businessName: document.getElementById('cafeName').textContent,
+            menu: menuSections,
+            currency: activeCurrency
+        }
+    };
+
+    try {
+        const response = await fetch('https://YOUR-RENDER-URL.onrender.com/api/publish', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const res = await response.json();
+        if(res.success) alert("🚀 LIVE! Site updated successfully.");
+    } catch (err) {
+        alert("Cloud setup is waiting for Part 1 & 2 (Server.js) tomorrow morning!");
+    }
+}
 
 /* ================== CORE LOGIC ================== */
 function setCurrency(c){ activeCurrency=c; localStorage.setItem('tiffyai_currency',c); renderMenu(); renderEditor(); renderSalesLog(); }
@@ -430,7 +531,11 @@ function toggleMarketingMode() {
 
 function uploadImage(input, cb){
   const f = input.files[0]; if (!f) return;
-  const r = new FileReader(); r.onload = e => cb(e.target.result); r.readAsDataURL(f);
+  const r = new FileReader(); r.onload = e => {
+      cb(e.target.result);
+      saveDraft(); // Auto-save after image upload
+  }; 
+  r.readAsDataURL(f);
 }
 
 /* ================== CREDIT & DOWNLOAD LOGIC ================== */
@@ -468,7 +573,8 @@ function actualDownload(){
   doc.querySelector('#editor')?.remove(); 
   doc.querySelector('#paymentModal')?.remove(); 
   doc.querySelector('#activationPanel')?.remove();
-  doc.querySelector('.support-btn')?.remove(); // Hide support in final export
+  doc.querySelector('.support-btn')?.remove();
+  doc.querySelector('#autoSaveStatus')?.remove();
   
   const script = Array.from(doc.querySelectorAll('script')).find(s => s.textContent.includes('const menuSections'));
   if(script){
@@ -714,12 +820,23 @@ function submitActivation(){
 
 function closePayment(){ document.getElementById('paymentModal').classList.add('hidden'); }
 
+/* ================== GLOBAL EVENT LISTENER (AUTOMATION) ================== */
 document.addEventListener('DOMContentLoaded', () => {
-  if(localStorage.getItem('tiffyai_activated') === 'true' && downloadCredits > 0) {
-      document.getElementById('activationPanel')?.remove();
-  }
-  updateCreditDisplay();
-  renderMenu(); renderEditor(); renderSalesLog();
+    // 1. Recover draft if it exists
+    loadDraft();
+
+    // 2. Automate Auto-Save: Listen for any input in the editor
+    document.getElementById('editor').addEventListener('input', () => {
+        clearTimeout(autoSaveTimer);
+        autoSaveTimer = setTimeout(saveDraft, 2000); // Wait 2s after user stops typing
+    });
+
+    // 3. Original logic
+    if(localStorage.getItem('tiffyai_activated') === 'true' && downloadCredits > 0) {
+        document.getElementById('activationPanel')?.remove();
+    }
+    updateCreditDisplay();
+    renderMenu(); renderEditor(); renderSalesLog();
 });
 </script>
 </body>
