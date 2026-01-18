@@ -451,6 +451,7 @@ let menuSections = [{ title: "Products", items: [{ name: 'Sample Item', price: 1
 /* ================== CLOUD ENGINE ================== */
 
 async function publishToCloud() {
+    // 1. Check activation status immediately
     const isActivated = localStorage.getItem('tiffyai_activated') === 'true';
     const ownerWA = document.getElementById('ownerWA').value;
     const syncBtn = document.getElementById('cloudSyncBtn');
@@ -467,13 +468,13 @@ async function publishToCloud() {
 
     syncBtn.textContent = "⏳ PUBLISHING...";
 
-    // FIX: If they have the 7-digit code active (isActivated), they are PRO regardless of credits.
+    // 2. FORCE PLAN DETECTION: This is what tells your Admin Panel to hide the 7-day timer.
     const planType = isActivated ? 'pro' : 'trial';
 
     const payload = {
         handle: handle,
         ownerWhatsapp: ownerWA,
-        planType: planType,
+        planType: planType, // Sends 'pro' if 7-digit code was used
         configData: {
             businessName: document.getElementById('cafeName').textContent,
             tagline: document.getElementById('tagline').textContent,
@@ -498,12 +499,11 @@ async function publishToCloud() {
 
         if (res.success) {
             updateDashboardLink(handle);
-            alert(`🚀 LIVE!\n\nLink: ${RENDER_BASE}/view/${handle}\n\nDashboard button is now active!`);
+            alert(`🚀 LIVE!\n\nLink: ${RENDER_BASE}/view/${handle}\n\nPlan Status: ${planType.toUpperCase()}`);
             window.open(`${RENDER_BASE}/view/${handle}`, '_blank');
         }
     } catch (err) {
-        console.error("Sync Error:", err);
-        alert("Server wake-up (Render spin-up). Please wait 15 seconds and try again.");
+        alert("Server is waking up. Please wait 15 seconds and try Cloud Sync again.");
     } finally {
         syncBtn.textContent = "☁️ CLOUD SYNC (SMART PUBLISH)";
     }
@@ -512,8 +512,8 @@ async function publishToCloud() {
 function updateDashboardLink(handle) {
     const link = document.getElementById('dashLink');
     if(handle && link) {
-        // Pointing them to you for their dashboard access
-        link.href = `https://wa.me/27766314246?text=Dashboard Request for ${handle}`;
+        // Updated to the direct WhatsApp request as per your strategy
+        link.href = `https://wa.me/27766314246?text=Dashboard%20Request%20for%20${handle}`;
         link.style.display = "block";
     }
 }
