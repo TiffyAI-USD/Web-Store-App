@@ -467,8 +467,8 @@ async function publishToCloud() {
 
     syncBtn.textContent = "⏳ PUBLISHING...";
 
-    // PLAN DETECTION: If user has credits/activated, they are PRO
-    const planType = (isActivated && downloadCredits > 0) ? 'pro' : 'trial';
+    // FIX: If they have the 7-digit code active (isActivated), they are PRO regardless of credits.
+    const planType = isActivated ? 'pro' : 'trial';
 
     const payload = {
         handle: handle,
@@ -502,7 +502,8 @@ async function publishToCloud() {
             window.open(`${RENDER_BASE}/view/${handle}`, '_blank');
         }
     } catch (err) {
-        alert("Server wake-up. Please try again in 15 seconds.");
+        console.error("Sync Error:", err);
+        alert("Server wake-up (Render spin-up). Please wait 15 seconds and try again.");
     } finally {
         syncBtn.textContent = "☁️ CLOUD SYNC (SMART PUBLISH)";
     }
@@ -510,8 +511,9 @@ async function publishToCloud() {
 
 function updateDashboardLink(handle) {
     const link = document.getElementById('dashLink');
-    if(handle) {
-        link.href = `https://wa.me/27766314246?text=Dashboard Request for ${handle}`; // Or your dashboard URL
+    if(handle && link) {
+        // Pointing them to you for their dashboard access
+        link.href = `https://wa.me/27766314246?text=Dashboard Request for ${handle}`;
         link.style.display = "block";
     }
 }
