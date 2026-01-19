@@ -13,7 +13,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
-:root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366;--accent:#00d4ff;}
+:root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
 
 /* Cloud & Auto-Save Indicators */
 #autoSaveStatus {
@@ -30,7 +30,7 @@ body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
   display: none;
 }
 
-/* HEADER - BANNER FIX: As wide as product photos + 0.2% */
+/* HEADER - BANNER FIX: As wide as product grid + overlap for Render links */
 header{
   min-height:80vh;
   background-size:cover;
@@ -66,32 +66,13 @@ h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
     display: inline-block;
     background: linear-gradient(180deg, var(--gold), var(--gold2));
     color: #000;
-    padding: 12px 30px;
+    padding: 12px 25px;
     border-radius: 50px;
     font-family: 'Bebas Neue';
     text-decoration: none;
-    font-size: 1.3rem;
-    box-shadow: 0 4px 20px rgba(212, 163, 115, 0.5);
-    transition: 0.3s;
-}
-
-/* DASHBOARD BUTTON */
-.dashboard-nav {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    z-index: 4000;
-}
-.btn-dash {
-    background: #111;
-    color: var(--accent);
-    border: 1px solid var(--accent);
-    padding: 8px 16px;
-    border-radius: 50px;
-    font-family: 'Bebas Neue';
-    text-decoration: none;
-    font-size: 0.9rem;
-    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+    font-size: 1.2rem;
+    box-shadow: 0 4px 15px rgba(212, 163, 115, 0.4);
+    transition: transform 0.2s;
 }
 
 /* MENU */
@@ -242,6 +223,11 @@ footer{
   box-shadow: 0 10px 30px rgba(0,0,0,0.6);
 }
 
+#editor h2 {
+  position: relative;
+  z-index: 2;
+}
+
 label{display:block;margin-top:1rem;color:var(--gold)}
 input,textarea,select{
   width:100%;
@@ -313,22 +299,19 @@ button{
 .support-btn {
   position: fixed;
   bottom: 20px;
-  left: 20px;
+  right: 20px;
   width: 60px;
   height: 60px;
   z-index: 3000;
   cursor: pointer;
   filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+  transition: transform 0.3s ease;
 }
 </style>
 </head>
 
 <body>
 <div id="autoSaveStatus">Saved Draft</div>
-
-<nav class="dashboard-nav">
-    <a href="#" id="dashLink" class="btn-dash" style="display:none;" target="_blank">📊 MY DASHBOARD</a>
-</nav>
 
 <div id="paymentModal" class="modal hidden">
   <div class="modal-glass">
@@ -375,7 +358,7 @@ button{
   <label>Tagline</label>
   <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value">
   
-  <label>Call to Action Button (Link to other pages)</label>
+  <label>Call to Action Button (External Link)</label>
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
       <input id="ctaText" placeholder="Button Text (e.g. Visit Main Site)" oninput="updateCTA()">
       <input id="ctaUrl" placeholder="Link URL (https://...)" oninput="updateCTA()">
@@ -394,12 +377,8 @@ button{
   <input id="bannerURL" placeholder="Paste Banner Image URL here" oninput="document.getElementById('header').style.backgroundImage='url('+this.value+')'">
   <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; document.getElementById('bannerURL').value=img;})">
 
-  <label>Owner WhatsApp (Admin Only)</label>
-  <input id="ownerWA" placeholder="e.g. 27766314246">
-
-  <label>Customer Order WhatsApp</label>
+  <label>WhatsApp Number</label>
   <input id="editWA" value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
-  
   <label>Currency</label>
   <select id="editCurr" onchange="setCurrency(this.value)">
       <option value="ZAR">ZAR (R)</option>
@@ -448,7 +427,7 @@ button{
 <iframe id="printFrame" style="display:none;"></iframe>
 
 <script>
-/* ================== STATE & CONFIG ================== */
+/* ================== STATE ================== */
 let whatsappNumber = "+27660000000";
 let marketingMode = false;
 let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
@@ -456,8 +435,9 @@ let downloadCredits = parseInt(localStorage.getItem('tiffyai_credits')) || 0;
 let promoQueue = [];
 let autoSaveTimer;
 const orderState = {};
-const RENDER_BASE = "https://webstore-api-m8sr.onrender.com";
-const RENDER_API = RENDER_BASE + "/api";
+
+const RENDER_API = "https://webstore-api-m8sr.onrender.com/api";
+const MASK_BASE = "https://webstore-api-m8sr.onrender.com/store/"; 
 
 const currencyMap = {
   ZAR: { symbol: 'R' }, INR: { symbol: '₹' }, USD: { symbol: '$' }, EUR: { symbol: '€' },
@@ -481,30 +461,23 @@ function updateCTA() {
 }
 
 /* ================== CLOUD ENGINE ================== */
-async function publishToCloud(isAuto = false) {
+async function publishToCloud() {
     const isActivated = localStorage.getItem('tiffyai_activated') === 'true';
-    const ownerWA = document.getElementById('ownerWA').value;
     const syncBtn = document.getElementById('cloudSyncBtn');
-
-    if(!ownerWA && !isAuto) return alert("Please enter Owner WhatsApp for administrative link.");
-    if(!ownerWA) return; 
+    const MASK_VIEWER = "https://webstore-api-m8sr.onrender.com/view/";
 
     let handle = localStorage.getItem('webstore_cloud_handle');
     if (!handle) {
-        if(isAuto) return;
-        const input = prompt("Choose Store Handle (e.g., myshop):");
+        const input = prompt("Choose your Store Handle (e.g., coffee-hub):");
         if (!input) return;
         handle = input.toLowerCase().replace(/[^a-z0-9-]/g, '-');
         localStorage.setItem('webstore_cloud_handle', handle);
     }
 
-    if(!isAuto) syncBtn.textContent = "⏳ PUBLISHING...";
+    syncBtn.textContent = "⏳ CONNECTING TO CLOUD...";
 
     const payload = {
         handle: handle,
-        ownerWhatsapp: ownerWA,
-        planType: isActivated ? 'pro' : 'trial',
-        activationCode: localStorage.getItem('last_used_code') || null,
         configData: {
             businessName: document.getElementById('cafeName').textContent,
             tagline: document.getElementById('tagline').textContent,
@@ -515,7 +488,8 @@ async function publishToCloud(isAuto = false) {
             ctaUrl: document.getElementById('ctaUrl').value,
             wa: whatsappNumber,
             curr: activeCurrency,
-            menu: menuSections
+            menu: menuSections,
+            isActivated: isActivated 
         }
     };
 
@@ -526,22 +500,18 @@ async function publishToCloud(isAuto = false) {
             body: JSON.stringify(payload)
         });
         const res = await response.json();
-        if (res.success) {
-            updateDashboardLink(handle);
-            if(!isAuto) {
-                alert(`🚀 LIVE!\nLink: ${RENDER_BASE}/view/${handle}`);
-                window.open(`${RENDER_BASE}/view/${handle}`, '_blank');
-            }
+        if (res.status === 'expired') {
+            alert("⚠️ Your 7-Day Free Cloud Trial has expired.");
+            triggerPaymentFlow();
+            return;
         }
-    } catch (err) { console.warn("Cloud offline, draft saved locally."); }
-    finally { if(!isAuto) syncBtn.textContent = "☁️ CLOUD SYNC (SMART PUBLISH)"; }
-}
-
-function updateDashboardLink(handle) {
-    const link = document.getElementById('dashLink');
-    if(handle && link) {
-        link.href = `https://tiffyai-usd.github.io/Shop-Dashboard/index.html?s=${handle}`;
-        link.style.display = "block";
+        if (res.success) {
+            window.prompt(`🚀 LIVE!\n\nTrial: ${res.trialDaysLeft} days left.\n\nYour Masked Link:`, MASK_VIEWER + handle); 
+        }
+    } catch (err) {
+        alert("Server spin-up. Please wait 30s and try again.");
+    } finally {
+        syncBtn.textContent = "☁️ CLOUD SYNC (SMART PUBLISH)";
     }
 }
 
@@ -549,7 +519,7 @@ function updateDashboardLink(handle) {
 function saveDraft() {
     const indicator = document.getElementById('autoSaveStatus');
     indicator.style.display = 'block';
-    indicator.textContent = "Saving...";
+    indicator.textContent = "Saving Draft...";
 
     const storeData = {
         businessName: document.getElementById('cafeName').textContent,
@@ -559,17 +529,15 @@ function saveDraft() {
         banner: document.getElementById('bannerURL').value,
         ctaText: document.getElementById('ctaText').value,
         ctaUrl: document.getElementById('ctaUrl').value,
-        ownerWA: document.getElementById('ownerWA').value,
         wa: whatsappNumber,
         curr: activeCurrency,
         menu: menuSections,
-        ts: Date.now()
+        ts: new Date().getTime()
     };
     localStorage.setItem('webstore_pro_draft', JSON.stringify(storeData));
-    publishToCloud(true); // Auto-sync to Admin Panel
-
+    
     setTimeout(() => { 
-        indicator.textContent = "Synced & Saved"; 
+        indicator.textContent = "Draft Saved Locally"; 
         setTimeout(() => indicator.style.display = 'none', 1500);
     }, 500);
 }
@@ -578,7 +546,8 @@ function loadDraft() {
     const saved = localStorage.getItem('webstore_pro_draft');
     if (!saved) return;
     const d = JSON.parse(saved);
-    if (confirm("Restore your work from " + new Date(d.ts).toLocaleTimeString() + "?")) {
+
+    if (confirm("Restore your saved work from " + new Date(d.ts).toLocaleTimeString() + "?")) {
         menuSections = d.menu; activeCurrency = d.curr; whatsappNumber = d.wa;
         document.getElementById('cafeName').textContent = d.businessName;
         document.getElementById('tagline').textContent = d.tagline;
@@ -587,17 +556,14 @@ function loadDraft() {
         document.getElementById('bannerURL').value = d.banner;
         document.getElementById('ctaText').value = d.ctaText || "";
         document.getElementById('ctaUrl').value = d.ctaUrl || "";
-        document.getElementById('ownerWA').value = d.ownerWA || "";
         document.getElementById('logo').src = d.logo;
         document.getElementById('header').style.backgroundImage = `url(${d.banner})`;
         document.getElementById('editName').value = d.businessName;
         document.getElementById('editTag').value = d.tagline;
+        document.getElementById('editFooter').value = d.footer;
         document.getElementById('editWA').value = d.wa;
         document.getElementById('editCurr').value = d.curr;
-        updateCTA();
-        const handle = localStorage.getItem('webstore_cloud_handle');
-        if(handle) updateDashboardLink(handle);
-        renderMenu(); renderEditor();
+        updateCTA(); renderMenu(); renderEditor();
     }
 }
 
@@ -610,6 +576,7 @@ function toggleMarketingMode() {
   const btn = document.getElementById('mktBtn');
   btn.textContent = marketingMode ? "🔥 MARKETING MODE LIVE" : "⚡ ACTIVATE MARKETING MODE";
   btn.style.background = marketingMode ? "var(--gold)" : "#1a1a1a";
+  btn.style.color = marketingMode ? "#000" : "var(--gold)";
   renderMenu();
 }
 
@@ -622,48 +589,51 @@ function uploadImage(input, cb){
 function updateCreditDisplay() {
     const btn = document.getElementById('downloadBtn');
     if (!btn) return;
-    btn.textContent = `DOWNLOAD WEBSITE HTML (${downloadCredits}/100 Left)`;
-    btn.style.background = (downloadCredits > 0) ? "linear-gradient(180deg, var(--gold), var(--gold2))" : "#600";
+    if (localStorage.getItem('tiffyai_activated') !== 'true' || downloadCredits <= 0) {
+        btn.textContent = `ACTIVATE / REFILL CREDITS (${downloadCredits}/100 Left)`;
+        btn.style.background = "#600";
+    } else {
+        btn.textContent = `DOWNLOAD WEBSITE HTML (${downloadCredits}/100 Left)`;
+        btn.style.background = "linear-gradient(180deg, var(--gold), var(--gold2))";
+    }
 }
 
+function triggerPaymentFlow() { document.getElementById('paymentModal').classList.remove('hidden'); }
+
 function downloadHTML(){
-  if(localStorage.getItem('tiffyai_activated') === 'true' && downloadCredits > 0) {
-      downloadCredits--; localStorage.setItem('tiffyai_credits', downloadCredits);
-      updateCreditDisplay();
-      const doc = document.documentElement.cloneNode(true);
-      ['#editor', '#paymentModal', '#activationPanel', '.support-btn', '#autoSaveStatus', '.dashboard-nav'].forEach(id => doc.querySelector(id)?.remove());
-      const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], { type: 'text/html' });
-      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WebStore.html'; a.click();
-  } else triggerPaymentFlow();
+  if(localStorage.getItem('tiffyai_activated') === 'true' && downloadCredits > 0) actualDownload(); 
+  else triggerPaymentFlow();
+}
+
+function actualDownload(){
+  downloadCredits--; localStorage.setItem('tiffyai_credits', downloadCredits); updateCreditDisplay();
+  const doc = document.documentElement.cloneNode(true);
+  ['#editor', '#paymentModal', '#activationPanel', '.support-btn', '#autoSaveStatus'].forEach(id => doc.querySelector(id)?.remove());
+  const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], { type: 'text/html' });
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WebStore.html'; a.click();
+}
+
+function payWithPaypal(){ window.open('https://paypal.me/CatHostProWebsites/30', '_blank'); confirmManualPayment(); }
+function confirmManualPayment(){
+  const code = generateRequestCode();
+  window.open('https://wa.me/27766314246?text=CREDIT%20REQUEST%20'+code, '_blank');
 }
 
 function renderMenu(){
   const menuRender = document.getElementById('menuRender');
   menuRender.innerHTML = '';
   const sym = currencyMap[activeCurrency].symbol;
-
   menuSections.forEach((sec, s) => {
     const h2 = document.createElement('h2'); h2.className = 'section-title'; h2.textContent = sec.title;
     const grid = document.createElement('div'); grid.className = 'menu-grid';
-
     sec.items.forEach((it, i) => {
       const key = `${s}-${i}`;
       const qty = orderState[key] || 0;
       const stars = "★".repeat(it.rating || 5) + "☆".repeat(5 - (it.rating || 5));
-      let badgeHtml = (marketingMode && it.badge && it.badge !== 'none') ? 
-        `<div class="badge badge-${it.badge}">${it.badge === 'scarcity' ? `ONLY ${it.stock || 3} LEFT` : it.badge.replace('-', ' ')}</div>` : '';
-
-      const card = document.createElement('div');
-      card.className = 'menu-item';
-      let mktTools = marketingMode ? `
-        <button class="status-saver-btn" onclick='generateStatusFlyer(${JSON.stringify(it).replace(/'/g, "&apos;")})'>📲 STATUS</button>
-        <div class="share-btn" onclick="shareItem('${it.name}', '${it.price}', '${it.desc}')">🔗</div>` : '';
-
-      card.innerHTML = `${badgeHtml}${mktTools}<img src="${it.img || 'https://via.placeholder.com/300'}">
-        <div class="card"><h3>${it.name}</h3><div class="rating-stars">${stars}</div><p>${it.desc}</p>
-          <div class="price">${sym + it.price}</div>
-          <div style="display:flex;gap:10px;margin-top:10px;align-items:center"><button onclick="changeQty('${key}', -1)">−</button><strong>${qty}</strong><button onclick="changeQty('${key}', 1)">+</button></div>
-        </div>`;
+      let badgeHtml = (marketingMode && it.badge && it.badge !== 'none') ? `<div class="badge badge-${it.badge}">${it.badge === 'scarcity' ? `ONLY ${it.stock || 3} LEFT` : it.badge.replace('-', ' ')}</div>` : '';
+      const card = document.createElement('div'); card.className = 'menu-item';
+      let mktTools = marketingMode ? `<button class="status-saver-btn" onclick='generateStatusFlyer(${JSON.stringify(it).replace(/'/g, "&apos;")})'>📲 STATUS</button><div class="share-btn" onclick="shareItem('${it.name}', '${it.price}', '${it.desc}')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg></div>` : '';
+      card.innerHTML = `${badgeHtml}${mktTools}<img src="${it.img || 'https://via.placeholder.com/300?text=No+Image'}"><div class="card"><h3>${it.name}</h3><div class="rating-stars">${stars}</div><p>${it.desc}</p><div class="price">${sym + it.price}</div><div style="display:flex;gap:10px;margin-top:10px;align-items:center"><button onclick="changeQty('${key}', -1)">−</button><strong>${qty}</strong><button onclick="changeQty('${key}', 1)">+</button></div></div>`;
       grid.appendChild(card);
     });
     menuRender.appendChild(h2); menuRender.appendChild(grid);
@@ -678,18 +648,10 @@ function renderWhatsapp(){
   let btn = document.getElementById('whatsappOrderBtn');
   let qBtn = document.getElementById('quoteBtn');
   if (total === 0){ if(btn) btn.remove(); if(qBtn) qBtn.remove(); return; }
-  
   const sym = currencyMap[activeCurrency].symbol;
-  let msg = `🛍️ NEW ORDER\n\n`;
-  let grand = 0;
-  menuSections.forEach((sec, s)=>{
-    sec.items.forEach((it, i)=>{
-      const q = orderState[`${s}-${i}`] || 0;
-      if(q){ grand += (q * it.price); msg += `✅ ${q}x ${it.name} - ${sym}${q*it.price}\n`; }
-    });
-  });
+  let msg = `🛍️ NEW ORDER\n\n`; let grand = 0;
+  menuSections.forEach((sec, s)=>{ sec.items.forEach((it, i)=>{ let q = orderState[`${s}-${i}`]; if(q){ grand += (q * it.price); msg += `✅ ${q}x ${it.name} - ${sym}${q*it.price}\n`; } }); });
   msg += `\nTOTAL: ${sym}${grand}`;
-
   if(!btn){
     btn = document.createElement('a'); btn.id = 'whatsappOrderBtn'; document.body.appendChild(btn);
     qBtn = document.createElement('button'); qBtn.id = 'quoteBtn'; qBtn.className = 'quote-btn';
@@ -711,17 +673,29 @@ function logSale(msg, total) {
 function renderSalesLog() {
     const log = document.getElementById('salesLog');
     const sales = JSON.parse(localStorage.getItem('tiffyai_sales') || '[]');
-    log.innerHTML = sales.map(s => `<div class="log-entry"><span>${s.date} <br> <strong>${currencyMap[activeCurrency].symbol}${s.total}</strong></span>
-            <button onclick='printReceipt(${JSON.stringify(s)})' style="padding:2px 10px; font-size:0.7rem; color:#000;">PRINT</button></div>`).join('') || '<p>No sales.</p>';
+    log.innerHTML = sales.map(s => `<div class="log-entry"><span>${s.date} <br> <strong>${currencyMap[activeCurrency].symbol}${s.total}</strong></span><button onclick='printReceipt(${JSON.stringify(s)})' style="padding:2px 10px; font-size:0.7rem; color:#000;">PRINT</button></div>`).join('') || '<p style="color:#666">No sales recorded.</p>';
 }
 
 function printReceipt(s) {
     const frame = document.getElementById('printFrame');
     const doc = frame.contentWindow.document;
     doc.open();
-    doc.write(`<html><body style="font-family:monospace;text-align:center;"><h2>${document.getElementById('cafeName').textContent}</h2><hr>${s.msg.replace(/\n/g,'<br>')}<hr><h3>TOTAL: ${currencyMap[activeCurrency].symbol}${s.total}</h3></body></html>`);
+    doc.write(`<html><body style="font-family:monospace;padding:20px;text-align:center;"><h2>${document.getElementById('cafeName').textContent}</h2><p>${s.date}</p><hr>${s.msg.replace(/\n/g,'<br>')}<hr><h3>TOTAL: ${currencyMap[activeCurrency].symbol}${s.total}</h3></body></html>`);
     doc.close();
     setTimeout(() => { frame.contentWindow.focus(); frame.contentWindow.print(); }, 500);
+}
+
+function startBulk() { promoQueue = document.getElementById('bulkNumbers').value.split(/[\n,]+/).map(n=>n.trim()).filter(n=>n.length > 5); nextInQueue(); }
+function nextInQueue() {
+    if(!promoQueue.length) { document.getElementById('bulkStatus').textContent = "Done!"; return; }
+    const num = promoQueue.shift();
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent('Check out our store: ' + window.location.href)}`, '_blank');
+}
+
+function shareItem(name, price, desc) {
+  const text = `🔥 ${name}\n💰 ${currencyMap[activeCurrency].symbol}${price}\n\n${desc}\n🛒 Shop: ${window.location.href}`;
+  if (navigator.share) navigator.share({ title: name, text: text });
+  else { navigator.clipboard.writeText(text); alert("Marketing info copied!"); }
 }
 
 function generateStatusFlyer(it) {
@@ -742,48 +716,34 @@ function renderEditor(){
   const me = document.getElementById('menuEditor'); me.innerHTML = '';
   menuSections.forEach((sec, s)=>{
     const b = document.createElement('div'); b.className = 'editor-block';
-    b.innerHTML = `<input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
-      ${sec.items.map((it,i)=>`<div style="border-top:1px solid #333; margin-top:10px; padding-top:10px;">
-          <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
-          <select onchange="menuSections[${s}].items[${i}].badge=this.value;renderMenu()"><option value="none">No Badge</option><option value="scarcity">Scarcity</option><option value="hot">Hot Deal</option></select>
-          <input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
-          <textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
-          <input value="${it.img}" placeholder="Img URL" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
-          <button class="remove" onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">✕</button></div>`).join('')}
-      <button onclick="menuSections[${s}].items.push({name:'New Item',price:0,desc:'',img:'',badge:'none'});renderEditor();renderMenu()">+ Item</button>`;
+    b.innerHTML = `<div class="section-head"><input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()"><button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu()">✕</button></div>
+      ${sec.items.map((it,i)=>`<div style="border-top:1px solid #333; margin-top:10px; padding-top:10px;"><label>Item Name</label><input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()"><label>Price</label><input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()"><label>Description</label><textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea><label>Image</label><input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()"><button class="remove" onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">Remove Item</button></div>`).join('')}<button onclick="menuSections[${s}].items.push({name:'New Item',price:0,desc:'',img:'',rating:5,badge:'none'});renderEditor();renderMenu()">+ Add Item</button>`;
     me.appendChild(b);
   });
 }
 
-function startBulk() {
-    promoQueue = document.getElementById('bulkNumbers').value.split(/[\n,]+/).map(n=>n.trim()).filter(n=>n.length > 5);
-    nextInQueue();
-}
-
-function nextInQueue() {
-    if(!promoQueue.length) { document.getElementById('bulkStatus').textContent = "Done!"; return; }
-    const num = promoQueue.shift();
-    window.open(`https://wa.me/${num}?text=${encodeURIComponent('Check our store: ' + window.location.href)}`, '_blank');
-}
-
 function addSection(){ menuSections.push({ title: "New Section", items: [] }); renderEditor(); renderMenu(); }
-function triggerPaymentFlow(){ document.getElementById('paymentModal').classList.remove('hidden'); }
-function payWithPaypal(){ window.open('https://paypal.me/CatHostProWebsites/30', '_blank'); }
-function confirmManualPayment(){ window.open('https://wa.me/27766314246?text=REQ-'+Date.now()); }
+
+function generateRequestCode(){
+  let d = ''; while(d.length < 14) d += Math.floor(Math.random()*10);
+  let s = JSON.parse(localStorage.getItem('tiffyai_r') || '[]'); s.push(d); localStorage.setItem('tiffyai_r', JSON.stringify(s));
+  return d.match(/.{1,4}/g).join('-');
+}
+
 function submitActivation(){
   const ent = Array.from(document.querySelectorAll('.code-inputs input')).map(i=>i.value).join('');
   const s = JSON.parse(localStorage.getItem('tiffyai_r') || '[]');
   if(s.some(d => { let k=''; for(let i=0; i<d.length; i+=2) k+=d[i]; return k===ent; })){
-    localStorage.setItem('tiffyai_activated', 'true'); localStorage.setItem('tiffyai_credits', 100); 
-    localStorage.setItem('last_used_code', ent); 
-    publishToCloud(); location.reload();
-  } else alert('Invalid');
+    localStorage.setItem('tiffyai_activated', 'true'); localStorage.setItem('tiffyai_credits', 100); location.reload();
+  } else alert('Invalid Key');
 }
+
 function closePayment(){ document.getElementById('paymentModal').classList.add('hidden'); }
 
 document.addEventListener('DOMContentLoaded', () => {
     loadDraft();
     document.getElementById('editor').addEventListener('input', () => { clearTimeout(autoSaveTimer); autoSaveTimer = setTimeout(saveDraft, 2000); });
+    if(localStorage.getItem('tiffyai_activated') === 'true' && downloadCredits > 0) document.getElementById('activationPanel')?.remove();
     updateCreditDisplay(); renderMenu(); renderEditor(); renderSalesLog();
 });
 </script>
