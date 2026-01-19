@@ -1,0 +1,791 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro - Cloud Edition</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta property="og:title" content="TiffyAI Web-Store Builder">
+<meta property="og:description" content="A high-performance, mobile-first WhatsApp POS and Web-Store Builder.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://tiffyai-usd.github.io/Web-Store-App/v6.html">
+<meta property="og:image" content="https://tiffyai-usd.github.io/Web-Store-App/WebApp.gif">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+:root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366;--accent:#00d4ff;}
+
+/* Cloud & Auto-Save Indicators */
+#autoSaveStatus {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 5000;
+  font-size: 0.7rem;
+  background: rgba(0,0,0,0.7);
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  display: none;
+}
+
+/* HEADER - BANNER FIX: As wide as product photos + 0.2% */
+header{
+  min-height:80vh;
+  background-size:cover;
+  background-position:center;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  position:relative;
+  width: 100.2%; 
+  margin-left: -0.1%;
+}
+header::after{
+  content:'';
+  position:absolute;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+}
+header *{position:relative;z-index:2}
+.logo{
+  max-width:180px;
+  border-radius:16px;
+  border:3px solid var(--gold);
+  margin-bottom:1rem;
+}
+h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
+.tagline{font-family:'Bebas Neue';color:var(--gold)}
+
+/* CALL TO ACTION BUTTON */
+.cta-container { margin-top: 20px; z-index: 10; }
+.btn-cta {
+    display: inline-block;
+    background: linear-gradient(180deg, var(--gold), var(--gold2));
+    color: #000;
+    padding: 12px 30px;
+    border-radius: 50px;
+    font-family: 'Bebas Neue';
+    text-decoration: none;
+    font-size: 1.3rem;
+    box-shadow: 0 4px 20px rgba(212, 163, 115, 0.5);
+    transition: 0.3s;
+}
+
+/* DASHBOARD BUTTON */
+.dashboard-nav {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 4000;
+}
+.btn-dash {
+    background: #111;
+    color: var(--accent);
+    border: 1px solid var(--accent);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-family: 'Bebas Neue';
+    text-decoration: none;
+    font-size: 0.9rem;
+    box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);
+}
+
+/* MENU */
+#menu{max-width:1200px;margin:auto;padding:4rem 5%}
+.section-title{
+  font-family:'Bebas Neue';
+  font-size:2.4rem;
+  color:var(--gold);
+  margin:2rem 0 1rem;
+}
+.menu-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+  gap:1.2rem;
+}
+.menu-item{
+  background:#0f0f0f;
+  border-radius:12px;
+  border:1px solid #222;
+  overflow:hidden;
+  position: relative;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.marketing-active .menu-item {
+  border: 1px solid var(--gold);
+  transform: scale(1.02);
+  box-shadow: 0 0 15px rgba(212, 163, 115, 0.2);
+}
+
+.badge {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  padding: 5px 12px;
+  border-radius: 4px;
+  font-family: 'Bebas Neue';
+  font-size: 0.9rem;
+  z-index: 4;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+.badge-scarcity { background: #ff0000; color: #fff; animation: pulse-red 1.5s infinite; }
+.badge-hot { background: var(--gold); color: #000; }
+.badge-new { background: #3498db; color: #fff; }
+
+@keyframes pulse-red {
+  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
+  70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
+  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
+}
+
+.share-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(0,0,0,0.5);
+  border: 1px solid var(--gold);
+  color: var(--gold);
+  border-radius: 50%;
+  width: 38px;
+  height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  z-index: 5;
+}
+
+.status-saver-btn {
+  position: absolute;
+  top: 10px;
+  left: 60px;
+  background: #25D366;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 20px;
+  font-size: 0.7rem;
+  font-family: 'Bebas Neue';
+  cursor: pointer;
+  z-index: 5;
+}
+
+.rating-stars { color: #ffcc00; margin-bottom: 5px; font-size: 0.9rem; }
+
+.menu-item img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-bottom:3px solid var(--gold);
+}
+.card{padding:1rem}
+.menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
+.price{font-family:'Bebas Neue';color:var(--gold2)}
+
+.sales-log { background: #000; padding: 10px; border-radius: 8px; max-height: 200px; overflow-y: auto; margin: 10px 0; border: 1px solid #333; }
+.log-entry { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #222; font-size: 0.8rem; }
+.bulk-panel { background: rgba(37, 211, 102, 0.1); border: 1px solid var(--whatsapp); padding: 15px; border-radius: 12px; margin-top: 20px; }
+
+.receipt-wrap { 
+  background: #fff; 
+  color: #000; 
+  padding: 20px; 
+  width: 300px; 
+  margin: auto; 
+  display: none; 
+  font-family: 'Courier New', monospace; 
+  font-size: 0.85rem; 
+}
+
+footer{
+  background:#000;
+  padding:2rem;
+  text-align:center;
+  border-top:1px solid #222;
+  color:#999;
+}
+
+#editor {
+  position: relative;
+  border-top: 3px dashed var(--gold);
+  padding: 3rem 5%;
+  background-color: #0a0a0a;
+  background-image: url('silky.jpeg');
+  background-size: cover;
+  background-position: center;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+}
+
+#editor::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(10, 10, 10, 0.8);
+  z-index: 1;
+}
+
+.editor-block {
+  position: relative;
+  z-index: 2;
+  background: rgba(20, 20, 20, 0.9);
+  padding: 1.5rem;
+  border-radius: 14px;
+  margin-bottom: 2rem;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+}
+
+label{display:block;margin-top:1rem;color:var(--gold)}
+input,textarea,select{
+  width:100%;
+  padding:10px;
+  background:#222;
+  border:1px solid #444;
+  color:#fff;
+  border-radius:6px;
+}
+textarea{resize:vertical}
+button{
+  background:linear-gradient(180deg,var(--gold),var(--gold2));
+  border:none;
+  padding:10px 18px;
+  border-radius:30px;
+  font-family:'Bebas Neue';
+  font-size:1.1rem;
+  cursor:pointer;
+  margin-top:10px;
+  position: relative;
+  z-index: 2;
+}
+.remove{background:#900;color:#fff}
+.cloud-btn { background: #3498db; color: white; margin-bottom: 5px; font-size: 0.8rem; }
+
+#whatsappOrderBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:999;
+  background:linear-gradient(180deg,#25D366,#1ebe5d);
+  color:#071010;
+  padding:14px 22px;
+  border-radius:40px;
+  font-family:'Bebas Neue';
+  font-size:1.2rem;
+  text-decoration:none;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.quote-btn {
+  position: fixed;
+  bottom: 80px;
+  right: 20px;
+  z-index: 998;
+  background: #fff;
+  color: #000;
+  padding: 10px 20px;
+  border-radius: 30px;
+  font-family: 'Bebas Neue';
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+}
+
+.modal{ position:fixed; inset:0; background:rgba(0,0,0,0.75); display:flex; align-items:center; justify-content:center; z-index:2000; }
+.hidden{display:none}
+.modal-glass{
+  width:90%; max-width:420px; background:rgba(20,20,20,0.85); backdrop-filter:blur(14px);
+  border:1px solid rgba(212,163,115,0.4); border-radius:20px; padding:2rem; color:#fff;
+}
+.pay-btn{ width:100%; padding:14px; border-radius:40px; margin-top:12px; font-family:'Bebas Neue'; font-size:1.1rem; cursor:pointer; border:none; text-align:center; display:block; text-decoration:none; }
+.paypal{ background:#ffc439; color:#111; }
+.confirm{ background:var(--gold); color:#111; }
+.activation{ max-width:600px; margin:3rem auto; padding:2rem; border-top:1px dashed var(--gold); text-align:center; }
+.code-inputs{ display:flex; justify-content:center; gap:10px; margin-bottom:1.5rem; }
+.code-inputs input{ width:42px; height:52px; text-align:center; font-size:1.4rem; border-radius:8px; background:#111; border:1px solid #444; color:#fff; }
+
+.support-btn {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  width: 60px;
+  height: 60px;
+  z-index: 3000;
+  cursor: pointer;
+  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
+}
+</style>
+</head>
+
+<body>
+<div id="autoSaveStatus">Saved Draft</div>
+
+<nav class="dashboard-nav">
+    <a href="#" id="dashLink" class="btn-dash" style="display:none;" target="_blank">📊 MY DASHBOARD</a>
+</nav>
+
+<div id="paymentModal" class="modal hidden">
+  <div class="modal-glass">
+    <h2 style="font-family:'Bebas Neue'; color:var(--gold); text-align:center; font-size:2rem;">Developer License</h2>
+    <p style="text-align:center; margin:1rem 0;">$30 USD (≈ R499)<br>• 100 HTML Export Credits<br>• Professional WhatsApp Builder</p>
+    <button class="pay-btn paypal" onclick="payWithPaypal()">Pay with PayPal</button>
+    <button class="pay-btn confirm" onclick="confirmManualPayment()">I will send an EFT</button>
+    <button class="pay-btn ghost" style="background:none; color:#aaa; width:100%; margin-top:10px; border:none; cursor:pointer;" onclick="closePayment()">Cancel</button>
+  </div>
+</div>
+
+<img src="support.png" class="support-btn" onclick="triggerPaymentFlow()" alt="Support">
+
+<header id="header">
+  <img id="logo" class="logo">
+  <h1 id="cafeName">YOUR WEB STORE BUSINESS</h1>
+  <p id="tagline" class="tagline">With Live Preview</p>
+  <div class="cta-container">
+      <a href="#" id="ctaBtn" class="btn-cta" style="display:none;">VISIT WEBSITE</a>
+  </div>
+</header>
+
+<section id="menu">
+  <div id="menuRender"></div>
+</section>
+
+<footer>
+  <p id="footerText">© 2026 YOUR BUSINESS</p>
+</footer>
+
+<div id="activationPanel" class="activation">
+  <h3 style="font-family:'Bebas Neue'; color:var(--gold); font-size:2rem;">Activate Developer Credits</h3>
+  <div class="code-inputs">
+    <input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1">
+  </div>
+  <button onclick="submitActivation()">Unlock 100 Website Exports</button>
+</div>
+ 
+<div id="editor">
+<h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
+<div class="editor-block">
+  <label>Business Name</label>
+  <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value">
+  <label>Tagline</label>
+  <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value">
+  
+  <label>Call to Action Button (Link to other pages)</label>
+  <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
+      <input id="ctaText" placeholder="Button Text (e.g. Visit Main Site)" oninput="updateCTA()">
+      <input id="ctaUrl" placeholder="Link URL (https://...)" oninput="updateCTA()">
+  </div>
+
+  <label>Footer Copyright</label>
+  <input id="editFooter" oninput="document.getElementById('footerText').textContent=this.value" value="© 2026 YOUR BUSINESS">
+  
+  <label>Logo (URL or Upload)</label>
+  <button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD LOGO</button>
+  <input id="logoURL" placeholder="Paste Logo Image URL here" oninput="document.getElementById('logo').src=this.value">
+  <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; document.getElementById('logoURL').value=img;})">
+
+  <label>Banner (URL or Upload)</label>
+  <button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD BANNER</button>
+  <input id="bannerURL" placeholder="Paste Banner Image URL here" oninput="document.getElementById('header').style.backgroundImage='url('+this.value+')'">
+  <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; document.getElementById('bannerURL').value=img;})">
+
+  <label>Owner WhatsApp (Admin Only)</label>
+  <input id="ownerWA" placeholder="e.g. 27766314246">
+
+  <label>Customer Order WhatsApp</label>
+  <input id="editWA" value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
+  
+  <label>Currency</label>
+  <select id="editCurr" onchange="setCurrency(this.value)">
+      <option value="ZAR">ZAR (R)</option>
+      <option value="INR">INR (₹)</option>
+      <option value="USD">USD ($)</option>
+      <option value="EUR">EUR (€)</option>
+      <option value="GBP">GBP (£)</option>
+      <option value="NGN">NGN (₦)</option>
+  </select>
+  <button onclick="toggleMarketingMode()" id="mktBtn" style="width:100%; margin-top:20px; background:#1a1a1a; color:var(--gold); border:1px solid var(--gold);">
+    ⚡ ACTIVATE MARKETING MODE
+  </button>
+</div>
+
+<h2 style="font-family:'Bebas Neue';color:var(--gold)">POS & BULK TOOLS</h2>
+<div class="editor-block">
+  <label>Local Sales History</label>
+  <div id="salesLog" class="sales-log"></div>
+  <button onclick="localStorage.removeItem('tiffyai_sales'); renderSalesLog();" style="background:#600; font-size:0.7rem;">Clear Sales History</button>
+  
+  <div class="bulk-panel">
+    <h3 style="font-family:'Bebas Neue'; color:var(--whatsapp)">🚀 BROADCAST SYSTEM</h3>
+    <textarea id="bulkNumbers" placeholder="27660000001, 27660000002..."></textarea>
+    <button onclick="startBulk()" style="background:var(--whatsapp); color:#000; width:100%">GENERATE QUEUE</button>
+    <div id="bulkStatus" style="color:var(--whatsapp); font-size:0.8rem; margin-top:10px;"></div>
+  </div>
+</div>
+
+<h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
+<div id="menuEditor"></div>
+<button onclick="addSection()">+ ADD SECTION</button>
+<button id="downloadBtn" onclick="downloadHTML()">DOWNLOAD WEBSITE HTML (0/100 Left)</button>
+<button id="cloudSyncBtn" onclick="publishToCloud()" style="background:#3498db; width:100%; margin-top:10px;">☁️ CLOUD SYNC (SMART PUBLISH)</button>
+</div>
+
+<div id="receiptArea" class="receipt-wrap">
+    <center><h2 id="r-biz"></h2><p id="r-date"></p></center>
+    <hr style="border:1px dashed #000">
+    <div id="r-items" style="margin:10px 0;"></div>
+    <hr style="border:1px dashed #000">
+    <h3 id="r-total" style="text-align:right"></h3>
+    <center><p style="margin-top:10px">Powered by TiffyAI</p></center>
+</div>
+
+<canvas id="statusCanvas" width="1080" height="1920" style="display:none;"></canvas>
+<iframe id="printFrame" style="display:none;"></iframe>
+
+<script>
+/* ================== STATE & CONFIG ================== */
+let whatsappNumber = "+27660000000";
+let marketingMode = false;
+let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
+let downloadCredits = parseInt(localStorage.getItem('tiffyai_credits')) || 0;
+let promoQueue = [];
+let autoSaveTimer;
+const orderState = {};
+const RENDER_BASE = "https://webstore-api-m8sr.onrender.com";
+const RENDER_API = RENDER_BASE + "/api";
+
+const currencyMap = {
+  ZAR: { symbol: 'R' }, INR: { symbol: '₹' }, USD: { symbol: '$' }, EUR: { symbol: '€' },
+  GBP: { symbol: '£' }, NGN: { symbol: '₦' }, KES: { symbol: 'KSh' }
+};
+
+let menuSections = [{ title: "Products", items: [{ name: 'Sample Item', price: 100, desc: "Description here", img: "", rating: 5, badge: 'none', stock: 5 }] }];
+
+/* ================== CTA LOGIC ================== */
+function updateCTA() {
+    const text = document.getElementById('ctaText').value;
+    const url = document.getElementById('ctaUrl').value;
+    const btn = document.getElementById('ctaBtn');
+    if(text && url) {
+        btn.textContent = text.toUpperCase();
+        btn.href = url;
+        btn.style.display = "inline-block";
+    } else {
+        btn.style.display = "none";
+    }
+}
+
+/* ================== CLOUD ENGINE ================== */
+async function publishToCloud(isAuto = false) {
+    const isActivated = localStorage.getItem('tiffyai_activated') === 'true';
+    const ownerWA = document.getElementById('ownerWA').value;
+    const syncBtn = document.getElementById('cloudSyncBtn');
+
+    if(!ownerWA && !isAuto) return alert("Please enter Owner WhatsApp for administrative link.");
+    if(!ownerWA) return; 
+
+    let handle = localStorage.getItem('webstore_cloud_handle');
+    if (!handle) {
+        if(isAuto) return;
+        const input = prompt("Choose Store Handle (e.g., myshop):");
+        if (!input) return;
+        handle = input.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+        localStorage.setItem('webstore_cloud_handle', handle);
+    }
+
+    if(!isAuto) syncBtn.textContent = "⏳ PUBLISHING...";
+
+    const payload = {
+        handle: handle,
+        ownerWhatsapp: ownerWA,
+        planType: isActivated ? 'pro' : 'trial',
+        activationCode: localStorage.getItem('last_used_code') || null,
+        configData: {
+            businessName: document.getElementById('cafeName').textContent,
+            tagline: document.getElementById('tagline').textContent,
+            footer: document.getElementById('footerText').textContent,
+            logo: document.getElementById('logoURL').value,
+            banner: document.getElementById('bannerURL').value,
+            ctaText: document.getElementById('ctaText').value,
+            ctaUrl: document.getElementById('ctaUrl').value,
+            wa: whatsappNumber,
+            curr: activeCurrency,
+            menu: menuSections
+        }
+    };
+
+    try {
+        const response = await fetch(`${RENDER_API}/publish`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        const res = await response.json();
+        if (res.success) {
+            updateDashboardLink(handle);
+            if(!isAuto) {
+                alert(`🚀 LIVE!\nLink: ${RENDER_BASE}/view/${handle}`);
+                window.open(`${RENDER_BASE}/view/${handle}`, '_blank');
+            }
+        }
+    } catch (err) { console.warn("Cloud offline, draft saved locally."); }
+    finally { if(!isAuto) syncBtn.textContent = "☁️ CLOUD SYNC (SMART PUBLISH)"; }
+}
+
+function updateDashboardLink(handle) {
+    const link = document.getElementById('dashLink');
+    if(handle && link) {
+        link.href = `https://tiffyai-usd.github.io/Shop-Dashboard/index.html?s=${handle}`;
+        link.style.display = "block";
+    }
+}
+
+/* ================== AUTOMATION LOGIC ================== */
+function saveDraft() {
+    const indicator = document.getElementById('autoSaveStatus');
+    indicator.style.display = 'block';
+    indicator.textContent = "Saving...";
+
+    const storeData = {
+        businessName: document.getElementById('cafeName').textContent,
+        tagline: document.getElementById('tagline').textContent,
+        footer: document.getElementById('footerText').textContent,
+        logo: document.getElementById('logoURL').value,
+        banner: document.getElementById('bannerURL').value,
+        ctaText: document.getElementById('ctaText').value,
+        ctaUrl: document.getElementById('ctaUrl').value,
+        ownerWA: document.getElementById('ownerWA').value,
+        wa: whatsappNumber,
+        curr: activeCurrency,
+        menu: menuSections,
+        ts: Date.now()
+    };
+    localStorage.setItem('webstore_pro_draft', JSON.stringify(storeData));
+    publishToCloud(true); // Auto-sync to Admin Panel
+
+    setTimeout(() => { 
+        indicator.textContent = "Synced & Saved"; 
+        setTimeout(() => indicator.style.display = 'none', 1500);
+    }, 500);
+}
+
+function loadDraft() {
+    const saved = localStorage.getItem('webstore_pro_draft');
+    if (!saved) return;
+    const d = JSON.parse(saved);
+    if (confirm("Restore your work from " + new Date(d.ts).toLocaleTimeString() + "?")) {
+        menuSections = d.menu; activeCurrency = d.curr; whatsappNumber = d.wa;
+        document.getElementById('cafeName').textContent = d.businessName;
+        document.getElementById('tagline').textContent = d.tagline;
+        document.getElementById('footerText').textContent = d.footer;
+        document.getElementById('logoURL').value = d.logo;
+        document.getElementById('bannerURL').value = d.banner;
+        document.getElementById('ctaText').value = d.ctaText || "";
+        document.getElementById('ctaUrl').value = d.ctaUrl || "";
+        document.getElementById('ownerWA').value = d.ownerWA || "";
+        document.getElementById('logo').src = d.logo;
+        document.getElementById('header').style.backgroundImage = `url(${d.banner})`;
+        document.getElementById('editName').value = d.businessName;
+        document.getElementById('editTag').value = d.tagline;
+        document.getElementById('editWA').value = d.wa;
+        document.getElementById('editCurr').value = d.curr;
+        updateCTA();
+        const handle = localStorage.getItem('webstore_cloud_handle');
+        if(handle) updateDashboardLink(handle);
+        renderMenu(); renderEditor();
+    }
+}
+
+/* ================== CORE LOGIC ================== */
+function setCurrency(c){ activeCurrency=c; localStorage.setItem('tiffyai_currency',c); renderMenu(); renderEditor(); renderSalesLog(); }
+
+function toggleMarketingMode() {
+  marketingMode = !marketingMode;
+  document.body.classList.toggle('marketing-active');
+  const btn = document.getElementById('mktBtn');
+  btn.textContent = marketingMode ? "🔥 MARKETING MODE LIVE" : "⚡ ACTIVATE MARKETING MODE";
+  btn.style.background = marketingMode ? "var(--gold)" : "#1a1a1a";
+  renderMenu();
+}
+
+function uploadImage(input, cb){
+  const f = input.files[0]; if (!f) return;
+  const r = new FileReader(); r.onload = e => { cb(e.target.result); saveDraft(); }; 
+  r.readAsDataURL(f);
+}
+
+function updateCreditDisplay() {
+    const btn = document.getElementById('downloadBtn');
+    if (!btn) return;
+    btn.textContent = `DOWNLOAD WEBSITE HTML (${downloadCredits}/100 Left)`;
+    btn.style.background = (downloadCredits > 0) ? "linear-gradient(180deg, var(--gold), var(--gold2))" : "#600";
+}
+
+function downloadHTML(){
+  if(localStorage.getItem('tiffyai_activated') === 'true' && downloadCredits > 0) {
+      downloadCredits--; localStorage.setItem('tiffyai_credits', downloadCredits);
+      updateCreditDisplay();
+      const doc = document.documentElement.cloneNode(true);
+      ['#editor', '#paymentModal', '#activationPanel', '.support-btn', '#autoSaveStatus', '.dashboard-nav'].forEach(id => doc.querySelector(id)?.remove());
+      const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], { type: 'text/html' });
+      const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WebStore.html'; a.click();
+  } else triggerPaymentFlow();
+}
+
+function renderMenu(){
+  const menuRender = document.getElementById('menuRender');
+  menuRender.innerHTML = '';
+  const sym = currencyMap[activeCurrency].symbol;
+
+  menuSections.forEach((sec, s) => {
+    const h2 = document.createElement('h2'); h2.className = 'section-title'; h2.textContent = sec.title;
+    const grid = document.createElement('div'); grid.className = 'menu-grid';
+
+    sec.items.forEach((it, i) => {
+      const key = `${s}-${i}`;
+      const qty = orderState[key] || 0;
+      const stars = "★".repeat(it.rating || 5) + "☆".repeat(5 - (it.rating || 5));
+      let badgeHtml = (marketingMode && it.badge && it.badge !== 'none') ? 
+        `<div class="badge badge-${it.badge}">${it.badge === 'scarcity' ? `ONLY ${it.stock || 3} LEFT` : it.badge.replace('-', ' ')}</div>` : '';
+
+      const card = document.createElement('div');
+      card.className = 'menu-item';
+      let mktTools = marketingMode ? `
+        <button class="status-saver-btn" onclick='generateStatusFlyer(${JSON.stringify(it).replace(/'/g, "&apos;")})'>📲 STATUS</button>
+        <div class="share-btn" onclick="shareItem('${it.name}', '${it.price}', '${it.desc}')">🔗</div>` : '';
+
+      card.innerHTML = `${badgeHtml}${mktTools}<img src="${it.img || 'https://via.placeholder.com/300'}">
+        <div class="card"><h3>${it.name}</h3><div class="rating-stars">${stars}</div><p>${it.desc}</p>
+          <div class="price">${sym + it.price}</div>
+          <div style="display:flex;gap:10px;margin-top:10px;align-items:center"><button onclick="changeQty('${key}', -1)">−</button><strong>${qty}</strong><button onclick="changeQty('${key}', 1)">+</button></div>
+        </div>`;
+      grid.appendChild(card);
+    });
+    menuRender.appendChild(h2); menuRender.appendChild(grid);
+  });
+  renderWhatsapp();
+}
+
+function changeQty(key, delta){ orderState[key] = Math.max(0, (orderState[key] || 0) + delta); renderMenu(); }
+
+function renderWhatsapp(){
+  const total = Object.values(orderState).reduce((a,b)=>a+b,0);
+  let btn = document.getElementById('whatsappOrderBtn');
+  let qBtn = document.getElementById('quoteBtn');
+  if (total === 0){ if(btn) btn.remove(); if(qBtn) qBtn.remove(); return; }
+  
+  const sym = currencyMap[activeCurrency].symbol;
+  let msg = `🛍️ NEW ORDER\n\n`;
+  let grand = 0;
+  menuSections.forEach((sec, s)=>{
+    sec.items.forEach((it, i)=>{
+      const q = orderState[`${s}-${i}`] || 0;
+      if(q){ grand += (q * it.price); msg += `✅ ${q}x ${it.name} - ${sym}${q*it.price}\n`; }
+    });
+  });
+  msg += `\nTOTAL: ${sym}${grand}`;
+
+  if(!btn){
+    btn = document.createElement('a'); btn.id = 'whatsappOrderBtn'; document.body.appendChild(btn);
+    qBtn = document.createElement('button'); qBtn.id = 'quoteBtn'; qBtn.className = 'quote-btn';
+    qBtn.textContent = "📄 PRINT QUOTE"; document.body.appendChild(qBtn);
+  }
+  qBtn.onclick = () => { printReceipt({date: new Date().toLocaleString(), total: grand, msg: msg}); };
+  btn.onclick = () => { logSale(msg, grand); };
+  btn.href = `https://wa.me/${whatsappNumber}?text=` + encodeURIComponent(msg);
+  btn.textContent = `ORDER NOW (${total})`;
+}
+
+function logSale(msg, total) {
+    const sales = JSON.parse(localStorage.getItem('tiffyai_sales') || '[]');
+    sales.unshift({ id: Date.now(), date: new Date().toLocaleString(), total: total, msg: msg });
+    localStorage.setItem('tiffyai_sales', JSON.stringify(sales));
+    renderSalesLog();
+}
+
+function renderSalesLog() {
+    const log = document.getElementById('salesLog');
+    const sales = JSON.parse(localStorage.getItem('tiffyai_sales') || '[]');
+    log.innerHTML = sales.map(s => `<div class="log-entry"><span>${s.date} <br> <strong>${currencyMap[activeCurrency].symbol}${s.total}</strong></span>
+            <button onclick='printReceipt(${JSON.stringify(s)})' style="padding:2px 10px; font-size:0.7rem; color:#000;">PRINT</button></div>`).join('') || '<p>No sales.</p>';
+}
+
+function printReceipt(s) {
+    const frame = document.getElementById('printFrame');
+    const doc = frame.contentWindow.document;
+    doc.open();
+    doc.write(`<html><body style="font-family:monospace;text-align:center;"><h2>${document.getElementById('cafeName').textContent}</h2><hr>${s.msg.replace(/\n/g,'<br>')}<hr><h3>TOTAL: ${currencyMap[activeCurrency].symbol}${s.total}</h3></body></html>`);
+    doc.close();
+    setTimeout(() => { frame.contentWindow.focus(); frame.contentWindow.print(); }, 500);
+}
+
+function generateStatusFlyer(it) {
+  const canvas = document.getElementById('statusCanvas'); const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,1080,1920);
+  const img = new Image(); img.crossOrigin = "anonymous"; img.src = it.img || 'https://via.placeholder.com/600';
+  img.onload = () => {
+    ctx.drawImage(img, 0, 300, 1080, 1080);
+    ctx.fillStyle = "rgba(212,163,115,0.9)"; ctx.fillRect(0, 1400, 1080, 250);
+    ctx.fillStyle = "#000"; ctx.font = "bold 90px Arial"; ctx.textAlign = "center";
+    ctx.fillText(it.name.toUpperCase(), 540, 1500);
+    ctx.font = "bold 130px Arial"; ctx.fillText(currencyMap[activeCurrency].symbol + it.price, 540, 1620);
+    const link = document.createElement('a'); link.download='flyer.png'; link.href=canvas.toDataURL(); link.click();
+  };
+}
+
+function renderEditor(){
+  const me = document.getElementById('menuEditor'); me.innerHTML = '';
+  menuSections.forEach((sec, s)=>{
+    const b = document.createElement('div'); b.className = 'editor-block';
+    b.innerHTML = `<input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
+      ${sec.items.map((it,i)=>`<div style="border-top:1px solid #333; margin-top:10px; padding-top:10px;">
+          <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+          <select onchange="menuSections[${s}].items[${i}].badge=this.value;renderMenu()"><option value="none">No Badge</option><option value="scarcity">Scarcity</option><option value="hot">Hot Deal</option></select>
+          <input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+          <textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
+          <input value="${it.img}" placeholder="Img URL" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
+          <button class="remove" onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu()">✕</button></div>`).join('')}
+      <button onclick="menuSections[${s}].items.push({name:'New Item',price:0,desc:'',img:'',badge:'none'});renderEditor();renderMenu()">+ Item</button>`;
+    me.appendChild(b);
+  });
+}
+
+function startBulk() {
+    promoQueue = document.getElementById('bulkNumbers').value.split(/[\n,]+/).map(n=>n.trim()).filter(n=>n.length > 5);
+    nextInQueue();
+}
+
+function nextInQueue() {
+    if(!promoQueue.length) { document.getElementById('bulkStatus').textContent = "Done!"; return; }
+    const num = promoQueue.shift();
+    window.open(`https://wa.me/${num}?text=${encodeURIComponent('Check our store: ' + window.location.href)}`, '_blank');
+}
+
+function addSection(){ menuSections.push({ title: "New Section", items: [] }); renderEditor(); renderMenu(); }
+function triggerPaymentFlow(){ document.getElementById('paymentModal').classList.remove('hidden'); }
+function payWithPaypal(){ window.open('https://paypal.me/CatHostProWebsites/30', '_blank'); }
+function confirmManualPayment(){ window.open('https://wa.me/27766314246?text=REQ-'+Date.now()); }
+function submitActivation(){
+  const ent = Array.from(document.querySelectorAll('.code-inputs input')).map(i=>i.value).join('');
+  const s = JSON.parse(localStorage.getItem('tiffyai_r') || '[]');
+  if(s.some(d => { let k=''; for(let i=0; i<d.length; i+=2) k+=d[i]; return k===ent; })){
+    localStorage.setItem('tiffyai_activated', 'true'); localStorage.setItem('tiffyai_credits', 100); 
+    localStorage.setItem('last_used_code', ent); 
+    publishToCloud(); location.reload();
+  } else alert('Invalid');
+}
+function closePayment(){ document.getElementById('paymentModal').classList.add('hidden'); }
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadDraft();
+    document.getElementById('editor').addEventListener('input', () => { clearTimeout(autoSaveTimer); autoSaveTimer = setTimeout(saveDraft, 2000); });
+    updateCreditDisplay(); renderMenu(); renderEditor(); renderSalesLog();
+});
+</script>
+</body>
+</html>
