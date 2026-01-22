@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro - Cloud Edition</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+:root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366;--accent:#00d4ff;}
+
+/* ... Rest of your existing CSS ... */
+
+/* --- 5-STAR RATING VISIBILITY FIX --- */
+.rating-stars { 
+    color: #ffcc00 !important; 
+    margin-bottom: 8px; 
+    font-size: 1.1rem; 
+    text-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
+    letter-spacing: 2px;
+}
+
+/* --- STYLISH CART BUTTONS --- */
+.cart-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    width: 100%;
+}
+
+.btn-cart {
+    flex: 1;
+    border: none;
+    padding: 10px 5px;
+    border-radius: 8px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+}
+
+.btn-add {
+    background: var(--accent);
+    color: #000;
+}
+
+.btn-empty {
+    background: rgba(255, 77, 77, 0.1);
+    color: #ff4d4d;
+    border: 1px solid #ff4d4d;
+}
+
+.qty-display {
+    font-weight: 900;
+    font-size: 1.2rem;
+    min-width: 35px;
+    text-align: center;
+    color: #fff;
+}
+
+/* Ensure existing item styles accommodate new buttons */
+.menu-item img{
+  width:100%;
+  height:200px;
+  object-fit:cover;
+  border-bottom:3px solid var(--gold);
+}
+.card{padding:1.2rem}
+.menu-item h3{font-family:'Bebas Neue';color:var(--gold); margin-bottom: 5px;}
+.price{font-family:'Bebas Neue';color:var(--gold2); font-size: 1.3rem;}
+
+/* ... Your other CSS ... */
+</style>
+</head>
+
+<body>
+<script>
+/* ================== CORE RENDERING ================== */
+
+function renderMenu(){
+  const menuRender = document.getElementById('menuRender');
+  menuRender.innerHTML = '';
+  const sym = currencyMap[activeCurrency].symbol;
+
+  menuSections.forEach((sec, s) => {
+    const h2 = document.createElement('h2');
+    h2.className = 'section-title'; h2.textContent = sec.title;
+    const grid = document.createElement('div');
+    grid.className = 'menu-grid';
+
+    sec.items.forEach((it, i) => {
+      const key = `${s}-${i}`;
+      const qty = orderState[key] || 0;
+      
+      // Use standard star characters - CSS fix above handles visibility
+      const stars = "★".repeat(it.rating || 5) + "☆".repeat(5 - (it.rating || 5));
+      
+      let badgeHtml = (marketingMode && it.badge && it.badge !== 'none') ? 
+        `<div class="badge badge-${it.badge}">${it.badge === 'scarcity' ? `ONLY ${it.stock || 3} LEFT` : it.badge.replace('-', ' ')}</div>` : '';
+
+      const card = document.createElement('div');
+      card.className = 'menu-item';
+      
+      let mktTools = marketingMode ? `
+        <button class="status-saver-btn" onclick='generateStatusFlyer(${JSON.stringify(it).replace(/'/g, "&apos;")})'>📲 STATUS</button>
+        <div class="share-btn" onclick="shareItem('${it.name}', '${it.price}', '${it.desc}')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
+        </div>` : '';
+
+      card.innerHTML = `
+        ${badgeHtml}
+        ${mktTools}
+        <img src="${it.img || 'https://via.placeholder.com/300?text=No+Image'}">
+        <div class="card">
+          <h3>${it.name}</h3>
+          <div class="rating-stars">${stars}</div>
+          <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 10px;">${it.desc}</p>
+          <div class="price">${it.price == 0 ? 'NEGOTIABLE' : sym + it.price}</div>
+          
+          <div class="cart-controls">
+            <button class="btn-cart btn-empty" onclick="changeQty('${key}', -1)">EMPTY CART</button>
+            <span class="qty-display">${qty}</span>
+            <button class="btn-cart btn-add" onclick="changeQty('${key}', 1)">ADD TO CART</button>
+          </div>
+        </div>`;
+      grid.appendChild(card);
+    });
+    menuRender.appendChild(h2); menuRender.appendChild(grid);
+  });
+  renderWhatsapp();
+}
+
+/* ... Rest of your JavaScript ... */
+</script>
+</body>
+</html>
