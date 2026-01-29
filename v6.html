@@ -13,7 +13,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
-:root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
+:root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366;--accent:#00d4ff;}
 
 /* Cloud & Auto-Save Indicators */
 #autoSaveStatus {
@@ -155,7 +155,48 @@ h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
   z-index: 5;
 }
 
-.rating-stars { color: #ffcc00; margin-bottom: 5px; font-size: 0.9rem; }
+/* FIXED STAR GLOW */
+.rating-stars { 
+    color: #ffcc00 !important; 
+    margin-bottom: 8px; 
+    font-size: 1rem; 
+    text-shadow: 0 0 8px rgba(255, 204, 0, 0.4);
+    letter-spacing: 2px;
+}
+
+/* STYLISH CART BUTTONS */
+.cart-controls {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 15px;
+    width: 100%;
+}
+.btn-cart {
+    flex: 1;
+    border: none;
+    padding: 10px 5px;
+    border-radius: 8px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: 0.2s;
+    text-align: center;
+}
+.btn-add { background: var(--accent); color: #000; }
+.btn-empty { background: rgba(255, 77, 77, 0.1); color: #ff4d4d; border: 1px solid #ff4d4d; }
+.hidden-btn { visibility: hidden; pointer-events: none; }
+.qty-display { font-weight: 900; font-size: 1.2rem; min-width: 35px; text-align: center; color: #fff; }
+
+/* WHATSAPP SERVICE BUTTON */
+.wa-service-btn {
+    width: 100%;
+    margin-top: 15px;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+.wa-service-btn:hover { transform: scale(1.05); }
 
 .menu-item img{
   width:100%;
@@ -170,17 +211,6 @@ h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
 .sales-log { background: #000; padding: 10px; border-radius: 8px; max-height: 200px; overflow-y: auto; margin: 10px 0; border: 1px solid #333; }
 .log-entry { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #222; font-size: 0.8rem; }
 .bulk-panel { background: rgba(37, 211, 102, 0.1); border: 1px solid var(--whatsapp); padding: 15px; border-radius: 12px; margin-top: 20px; }
-
-.receipt-wrap { 
-  background: #fff; 
-  color: #000; 
-  padding: 20px; 
-  width: 300px; 
-  margin: auto; 
-  display: none; 
-  font-family: 'Courier New', monospace; 
-  font-size: 0.85rem; 
-}
 
 footer{
   background:#000;
@@ -446,7 +476,7 @@ const currencyMap = {
 
 let menuSections = [{ title: "Products", items: [{ name: 'Sample Item', price: 100, desc: "Description here", img: "", rating: 5, badge: 'none', stock: 5 }] }];
 
-/* ================== NEW TOOLS (CTA & DASHBOARD) ================== */
+/* ================== CTA LOGIC (WITH SAVE FIX) ================== */
 function updateCTA() {
     const text = document.getElementById('ctaText').value;
     const url = document.getElementById('ctaUrl').value;
@@ -495,7 +525,6 @@ async function publishToCloud() {
 
     syncBtn.textContent = "⏳ CONNECTING TO CLOUD...";
 
-    // SURGICAL FIX: Move isActivated out and add CTA fields
     const payload = {
         handle: handle,
         isActivated: isActivated, 
@@ -509,7 +538,6 @@ async function publishToCloud() {
             wa: whatsappNumber,
             curr: activeCurrency,
             menu: menuSections,
-            // ADDED CTA SUPPORT
             ctaText: document.getElementById('ctaText').value,
             ctaUrl: document.getElementById('ctaUrl').value
         }
@@ -533,8 +561,6 @@ async function publishToCloud() {
         if (res.success) {
             const maskedLink = MASK_VIEWER + handle;
             updateCreditDisplay();
-            
-            // SHOW CORRECT STATUS IN POPUP
             const statusLabel = isActivated ? "PRO LICENSE ACTIVE" : `${res.trialDaysLeft} days left`;
             window.prompt(`🚀 LIVE! (${statusLabel})\n\nYour Link:`, maskedLink); 
         }
@@ -545,7 +571,7 @@ async function publishToCloud() {
     }
 }
 
-/* ================== AUTOMATION LOGIC ================== */
+/* ================== AUTOMATION LOGIC (FIXED CTA SAVE) ================== */
 
 function saveDraft() {
     const indicator = document.getElementById('autoSaveStatus');
@@ -558,6 +584,9 @@ function saveDraft() {
         footer: document.getElementById('footerText').textContent,
         logo: document.getElementById('logoURL').value,
         banner: document.getElementById('bannerURL').value,
+        // CTA FIX
+        ctaText: document.getElementById('ctaText').value,
+        ctaUrl: document.getElementById('ctaUrl').value,
         wa: whatsappNumber,
         curr: activeCurrency,
         menu: menuSections,
@@ -589,6 +618,11 @@ function loadDraft() {
         document.getElementById('logo').src = d.logo;
         document.getElementById('header').style.backgroundImage = `url(${d.banner})`;
         
+        // CTA RESTORE FIX
+        document.getElementById('ctaText').value = d.ctaText || "";
+        document.getElementById('ctaUrl').value = d.ctaUrl || "";
+        updateCTA();
+
         document.getElementById('editName').value = d.businessName;
         document.getElementById('editTag').value = d.tagline;
         document.getElementById('editFooter').value = d.footer;
@@ -600,7 +634,7 @@ function loadDraft() {
     }
 }
 
-/* ================== CORE LOGIC ================== */
+/* ================== CORE LOGIC & RENDERING ================== */
 function setCurrency(c){ activeCurrency=c; localStorage.setItem('tiffyai_currency',c); renderMenu(); renderEditor(); renderSalesLog(); }
 
 function toggleMarketingMode() {
@@ -650,7 +684,7 @@ function actualDownload(){
 }
 
 function payWithPaypal(){
-  window.open('https://paypal.me/CatHostProWebsites/30', '_blank');
+  window.open('https://paypal.me/CatHostProWebsites/70', '_blank');
   confirmManualPayment();
 }
 
@@ -660,6 +694,7 @@ function confirmManualPayment(){
   window.open('https://wa.me/27766314246?text=' + encodeURIComponent(msg), '_blank');
 }
 
+/* RENDERING MENU WITH STAR FIX & WHATSAPP SERVICE LOGIC */
 function renderMenu(){
   const menuRender = document.getElementById('menuRender');
   menuRender.innerHTML = '';
@@ -680,16 +715,34 @@ function renderMenu(){
 
       const card = document.createElement('div');
       card.className = 'menu-item';
+      
       let mktTools = marketingMode ? `
         <button class="status-saver-btn" onclick='generateStatusFlyer(${JSON.stringify(it).replace(/'/g, "&apos;")})'>📲 STATUS</button>
         <div class="share-btn" onclick="shareItem('${it.name}', '${it.price}', '${it.desc}')">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
         </div>` : '';
 
+      // LOGIC: If price is 0, show WhatsApp Image instead of Cart
+      let actionControl = '';
+      if(it.price == 0) {
+        const waInquiry = `Hi, I am interested in ${it.name}`;
+        actionControl = `<img src="WhatsApp.png" class="wa-service-btn" onclick="window.open('https://wa.me/${whatsappNumber}?text=${encodeURIComponent(waInquiry)}', '_blank')">`;
+      } else {
+        actionControl = `
+          <div class="cart-controls">
+            <button class="btn-cart btn-empty ${qty > 0 ? '' : 'hidden-btn'}" onclick="changeQty('${key}', -1)">EMPTY CART</button>
+            <span class="qty-display">${qty}</span>
+            <button class="btn-cart btn-add" onclick="changeQty('${key}', 1)">ADD TO CART</button>
+          </div>`;
+      }
+
       card.innerHTML = `${badgeHtml}${mktTools}<img src="${it.img || 'https://via.placeholder.com/300?text=No+Image'}">
-        <div class="card"><h3>${it.name}</h3><div class="rating-stars">${stars}</div><p>${it.desc}</p>
+        <div class="card">
+          <h3>${it.name}</h3>
+          <div class="rating-stars">${stars}</div>
+          <p style="font-size:0.85rem; color:#aaa; margin-bottom:10px;">${it.desc}</p>
           <div class="price">${it.price == 0 ? 'NEGOTIABLE' : sym + it.price}</div>
-          <div style="display:flex;gap:10px;margin-top:10px;align-items:center"><button onclick="changeQty('${key}', -1)">−</button><strong>${qty}</strong><button onclick="changeQty('${key}', 1)">+</button></div>
+          ${actionControl}
         </div>`;
       grid.appendChild(card);
     });
@@ -796,7 +849,7 @@ function renderEditor(){
             <div><label>Stock</label><input type="number" value="${it.stock||5}" oninput="menuSections[${s}].items[${i}].stock=this.value;renderMenu()"></div>
           </div>
           <label>Rating (1-5)</label><input type="number" min="1" max="5" value="${it.rating||5}" oninput="menuSections[${s}].items[${i}].rating=this.value;renderMenu()">
-          <label>Price</label><input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+          <label>Price (0 for Service/WhatsApp)</label><input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
           <label>Description</label><textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">${it.desc}</textarea>
           <label>Image</label><button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD</button>
           <input value="${it.img}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu()">
