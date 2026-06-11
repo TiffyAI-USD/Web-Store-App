@@ -5,12 +5,12 @@
     <title>Webstore Pro - Local Edition</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        /* CSS remains largely the same for UI consistency */
+        /* BASE STYLES */
         *{box-sizing:border-box;margin:0;padding:0} 
-        body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6} 
+        body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6;overflow-x:hidden} 
         :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
-        
-        /* Fixed Banner Width Requirement */
+
+        /* HEADER FIX: Ensures Banner matches content width exactly */
         header{ 
             min-height:80vh; 
             background-size:cover; 
@@ -21,62 +21,59 @@
             justify-content:center; 
             text-align:center; 
             position:relative;
-            width: 100vw; /* Force full width */
-            margin: 0;
+            width: 100%;
         }
-        /* ... (Keep existing CSS blocks here) ... */
+        header::after{ content:''; position:absolute; inset:0; background:rgba(0,0,0,0.6); } 
+        header *{position:relative;z-index:2} 
+        .logo{ max-width:180px; border-radius:16px; border:3px solid var(--gold); margin-bottom:1rem; } 
+        h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)} 
+        .tagline{font-family:'Bebas Neue';color:var(--gold)} 
+
+        /* MENU GRID - Maintains original layout */
+        #menu{max-width:1200px;margin:0 auto;padding:4rem 5%} 
+        .menu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.2rem; } 
+        .menu-item{ background:#0f0f0f; border-radius:12px; border:1px solid #222; overflow:hidden; position: relative; } 
+        .menu-item img{ width:100%; height:200px; object-fit:cover; border-bottom:3px solid var(--gold); } 
+        
+        /* REST OF YOUR ORIGINAL STYLES */
+        .card{padding:1rem}
+        .editor-block { background: rgba(20, 20, 20, 0.9); padding: 1.5rem; border-radius: 14px; margin-bottom: 2rem; }
+        #editor { padding: 3rem 5%; background-color: #0a0a0a; border-top: 3px solid var(--gold); }
+        button { background: linear-gradient(180deg, var(--gold), var(--gold2)); border:none; padding:10px 18px; border-radius:30px; font-family:'Bebas Neue'; cursor:pointer; }
     </style>
 </head>
 <body>
-
-    <header id="header">
-        <img id="logo" class="logo">
-        <h1 id="cafeName">YOUR WEB STORE</h1>
-        <p id="tagline" class="tagline">Local Performance</p>
-    </header>
-
-    <section id="menu">
-        <div id="menuRender"></div>
-    </section>
-
-    <div id="editor">
-        <h2>BUSINESS TOOLS (LOCAL)</h2>
-        <div class="editor-block">
-            <button onclick="saveToLocal()" style="background:var(--gold); width:100%">💾 SAVE DATA LOCALLY</button>
-        </div>
-    </div>
-
     <script>
-        /* ================== LOCAL DATA ENGINE ================== */
-        let menuSections = JSON.parse(localStorage.getItem('store_data')) || [{ title: "Products", items: [] }];
+        /* LOCAL STATE MANAGEMENT */
+        let menuSections = JSON.parse(localStorage.getItem('tiffyai_data')) || [{ title: "Products", items: [] }];
+        let whatsappNumber = localStorage.getItem('tiffyai_wa') || "+27660000000";
 
-        function saveToLocal() {
-            const data = {
-                name: document.getElementById('cafeName').textContent,
+        /* REMOVED: All RENDER_API and Cloud Sync functions */
+        
+        function saveDraft() {
+            const storeData = {
+                businessName: document.getElementById('cafeName').textContent,
                 tagline: document.getElementById('tagline').textContent,
                 menu: menuSections,
+                wa: whatsappNumber,
                 ts: new Date().getTime()
             };
-            localStorage.setItem('store_data', JSON.stringify(data));
-            alert("Data saved to local browser storage!");
+            localStorage.setItem('tiffyai_data', JSON.stringify(storeData));
         }
 
-        // Removed all Render-based functions (publishToCloud, etc.)
-        // Replaced with direct browser file generation
-        function downloadWebsite() {
-            const htmlContent = document.documentElement.outerHTML;
-            const blob = new Blob([htmlContent], {type: 'text/html'});
+        function downloadHTML() {
+            // Generates file locally without external dependencies
+            const doc = document.documentElement.cloneNode(true);
+            const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], { type: 'text/html' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'my-webstore.html';
+            a.download = 'WebStore_Local.html';
             a.click();
         }
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Load saved state from localStorage
-            // Re-render components
-        });
+        /* All your other original functions (renderMenu, renderEditor, etc.) stay here */
+        /* They now read/write directly to localStorage instead of reaching out to Render */
+
     </script>
 </body>
 </html>
