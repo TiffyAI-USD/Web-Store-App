@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Webstore Pro - Local Edition</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        /* CSS remains largely the same for UI consistency */
+        *{box-sizing:border-box;margin:0;padding:0} 
+        body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6} 
+        :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
+        
+        /* Fixed Banner Width Requirement */
+        header{ 
+            min-height:80vh; 
+            background-size:cover; 
+            background-position:center; 
+            display:flex; 
+            flex-direction:column; 
+            align-items:center; 
+            justify-content:center; 
+            text-align:center; 
+            position:relative;
+            width: 100vw; /* Force full width */
+            margin: 0;
+        }
+        /* ... (Keep existing CSS blocks here) ... */
+    </style>
+</head>
+<body>
+
+    <header id="header">
+        <img id="logo" class="logo">
+        <h1 id="cafeName">YOUR WEB STORE</h1>
+        <p id="tagline" class="tagline">Local Performance</p>
+    </header>
+
+    <section id="menu">
+        <div id="menuRender"></div>
+    </section>
+
+    <div id="editor">
+        <h2>BUSINESS TOOLS (LOCAL)</h2>
+        <div class="editor-block">
+            <button onclick="saveToLocal()" style="background:var(--gold); width:100%">💾 SAVE DATA LOCALLY</button>
+        </div>
+    </div>
+
+    <script>
+        /* ================== LOCAL DATA ENGINE ================== */
+        let menuSections = JSON.parse(localStorage.getItem('store_data')) || [{ title: "Products", items: [] }];
+
+        function saveToLocal() {
+            const data = {
+                name: document.getElementById('cafeName').textContent,
+                tagline: document.getElementById('tagline').textContent,
+                menu: menuSections,
+                ts: new Date().getTime()
+            };
+            localStorage.setItem('store_data', JSON.stringify(data));
+            alert("Data saved to local browser storage!");
+        }
+
+        // Removed all Render-based functions (publishToCloud, etc.)
+        // Replaced with direct browser file generation
+        function downloadWebsite() {
+            const htmlContent = document.documentElement.outerHTML;
+            const blob = new Blob([htmlContent], {type: 'text/html'});
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = 'my-webstore.html';
+            a.click();
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load saved state from localStorage
+            // Re-render components
+        });
+    </script>
+</body>
+</html>
