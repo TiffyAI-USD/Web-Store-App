@@ -4,95 +4,90 @@
     <meta charset="UTF-8">
     <title>Webstore Pro - Sovereign Local Edition</title>
     <style>
-        *{box-sizing:border-box;margin:0;padding:0} 
-        body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6} 
-        :root{--gold:#d4a373;--gold2:#f1b86b} 
-        
+        *{box-sizing:border-box;margin:0;padding:0} body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6} :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366} 
         #autoSaveStatus { position: fixed; top: 10px; left: 10px; z-index: 5000; font-size: 0.7rem; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); display: none; }
-        
-        /* Banner constraint: Ensuring it matches product photo width exactly */
-        header{ min-height:60vh; background-size:cover; background-position:center; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; position:relative; width: 100%; max-width: 1200px; margin: 0 auto; border: 1px solid transparent; } 
-        
-        .logo{ max-width:200px; border-radius:16px; border:3px solid var(--gold); margin-bottom:1rem; } 
-        h1{font-family:'Bebas Neue', sans-serif;font-size:4rem;color:var(--gold)} 
-        .tagline{font-family:'Bebas Neue', sans-serif;color:var(--gold)} 
-        
-        #menu{max-width:1200px;margin:auto;padding:4rem 5%} 
-        .menu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.2rem; } 
-        .menu-item{ background:#0f0f0f; border-radius:12px; border:1px solid #222; } 
-        .menu-item img{ width:100%; height:200px; object-fit:cover; border-bottom:3px solid var(--gold); }
-        
-        #editor { position: relative; border-top: 3px dashed var(--gold); padding: 3rem 5%; background-color: #0a0a0a; } 
-        .editor-block { background: rgba(20, 20, 20, 0.9); padding: 1.5rem; border-radius: 14px; margin-bottom: 2rem; }
-        button{ background:linear-gradient(180deg,var(--gold),var(--gold2)); border:none; padding:10px 18px; border-radius:30px; font-family:'Bebas Neue', sans-serif; font-size:1.1rem; cursor:pointer; margin-top:10px; }
+        header{ min-height:80vh; background-size:cover; background-position:center; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; position:relative; } 
+        header::after{ content:''; position:absolute; inset:0; background:rgba(0,0,0,0.6); } header *{position:relative;z-index:2} .logo{ max-width:180px; border-radius:16px; border:3px solid var(--gold); margin-bottom:1rem; } h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)} .tagline{font-family:'Bebas Neue';color:var(--gold)} .btn-cta { display: inline-block; background: linear-gradient(180deg, var(--gold), var(--gold2)); color: #000; padding: 12px 28px; border-radius: 50px; font-family: 'Bebas Neue'; text-decoration: none; font-size: 1.2rem; }
+        #menu{max-width:1200px;margin:auto;padding:4rem 5%} .section-title{ font-family:'Bebas Neue'; font-size:2.4rem; color:var(--gold); margin:2rem 0 1rem; } .menu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.2rem; } .menu-item{ background:#0f0f0f; border-radius:12px; border:1px solid #222; } .menu-item img{ width:100%; height:200px; object-fit:cover; border-bottom:3px solid var(--gold); }
+        #editor { position: relative; border-top: 3px dashed var(--gold); padding: 3rem 5%; background-color: #0a0a0a; } .editor-block { background: rgba(20, 20, 20, 0.9); padding: 1.5rem; border-radius: 14px; margin-bottom: 2rem; }
+        button{ background:linear-gradient(180deg,var(--gold),var(--gold2)); border:none; padding:10px 18px; border-radius:30px; font-family:'Bebas Neue'; font-size:1.1rem; cursor:pointer; margin-top:10px; }
     </style>
 </head>
 <body>
-    <div id="autoSaveStatus">Saved to Local Storage</div>
+    <div id="autoSaveStatus">Saved Draft</div>
     <header id="header">
-        <img id="logo" class="logo" style="display:none">
-        <h1 id="cafeName" contenteditable="true" onblur="saveData()">YOUR WEB STORE</h1>
-        <p id="tagline" class="tagline" contenteditable="true" onblur="saveData()">Local Edition</p>
+        <img id="logo" class="logo" src="" style="display:none;">
+        <h1 id="cafeName" contenteditable="true" onblur="saveDraft()">YOUR WEB STORE</h1>
+        <p id="tagline" class="tagline" contenteditable="true" onblur="saveDraft()">Local Edition</p>
     </header>
-
-    <section id="menu">
-        <div id="menuRender" class="menu-grid"></div>
-    </section>
+    <section id="menu"><div id="menuRender" class="menu-grid"></div></section>
     
     <div id="editor">
         <div class="editor-block">
-            <button onclick="downloadUnlockedHTML()">DOWNLOAD FULLY UNLOCKED HTML</button>
-            <input type="file" id="logoUpload" accept="image/*" onchange="uploadLogo(this)">
+            <button onclick="downloadHTML()">DOWNLOAD FULLY UNLOCKED HTML</button>
+            <input type="file" id="logoInput" onchange="uploadImage(this, 'logo')">
         </div>
+        <div id="menuEditor"></div>
+        <button onclick="addSection()">+ ADD SECTION</button>
     </div>
 
     <script>
-        // Purely local data handling
-        function saveData() {
-            const data = {
-                name: document.getElementById('cafeName').innerText,
-                tagline: document.getElementById('tagline').innerText,
-                logo: document.getElementById('logo').src
-            };
-            localStorage.setItem('local_store_data', JSON.stringify(data));
+        let state = JSON.parse(localStorage.getItem('webstore_pro_draft')) || { 
+            menu: [{ title: "Products", items: [] }], 
+            logo: "" 
+        };
+
+        function saveDraft() {
+            state.name = document.getElementById('cafeName').innerText;
+            state.tagline = document.getElementById('tagline').innerText;
+            localStorage.setItem('webstore_pro_draft', JSON.stringify(state));
             const indicator = document.getElementById('autoSaveStatus');
             indicator.style.display = 'block';
             setTimeout(() => indicator.style.display = 'none', 1000);
         }
 
-        function uploadLogo(input) {
+        function uploadImage(input, targetId) {
+            const file = input.files[0];
             const reader = new FileReader();
             reader.onload = (e) => {
-                const img = document.getElementById('logo');
-                img.src = e.target.result;
-                img.style.display = 'block';
-                saveData();
+                state[targetId] = e.target.result;
+                document.getElementById(targetId).src = e.target.result;
+                document.getElementById(targetId).style.display = 'block';
+                saveDraft();
             };
-            reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
         }
 
-        function downloadUnlockedHTML() {
-            const htmlContent = document.documentElement.outerHTML;
-            const blob = new Blob([htmlContent], { type: 'text/html' });
+        function addSection() {
+            state.menu.push({ title: "New Section", items: [] });
+            render();
+            saveDraft();
+        }
+
+        function render() {
+            const container = document.getElementById('menuRender');
+            container.innerHTML = '';
+            state.menu.forEach((section, index) => {
+                container.innerHTML += `<h2 class="section-title">${section.title}</h2>`;
+            });
+        }
+
+        function downloadHTML() {
+            const doc = document.documentElement.cloneNode(true);
+            const blob = new Blob([doc.outerHTML], { type: 'text/html' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = 'WebStore_Local_Edition.html';
+            a.download = 'WebStore_Sovereign.html';
             a.click();
         }
 
-        // Initialize from local storage
-        window.onload = () => {
-            const saved = JSON.parse(localStorage.getItem('local_store_data'));
-            if (saved) {
-                document.getElementById('cafeName').innerText = saved.name;
-                document.getElementById('tagline').innerText = saved.tagline;
-                if (saved.logo && saved.logo.startsWith('data:image')) {
-                    const img = document.getElementById('logo');
-                    img.src = saved.logo;
-                    img.style.display = 'block';
-                }
+        document.addEventListener('DOMContentLoaded', () => {
+            if(state.logo) {
+                document.getElementById('logo').src = state.logo;
+                document.getElementById('logo').style.display = 'block';
             }
-        };
+            render();
+        });
     </script>
 </body>
 </html>
