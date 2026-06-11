@@ -1,76 +1,58 @@
-<!DOCTYPE html> 
-<html lang="en"> 
-<head> 
-    <meta charset="UTF-8"> 
-    <title>Webstore Pro - Sovereign Local Edition</title> 
-    <meta name="viewport" content="width=device-width, initial-scale=1"> 
-    <meta property="og:title" content="TiffyAI Web-Store Builder"> 
-    <meta property="og:description" content="A high-performance, mobile-first business in a box, a Web-Store with a built in Point of sale and Instant cash payments even on WhatsApp. Comes with your owner dashboard and sovereign bank account to handle your business and send and receive payments anywhere in the world"> 
-    <meta property="og:type" content="website"> 
-    <meta property="og:url" content="https://tiffyai-usd.github.io/Web-Store-App/v6.html"> 
-    <meta property="og:image" content="https://tiffyai-usd.github.io/Web-Store-App/WebApp.gif"> 
-    <style> 
-        /* [PRESERVED CSS - NO CHANGES] */
-        *{box-sizing:border-box;margin:0;padding:0} body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6} :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366} 
-        #autoSaveStatus { position: fixed; top: 10px; left: 10px; z-index: 5000; font-size: 0.7rem; background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 20px; border: 1px solid var(--gold); color: var(--gold); display: none; } 
-        header{ min-height:80vh; background-size:cover; background-position:center; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; position:relative; } 
-        header::after{ content:''; position:absolute; inset:0; background:rgba(0,0,0,0.6); } header *{position:relative;z-index:2} .logo{ max-width:180px; border-radius:16px; border:3px solid var(--gold); margin-bottom:1rem; } h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)} .tagline{font-family:'Bebas Neue';color:var(--gold)} 
-        .cta-container { margin-top: 25px; z-index: 10; } .btn-cta { display: inline-block; background: linear-gradient(180deg, var(--gold), var(--gold2)); color: #000; padding: 12px 28px; border-radius: 50px; font-family: 'Bebas Neue'; text-decoration: none; font-size: 1.2rem; box-shadow: 0 4px 15px rgba(212, 163, 115, 0.4); } 
-        #menu{max-width:1200px;margin:auto;padding:4rem 5%} .section-title{ font-family:'Bebas Neue'; font-size:2.4rem; color:var(--gold); margin:2rem 0 1rem; } .menu-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:1.2rem; } .menu-item{ background:#0f0f0f; border-radius:12px; border:1px solid #222; overflow:hidden; position: relative; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); } .marketing-active .menu-item { border: 1px solid var(--gold); transform: scale(1.02); box-shadow: 0 0 15px rgba(212, 163, 115, 0.2); } .badge { position: absolute; top: 15px; left: 15px; padding: 5px 12px; border-radius: 4px; font-family: 'Bebas Neue'; font-size: 0.9rem; z-index: 4; text-transform: uppercase; letter-spacing: 1px; } .badge-scarcity { background: #ff0000; color: #fff; animation: pulse-red 1.5s infinite; } .badge-hot { background: var(--gold); color: #000; } .badge-new { background: #3498db; color: #fff; } @keyframes pulse-red { 0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } } .share-btn { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); border: 1px solid var(--gold); color: var(--gold); border-radius: 50%; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; cursor: pointer; backdrop-filter: blur(5px); z-index: 5; } .status-saver-btn { position: absolute; top: 10px; left: 60px; background: #25D366; color: #fff; border: none; padding: 6px 10px; border-radius: 20px; font-size: 0.7rem; font-family: 'Bebas Neue'; cursor: pointer; z-index: 5; } .rating-stars { color: #ffcc00; margin-bottom: 5px; font-size: 0.9rem; } .menu-item img{ width:100%; height:200px; object-fit:cover; border-bottom:3px solid var(--gold); } .card{padding:1rem} .menu-item h3{font-family:'Bebas Neue';color:var(--gold)} .price{font-family:'Bebas Neue';color:var(--gold2)} .sales-log { background: #000; padding: 10px; border-radius: 8px; max-height: 200px; overflow-y: auto; margin: 10px 0; border: 1px solid #333; } .log-entry { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #222; font-size: 0.8rem; } .bulk-panel { background: rgba(37, 211, 102, 0.1); border: 1px solid var(--whatsapp); padding: 15px; border-radius: 12px; margin-top: 20px; } .receipt-wrap { background: #fff; color: #000; padding: 20px; width: 300px; margin: auto; display: none; font-family: 'Courier New', monospace; font-size: 0.85rem; } footer{ background:#000; padding:2rem; text-align:center; border-top:1px solid #222; color:#999; } #editor { position: relative; border-top: 3px dashed var(--gold); padding: 3rem 5%; background-color: #0a0a0a; background-image: url('silky.jpeg'); background-size: cover; background-position: center; background-attachment: fixed; background-repeat: no-repeat; } #editor::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(10, 10, 10, 0.8); z-index: 1; } .editor-block { position: relative; z-index: 2; background: rgba(20, 20, 20, 0.9); padding: 1.5rem; border-radius: 14px; margin-bottom: 2rem; box-shadow: 0 10px 30px rgba(0,0,0,0.6); } #editor h2 { position: relative; z-index: 2; } label{display:block;margin-top:1rem;color:var(--gold)} input,textarea,select{ width:100%; padding:10px; background:#222; border:1px solid #444; color:#fff; border-radius:6px; } textarea{resize:vertical} button{ background:linear-gradient(180deg,var(--gold),var(--gold2)); border:none; padding:10px 18px; border-radius:30px; font-family:'Bebas Neue'; font-size:1.1rem; cursor:pointer; margin-top:10px; position: relative; z-index: 2; } .remove{background:#900;color:#fff} .cloud-btn { background: #3498db; color: white; margin-bottom: 5px; font-size: 0.8rem; } .dashboard-btn { background: #3498db; color: white; width: 100%; margin-bottom: 10px; display: block; text-align: center; } #whatsappOrderBtn{ position:fixed; bottom:20px; right:20px; z-index:999; background:linear-gradient(180deg,#25D366,#1ebe5d); color:#071010; padding:14px 22px; border-radius:40px; font-family:'Bebas Neue'; font-size:1.2rem; text-decoration:none; box-shadow: 0 5px 15px rgba(0,0,0,0.3); } .quote-btn { position: fixed; bottom: 80px; right: 20px; z-index: 998; background: #fff; color: #000; padding: 10px 20px; border-radius: 30px; font-family: 'Bebas Neue'; cursor: pointer; border: none; box-shadow: 0 4px 10px rgba(0,0,0,0.5); } .modal{ position:fixed; inset:0; background:rgba(0,0,0,0.75); display:flex; align-items:center; justify-content:center; z-index:2000; } .hidden{display:none} .modal-glass{ width:90%; max-width:420px; background:rgba(20,20,20,0.85); backdrop-filter:blur(14px); border:1px solid rgba(212,163,115,0.4); border-radius:20px; padding:2rem; color:#fff; } .pay-btn{ width:100%; padding:14px; border-radius:40px; margin-top:12px; font-family:'Bebas Neue'; font-size:1.1rem; cursor:pointer; border:none; text-align:center; display:block; text-decoration:none; } .paypal{ background:#ffc439; color:#111; } .confirm{ background:var(--gold); color:#111; } .activation{ max-width:600px; margin:3rem auto; padding:2rem; border-top:1px dashed var(--gold); text-align:center; } .code-inputs{ display:flex; justify-content:center; gap:10px; margin-bottom:1.5rem; } .code-inputs input{ width:42px; height:52px; text-align:center; font-size:1.4rem; border-radius:8px; background:#111; border:1px solid #444; color:#fff; } .support-btn { position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; z-index: 3000; cursor: pointer; filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5)); transition: transform 0.3s ease; } 
-    </style> 
-</head> 
-<body> 
-    <div id="autoSaveStatus">Saved Draft</div> 
-    <div id="paymentModal" class="modal hidden"> <div class="modal-glass"> <h2 style="font-family:'Bebas Neue'; color:var(--gold); text-align:center; font-size:2rem;"> 100 HTML Exports to our Professional Marketplace - 24 HRS Support - Developer License - POS Accounting - Web Store Pro - Tiffy International Banking ($70.00 Cash Back)</h2> <p style="text-align:center; margin:1rem 0;">$70 USD (≈ R1000)<br>•<br>•</p> <button class="pay-btn paypal" onclick="payWithPaypal()">Pay with PayPal</button> <button class="pay-btn confirm" onclick="confirmManualPayment()">I will send an EFT</button> <button class="pay-btn ghost" style="background:none; color:#aaa; width:100%; margin-top:10px; border:none; cursor:pointer;" onclick="closePayment()">Cancel</button> </div> </div> 
-    <img src="support.jpg" class="support-btn" onclick="triggerPaymentFlow()" alt="Support"> 
-    <header id="header"> 
-        <img id="logo" class="logo"> 
-        <h1 id="cafeName">YOUR WEB STORE BUSINESS</h1> 
-        <p id="tagline" class="tagline">With Live Preview</p> 
-        <div class="cta-container"> <a href="#" id="ctaBtn" class="btn-cta" style="display:none;">ORDER NOW</a> </div> 
-    </header> 
-    <section id="menu"> <div id="menuRender"></div> </section> 
-    <footer> <p id="footerText">© 2026 YOUR BUSINESS</p> </footer> 
-    <div id="activationPanel" class="activation"> <h3 style="font-family:'Bebas Neue'; color:var(--gold); font-size:2rem;">Activate Full Package</h3> <div class="code-inputs"> <input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"> </div> <button onclick="submitActivation()">Unlock Full Package</button> </div> 
-    <div id="editor"> 
-        <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2> 
-        <div class="editor-block"> 
-            <div id="dashboardLink"></div> 
-            <label>Business Name</label> <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value"> 
-            <label>Tagline</label> <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value"> 
-            <label>Header Call to Action (CTA)</label> <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;"> <input id="ctaText" placeholder="Btn Text" oninput="updateCTA()"> <input id="ctaUrl" placeholder="URL Link" oninput="updateCTA()"> </div> 
-            <label>Footer Copyright</label> <input id="editFooter" oninput="document.getElementById('footerText').textContent=this.value" value="© 2026 YOUR BUSINESS"> 
-            <label>Logo (URL or Upload)</label> <button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD LOGO</button> <input id="logoURL" placeholder="Paste Logo Image URL here" oninput="document.getElementById('logo').src=this.value"> <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; document.getElementById('logoURL').value=img;})"> 
-            <label>Banner (URL or Upload)</label> <button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD BANNER</button> <input id="bannerURL" placeholder="Paste Banner Image URL here" oninput="document.getElementById('header').style.backgroundImage='url('+this.value+')'"> <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; document.getElementById('bannerURL').value=img;})"> 
-            <label>WhatsApp Number</label> <input id="editWA" value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')"> 
-            <label>Currency</label> <select id="editCurr" onchange="setCurrency(this.value)"> <option value="ZAR">ZAR (R)</option> <option value="INR">INR (₹)</option> <option value="USD">USD ($)</option> <option value="EUR">EUR (€)</option> <option value="GBP">GBP (£)</option> <option value="NGN">NGN (₦)</option> </select> 
-            <button onclick="toggleMarketingMode()" id="mktBtn" style="width:100%; margin-top:20px; background:#1a1a1a; color:var(--gold); border:1px solid var(--gold);"> ⚡ ACTIVATE MARKETING MODE </button> 
-        </div> 
-        <h2 style="font-family:'Bebas Neue';color:var(--gold)">POS & BULK TOOLS</h2> 
-        <div class="editor-block"> 
-            <label>Local Sales History</label> <div id="salesLog" class="sales-log"></div> <button onclick="localStorage.removeItem('tiffyai_sales'); renderSalesLog();" style="background:#600; font-size:0.7rem;">Clear Sales History</button> 
-            <div class="bulk-panel"> <h3 style="font-family:'Bebas Neue'; color:var(--whatsapp)">🚀 BROADCAST SYSTEM</h3> <textarea id="bulkNumbers" placeholder="27660000001, 27660000002..."></textarea> <button onclick="startBulk()" style="background:var(--whatsapp); color:#000; width:100%">GENERATE QUEUE</button> <div id="bulkStatus" style="color:var(--whatsapp); font-size:0.8rem; margin-top:10px;"></div> </div> 
-        </div> 
-        <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2> <div id="menuEditor"></div> <button onclick="addSection()">+ ADD SECTION</button> 
-        <button id="downloadBtn" onclick="downloadHTML()">DOWNLOAD WEBSITE HTML (0/100 Left)</button> 
-        <button id="cloudSyncBtn" onclick="alert('Cloud Sync disabled in Local Edition.')" style="background:#333; width:100%; margin-top:10px; cursor:not-allowed;">☁️ CLOUD SYNC (OFFLINE)</button>
-    </div> 
-    <div id="receiptArea" class="receipt-wrap"> <center><h2 id="r-biz"></h2><p id="r-date"></p></center> <hr style="border:1px dashed #000"> <div id="r-items" style="margin:10px 0;"></div> <hr style="border:1px dashed #000"> <h3 id="r-total" style="text-align:right"></h3> <center><p style="margin-top:10px">Powered by TiffyAI</p></center> </div> 
-    <canvas id="statusCanvas" width="1080" height="1920" style="display:none;"></canvas> <iframe id="printFrame" style="display:none;"></iframe> 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>WebStore Local</title>
+    <style>
+        body { background: #0a0a0a; color: #fff; font-family: sans-serif; padding: 20px; }
+        .editor-block { background: #1a1a1a; padding: 20px; margin-bottom: 20px; border: 1px solid #d4a373; }
+        button { padding: 10px 20px; cursor: pointer; background: #d4a373; border: none; margin: 5px; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
 
-    <script> 
-        /* ================== STATE ================== */ 
-        let whatsappNumber = "+27660000000"; let marketingMode = false; let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR'; let downloadCredits = parseInt(localStorage.getItem('tiffyai_credits')) || 0; let promoQueue = []; let autoSaveTimer; const orderState = {}; 
-        // CLOUD & MASKING CONFIG REMOVED
-        const currencyMap = { ZAR: { symbol: 'R' }, INR: { symbol: '₹' }, USD: { symbol: '$' }, EUR: { symbol: '€' }, GBP: { symbol: '£' }, NGN: { symbol: '₦' }, KES: { symbol: 'KSh' } }; let menuSections = [{ title: "Products", items: [{ name: 'Sample Item', price: 100, desc: "Description here", img: "", rating: 5, badge: 'none', stock: 5 }] }]; 
-        
-        /* [KEEPING ALL YOUR ORIGINAL FUNCTIONS: updateCTA, updateCreditDisplay, saveDraft, loadDraft, setCurrency, toggleMarketingMode, uploadImage, triggerPaymentFlow, downloadHTML, actualDownload, payWithPaypal, confirmManualPayment, renderMenu, changeQty, renderWhatsapp, logSale, renderSalesLog, printReceipt, startBulk, nextInQueue, shareItem, generateStatusFlyer, renderEditor, addSection, generateRequestCode, submitActivation, closePayment, etc.] */
-        
-        // ... (YOUR ORIGINAL FUNCTIONS REMAIN COMPLETELY UNTOUCHED) ...
+    <div class="editor-block">
+        <h1>Control Panel</h1>
+        <button onclick="addSection()">+ Add Section</button>
+        <button onclick="triggerPaymentFlow()">Show Payment</button>
+    </div>
 
-        function publishToCloud() { alert("Cloud Sync is disabled in this local version."); }
+    <div id="menuEditor"></div>
 
-        document.addEventListener('DOMContentLoaded', () => { loadDraft(); document.getElementById('editor').addEventListener('input', () => { clearTimeout(autoSaveTimer); autoSaveTimer = setTimeout(saveDraft, 2000); }); if(localStorage.getItem('tiffyai_activated') === 'true' && downloadCredits > 0) document.getElementById('activationPanel')?.remove(); updateCreditDisplay(); renderMenu(); renderEditor(); renderSalesLog(); }); 
-    </script> 
-</body> 
+    <div id="paymentModal" class="hidden" style="position:fixed; top:20%; left:20%; background:#333; padding:20px;">
+        <h2>Payment Required</h2>
+        <button onclick="closeModal()">Close</button>
+    </div>
+
+    <script>
+        let menuSections = [{ title: "My Products", items: [] }];
+
+        function addSection() {
+            menuSections.push({ title: "New Section", items: [] });
+            renderEditor();
+        }
+
+        function triggerPaymentFlow() {
+            document.getElementById('paymentModal').classList.remove('hidden');
+        }
+
+        function closeModal() {
+            document.getElementById('paymentModal').classList.add('hidden');
+        }
+
+        function renderEditor() {
+            const container = document.getElementById('menuEditor');
+            container.innerHTML = '';
+            menuSections.forEach((sec, s) => {
+                const div = document.createElement('div');
+                div.innerHTML = `<h3>${sec.title}</h3>`;
+                container.appendChild(div);
+            });
+            console.log("Rendered");
+        }
+
+        renderEditor();
+    </script>
+</body>
 </html>
