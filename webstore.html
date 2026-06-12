@@ -2,322 +2,99 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Webstore Pro - Cloud Edition</title>
+<title>Webstore Pro - Local Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta property="og:title" content="TiffyAI Web-Store Builder">
-<meta property="og:description" content="A high-performance, mobile-first business in a box, a Web-Store with a built in Point of sale and Instant cash payments even on WhatsApp. Comes with your owner dashboard and sovereign bank account to handle your business and send and receive payments anywhere in the world">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://tiffyai-usd.github.io/Web-Store-App/v6.html">
-<meta property="og:image" content="https://tiffyai-usd.github.io/Web-Store-App/WebApp.gif">
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
 :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
 
-/* Cloud & Auto-Save Indicators */
+/* Auto-Save */
 #autoSaveStatus {
-  position: fixed;
-  top: 10px;
-  left: 10px;
-  z-index: 5000;
-  font-size: 0.7rem;
-  background: rgba(0,0,0,0.7);
-  padding: 4px 10px;
-  border-radius: 20px;
-  border: 1px solid var(--gold);
-  color: var(--gold);
-  display: none;
+  position: fixed; top: 10px; left: 10px; z-index: 5000; font-size: 0.7rem;
+  background: rgba(0,0,0,0.7); padding: 4px 10px; border-radius: 20px;
+  border: 1px solid var(--gold); color: var(--gold); display: none;
 }
 
-/* HEADER */
-header{
-  min-height:80vh;
-  background-size:cover;
-  background-position:center;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  text-align:center;
-  position:relative;
+/* Control Panel */
+#controlPanel {
+  background:#1a1a1a; padding:20px; margin:15px; border:2px solid var(--gold);
+  border-radius:12px; text-align:center;
 }
-header::after{
-  content:'';
-  position:absolute;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-}
+
+/* Rest of styles (kept clean) */
+header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
+header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
 header *{position:relative;z-index:2}
-.logo{
-  max-width:180px;
-  border-radius:16px;
-  border:3px solid var(--gold);
-  margin-bottom:1rem;
-}
+.logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;}
 h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
 .tagline{font-family:'Bebas Neue';color:var(--gold)}
 
-/* CTA BUTTON STYLE */
 .cta-container { margin-top: 25px; z-index: 10; }
-.btn-cta {
-    display: inline-block;
-    background: linear-gradient(180deg, var(--gold), var(--gold2));
-    color: #000;
-    padding: 12px 28px;
-    border-radius: 50px;
-    font-family: 'Bebas Neue';
-    text-decoration: none;
-    font-size: 1.2rem;
-    box-shadow: 0 4px 15px rgba(212, 163, 115, 0.4);
-}
+.btn-cta { display:inline-block; background:linear-gradient(180deg,var(--gold),var(--gold2)); color:#000; padding:12px 28px; border-radius:50px; font-family:'Bebas Neue'; text-decoration:none; font-size:1.2rem; box-shadow:0 4px 15px rgba(212,163,115,0.4); }
 
-/* MENU */
 #menu{max-width:1200px;margin:auto;padding:4rem 5%}
-.section-title{
-  font-family:'Bebas Neue';
-  font-size:2.4rem;
-  color:var(--gold);
-  margin:2rem 0 1rem;
-}
-.menu-grid{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-  gap:1.2rem;
-}
-.menu-item{
-  background:#0f0f0f;
-  border-radius:12px;
-  border:1px solid #222;
-  overflow:hidden;
-  position: relative;
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
+.section-title{font-family:'Bebas Neue';font-size:2.4rem;color:var(--gold);margin:2rem 0 1rem;}
+.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;}
+.menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;position:relative;transition:all 0.4s cubic-bezier(0.175,0.885,0.32,1.275);}
 
-.marketing-active .menu-item {
-  border: 1px solid var(--gold);
-  transform: scale(1.02);
-  box-shadow: 0 0 15px rgba(212, 163, 115, 0.2);
-}
+.marketing-active .menu-item { border:1px solid var(--gold); transform:scale(1.02); box-shadow:0 0 15px rgba(212,163,115,0.2); }
 
-.badge {
-  position: absolute;
-  top: 15px;
-  left: 15px;
-  padding: 5px 12px;
-  border-radius: 4px;
-  font-family: 'Bebas Neue';
-  font-size: 0.9rem;
-  z-index: 4;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-.badge-scarcity { background: #ff0000; color: #fff; animation: pulse-red 1.5s infinite; }
-.badge-hot { background: var(--gold); color: #000; }
-.badge-new { background: #3498db; color: #fff; }
+.badge{position:absolute;top:15px;left:15px;padding:5px 12px;border-radius:4px;font-family:'Bebas Neue';font-size:0.9rem;z-index:4;text-transform:uppercase;letter-spacing:1px;}
+.badge-scarcity{background:#ff0000;color:#fff;animation:pulse-red 1.5s infinite;}
+.badge-hot{background:var(--gold);color:#000;}
+.badge-new{background:#3498db;color:#fff;}
+@keyframes pulse-red{0%{transform:scale(1);}70%{transform:scale(1.05);}100%{transform:scale(1);}}
 
-@keyframes pulse-red {
-  0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); }
-  70% { transform: scale(1.05); box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); }
-  100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); }
-}
+.share-btn{position:absolute;top:10px;right:10px;background:rgba(0,0,0,0.5);border:1px solid var(--gold);color:var(--gold);border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5;}
+.status-saver-btn{position:absolute;top:10px;left:60px;background:#25D366;color:#fff;border:none;padding:6px 10px;border-radius:20px;font-size:0.7rem;font-family:'Bebas Neue';cursor:pointer;z-index:5;}
 
-.share-btn {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  background: rgba(0,0,0,0.5);
-  border: 1px solid var(--gold);
-  color: var(--gold);
-  border-radius: 50%;
-  width: 38px;
-  height: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  backdrop-filter: blur(5px);
-  z-index: 5;
-}
-
-.status-saver-btn {
-  position: absolute;
-  top: 10px;
-  left: 60px;
-  background: #25D366;
-  color: #fff;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 20px;
-  font-size: 0.7rem;
-  font-family: 'Bebas Neue';
-  cursor: pointer;
-  z-index: 5;
-}
-
-.rating-stars { color: #ffcc00; margin-bottom: 5px; font-size: 0.9rem; }
-
-.menu-item img{
-  width:100%;
-  height:200px;
-  object-fit:cover;
-  border-bottom:3px solid var(--gold);
-}
-.card{padding:1rem}
+.rating-stars{color:#ffcc00;margin-bottom:5px;font-size:0.9rem;}
+.menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid var(--gold);}
+.card{padding:1rem;}
 .menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
 .price{font-family:'Bebas Neue';color:var(--gold2)}
 
-.sales-log { background: #000; padding: 10px; border-radius: 8px; max-height: 200px; overflow-y: auto; margin: 10px 0; border: 1px solid #333; }
-.log-entry { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid #222; font-size: 0.8rem; }
-.bulk-panel { background: rgba(37, 211, 102, 0.1); border: 1px solid var(--whatsapp); padding: 15px; border-radius: 12px; margin-top: 20px; }
+.sales-log{background:#000;padding:10px;border-radius:8px;max-height:200px;overflow-y:auto;margin:10px 0;border:1px solid #333;}
+.log-entry{display:flex;justify-content:space-between;padding:8px;border-bottom:1px solid #222;font-size:0.8rem;}
 
-.receipt-wrap {
-  background: #fff;
-  color: #000;
-  padding: 20px;
-  width: 300px;
-  margin: auto;
-  display: none;
-  font-family: 'Courier New', monospace;
-  font-size: 0.85rem;
-}
-
-footer{
-  background:#000;
-  padding:2rem;
-  text-align:center;
-  border-top:1px solid #222;
-  color:#999;
-}
-
-#editor {
-  position: relative;
-  border-top: 3px dashed var(--gold);
-  padding: 3rem 5%;
-  background-color: #0a0a0a;
-  background-image: url('silky.jpeg');
-  background-size: cover;
-  background-position: center;
-  background-attachment: fixed;
-  background-repeat: no-repeat;
-}
-
-#editor::before {
-  content: '';
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(10, 10, 10, 0.8);
-  z-index: 1;
-}
-
-.editor-block {
-  position: relative;
-  z-index: 2;
-  background: rgba(20, 20, 20, 0.9);
-  padding: 1.5rem;
-  border-radius: 14px;
-  margin-bottom: 2rem;
-  box-shadow: 0 10px 30px rgba(0,0,0,0.6);
-}
-
-#editor h2 {
-  position: relative;
-  z-index: 2;
-}
+#editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:#0a0a0a;}
+.editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
 
 label{display:block;margin-top:1rem;color:var(--gold)}
-input,textarea,select{
-  width:100%;
-  padding:10px;
-  background:#222;
-  border:1px solid #444;
-  color:#fff;
-  border-radius:6px;
-}
-textarea{resize:vertical}
-button{
-  background:linear-gradient(180deg,var(--gold),var(--gold2));
-  border:none;
-  padding:10px 18px;
-  border-radius:30px;
-  font-family:'Bebas Neue';
-  font-size:1.1rem;
-  cursor:pointer;
-  margin-top:10px;
-  position: relative;
-  z-index: 2;
-}
+input,textarea,select{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;border-radius:6px;}
+button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;margin-top:10px;}
 .remove{background:#900;color:#fff}
-.cloud-btn { background: #3498db; color: white; margin-bottom: 5px; font-size: 0.8rem; }
-.dashboard-btn { background: #3498db; color: white; width: 100%; margin-bottom: 10px; display: block; text-align: center; }
 
-#whatsappOrderBtn{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  z-index:999;
-  background:linear-gradient(180deg,#25D366,#1ebe5d);
-  color:#071010;
-  padding:14px 22px;
-  border-radius:40px;
-  font-family:'Bebas Neue';
-  font-size:1.2rem;
-  text-decoration:none;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-}
+#whatsappOrderBtn{position:fixed;bottom:20px;right:20px;z-index:999;background:linear-gradient(180deg,#25D366,#1ebe5d);color:#071010;padding:14px 22px;border-radius:40px;font-family:'Bebas Neue';font-size:1.2rem;text-decoration:none;box-shadow:0 5px 15px rgba(0,0,0,0.3);}
+.quote-btn{position:fixed;bottom:80px;right:20px;z-index:998;background:#fff;color:#000;padding:10px 20px;border-radius:30px;font-family:'Bebas Neue';cursor:pointer;border:none;box-shadow:0 4px 10px rgba(0,0,0,0.5);}
 
-.quote-btn {
-  position: fixed;
-  bottom: 80px;
-  right: 20px;
-  z-index: 998;
-  background: #fff;
-  color: #000;
-  padding: 10px 20px;
-  border-radius: 30px;
-  font-family: 'Bebas Neue';
-  cursor: pointer;
-  border: none;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-}
-
-.modal{ position:fixed; inset:0; background:rgba(0,0,0,0.75); display:flex; align-items:center; justify-content:center; z-index:2000; }
+.modal{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:flex;align-items:center;justify-content:center;z-index:2000;}
 .hidden{display:none}
-.modal-glass{
-  width:90%; max-width:420px; background:rgba(20,20,20,0.85); backdrop-filter:blur(14px);
-  border:1px solid rgba(212,163,115,0.4); border-radius:20px; padding:2rem; color:#fff;
-}
-.pay-btn{ width:100%; padding:14px; border-radius:40px; margin-top:12px; font-family:'Bebas Neue'; font-size:1.1rem; cursor:pointer; border:none; text-align:center; display:block; text-decoration:none; }
-.paypal{ background:#ffc439; color:#111; }
-.confirm{ background:var(--gold); color:#111; }
-.activation{ max-width:600px; margin:3rem auto; padding:2rem; border-top:1px dashed var(--gold); text-align:center; }
-.code-inputs{ display:flex; justify-content:center; gap:10px; margin-bottom:1.5rem; }
-.code-inputs input{ width:42px; height:52px; text-align:center; font-size:1.4rem; border-radius:8px; background:#111; border:1px solid #444; color:#fff; }
-
-.support-btn {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 60px;
-  height: 60px;
-  z-index: 3000;
-  cursor: pointer;
-  filter: drop-shadow(0 4px 10px rgba(0,0,0,0.5));
-  transition: transform 0.3s ease;
-}
+.modal-glass{width:90%;max-width:420px;background:rgba(20,20,20,0.85);backdrop-filter:blur(14px);border:1px solid rgba(212,163,115,0.4);border-radius:20px;padding:2rem;color:#fff;}
+.pay-btn{width:100%;padding:14px;border-radius:40px;margin-top:12px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;border:none;}
 </style>
 </head>
 
 <body>
 <div id="autoSaveStatus">Saved Draft</div>
 
+<!-- CONTROL PANEL -->
+<div id="controlPanel" class="editor-block">
+    <h1>Control Panel</h1>
+    <button onclick="addSection()">+ Add Section</button>
+    <button onclick="triggerPaymentFlow()">Show Payment</button>
+    <button onclick="saveDraft()">💾 Save Draft</button>
+    <button onclick="downloadHTML()">📥 Download HTML</button>
+</div>
+
 <div id="paymentModal" class="modal hidden">
   <div class="modal-glass">
-    <h2 style="font-family:'Bebas Neue'; color:var(--gold); text-align:center; font-size:2rem;"> 100 HTML Exports to our Professional Marketplace - 24 HRS Support - Developer License - POS Accounting - Web Store Pro - Tiffy International Banking ($70.00 Cash Back)</h2>
-    <p style="text-align:center; margin:1rem 0;">$70 USD (≈ R1000)<br>•<br>•</p>
-    <button class="pay-btn paypal" onclick="payWithPaypal()">Pay with PayPal</button>
-    <button class="pay-btn confirm" onclick="confirmManualPayment()">I will send an EFT</button>
-    <button class="pay-btn ghost" style="background:none; color:#aaa; width:100%; margin-top:10px; border:none; cursor:pointer;" onclick="closePayment()">Cancel</button>
+    <h2 style="font-family:'Bebas Neue'; color:var(--gold); text-align:center; font-size:2rem;">Payment Required</h2>
+    <p style="text-align:center; margin:1rem 0;">$70 USD</p>
+    <button class="pay-btn" onclick="payWithPaypal()">Pay with PayPal</button>
+    <button class="pay-btn" onclick="confirmManualPayment()">I will send EFT</button>
+    <button onclick="closePayment()" style="background:none;color:#aaa;margin-top:10px;">Cancel</button>
   </div>
 </div>
 
@@ -332,261 +109,166 @@ button{
   </div>
 </header>
 
-<section id="menu">
-  <div id="menuRender"></div>
-</section>
+<section id="menu"><div id="menuRender"></div></section>
 
-<footer>
-  <p id="footerText">© 2026 YOUR BUSINESS</p>
-</footer>
-
-<div id="activationPanel" class="activation">
-  <h3 style="font-family:'Bebas Neue'; color:var(--gold); font-size:2rem;">Activate Full Package</h3>
-  <div class="code-inputs">
-    <input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1"><input maxlength="1">
-  </div>
-  <button onclick="submitActivation()">Unlock Full Package</button>
-</div>
+<footer><p id="footerText">© 2026 YOUR BUSINESS</p></footer>
 
 <div id="editor">
 <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
 <div class="editor-block">
-  <div id="dashboardLink"></div>
   <label>Business Name</label>
-  <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value">
+  <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
   <label>Tagline</label>
-  <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value">
+  <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value;saveDraft()">
  
   <label>Header Call to Action (CTA)</label>
   <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-      <input id="ctaText" placeholder="Btn Text" oninput="updateCTA()">
-      <input id="ctaUrl" placeholder="URL Link" oninput="updateCTA()">
+      <input id="ctaText" placeholder="Btn Text" oninput="updateCTA();saveDraft()">
+      <input id="ctaUrl" placeholder="URL Link" oninput="updateCTA();saveDraft()">
   </div>
 
   <label>Footer Copyright</label>
-  <input id="editFooter" oninput="document.getElementById('footerText').textContent=this.value" value="© 2026 YOUR BUSINESS">
+  <input id="editFooter" oninput="document.getElementById('footerText').textContent=this.value;saveDraft()" value="© 2026 YOUR BUSINESS">
  
   <label>Logo (URL or Upload)</label>
-  <button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD LOGO</button>
-  <input id="logoURL" placeholder="Paste Logo Image URL here" oninput="document.getElementById('logo').src=this.value">
-  <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; document.getElementById('logoURL').value=img;})">
+  <input id="logoURL" placeholder="Paste Logo Image URL" oninput="document.getElementById('logo').src=this.value;saveDraft()">
+  <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; document.getElementById('logoURL').value=img;saveDraft()})">
 
   <label>Banner (URL or Upload)</label>
-  <button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD BANNER</button>
-  <input id="bannerURL" placeholder="Paste Banner Image URL here" oninput="document.getElementById('header').style.backgroundImage='url('+this.value+')'">
-  <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; document.getElementById('bannerURL').value=img;})">
+  <input id="bannerURL" placeholder="Paste Banner Image URL" oninput="document.getElementById('header').style.backgroundImage='url('+this.value+')';saveDraft()">
+  <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; document.getElementById('bannerURL').value=img;saveDraft()})">
 
   <label>WhatsApp Number</label>
-  <input id="editWA" value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'')">
-  <label>Currency</label>
-  <select id="editCurr" onchange="setCurrency(this.value)">
-      <option value="ZAR">ZAR (R)</option>
-      <option value="INR">INR (₹)</option>
-      <option value="USD">USD ($)</option>
-      <option value="EUR">EUR (€)</option>
-      <option value="GBP">GBP (£)</option>
-      <option value="NGN">NGN (₦)</option>
-  </select>
-  <button onclick="toggleMarketingMode()" id="mktBtn" style="width:100%; margin-top:20px; background:#1a1a1a; color:var(--gold); border:1px solid var(--gold);">
-    ⚡ ACTIVATE MARKETING MODE
-  </button>
+  <input id="editWA" value="+27660000000" oninput="whatsappNumber=this.value.replace(/[^0-9+]/g,'');saveDraft()">
 </div>
 
-<h2 style="font-family:'Bebas Neue';color:var(--gold)">POS & BULK TOOLS</h2>
+<h2 style="font-family:'Bebas Neue';color:var(--gold)">POS TOOLS</h2>
 <div class="editor-block">
   <label>Local Sales History</label>
   <div id="salesLog" class="sales-log"></div>
   <button onclick="localStorage.removeItem('tiffyai_sales'); renderSalesLog();" style="background:#600; font-size:0.7rem;">Clear Sales History</button>
- 
-  <div class="bulk-panel">
-    <h3 style="font-family:'Bebas Neue'; color:var(--whatsapp)">🚀 BROADCAST SYSTEM</h3>
-    <textarea id="bulkNumbers" placeholder="27660000001, 27660000002..."></textarea>
-    <button onclick="startBulk()" style="background:var(--whatsapp); color:#000; width:100%">GENERATE QUEUE</button>
-    <div id="bulkStatus" style="color:var(--whatsapp); font-size:0.8rem; margin-top:10px;"></div>
-  </div>
 </div>
 
 <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
 <div id="menuEditor"></div>
 <button onclick="addSection()">+ ADD SECTION</button>
-<button id="downloadBtn" onclick="downloadHTML()">DOWNLOAD WEBSITE HTML</button>
-<button id="cloudSyncBtn" onclick="publishToCloud()" style="background:#3498db; width:100%; margin-top:10px;">☁️ SAVE TO LOCAL STORAGE</button>
-</div>
-
-<div id="receiptArea" class="receipt-wrap">
-    <center><h2 id="r-biz"></h2><p id="r-date"></p></center>
-    <hr style="border:1px dashed #000">
-    <div id="r-items" style="margin:10px 0;"></div>
-    <hr style="border:1px dashed #000">
-    <h3 id="r-total" style="text-align:right"></h3>
-    <center><p style="margin-top:10px">Powered by TiffyAI</p></center>
+<button onclick="downloadHTML()">DOWNLOAD WEBSITE HTML</button>
+<button onclick="saveDraft()" style="background:#3498db;">💾 SAVE TO LOCAL STORAGE</button>
 </div>
 
 <canvas id="statusCanvas" width="1080" height="1920" style="display:none;"></canvas>
 <iframe id="printFrame" style="display:none;"></iframe>
 
 <script>
-/* ================== STATE ================== */
+/* STATE */
 let whatsappNumber = "+27660000000";
 let marketingMode = false;
-let activeCurrency = localStorage.getItem('tiffyai_currency') || 'ZAR';
-let downloadCredits = 999;
-let promoQueue = [];
-let autoSaveTimer;
+let activeCurrency = "ZAR";
+let menuSections = [{ title: "Products", items: [{ name: 'Sample Item', price: 100, desc: "Description here", img: "", rating: 5, badge: 'none', stock: 5 }] }];
 const orderState = {};
 
-/* ================== LOCAL STORAGE PERSISTENCE ================== */
-function saveAllToLocal() {
-    const storeData = {
-        businessName: document.getElementById('cafeName').textContent,
-        tagline: document.getElementById('tagline').textContent,
-        footer: document.getElementById('footerText').textContent,
-        logo: document.getElementById('logoURL').value,
-        banner: document.getElementById('bannerURL').value,
-        wa: whatsappNumber,
-        curr: activeCurrency,
-        menu: menuSections,
-        ctaText: document.getElementById('ctaText').value,
-        ctaUrl: document.getElementById('ctaUrl').value,
-        ts: new Date().getTime()
-    };
-    localStorage.setItem('webstore_pro_draft', JSON.stringify(storeData));
-}
-
-function loadAllFromLocal() {
-    const saved = localStorage.getItem('webstore_pro_draft');
-    if (!saved) return;
-    const d = JSON.parse(saved);
-
-    menuSections = d.menu || menuSections;
-    activeCurrency = d.curr || activeCurrency;
-    whatsappNumber = d.wa || whatsappNumber;
-
-    document.getElementById('cafeName').textContent = d.businessName || "YOUR WEB STORE BUSINESS";
-    document.getElementById('tagline').textContent = d.tagline || "With Live Preview";
-    document.getElementById('footerText').textContent = d.footer || "© 2026 YOUR BUSINESS";
-    document.getElementById('logoURL').value = d.logo || "";
-    document.getElementById('bannerURL').value = d.banner || "";
-    if(d.logo) document.getElementById('logo').src = d.logo;
-    if(d.banner) document.getElementById('header').style.backgroundImage = `url(${d.banner})`;
-
-    document.getElementById('editName').value = d.businessName || "";
-    document.getElementById('editTag').value = d.tagline || "";
-    document.getElementById('editFooter').value = d.footer || "";
-    document.getElementById('editWA').value = d.wa || "+27660000000";
-    document.getElementById('editCurr').value = d.curr || "ZAR";
-    document.getElementById('ctaText').value = d.ctaText || "";
-    document.getElementById('ctaUrl').value = d.ctaUrl || "";
-}
-
-/* ================== NEW TOOLS ================== */
-function updateCTA() {
-    const text = document.getElementById('ctaText').value;
-    const url = document.getElementById('ctaUrl').value;
-    const btn = document.getElementById('ctaBtn');
-    if(text && url) {
-        btn.textContent = text.toUpperCase();
-        btn.href = url;
-        btn.style.display = "inline-block";
-    } else { btn.style.display = "none"; }
-}
-
-function updateCreditDisplay() {
-    const btn = document.getElementById('downloadBtn');
-    btn.textContent = `DOWNLOAD WEBSITE HTML`;
-    btn.style.background = "linear-gradient(180deg, var(--gold), var(--gold2))";
-}
-
-/* ================== LOCAL-ONLY PUBLISH ================== */
-function publishToCloud() {
-    saveAllToLocal();
-    const indicator = document.getElementById('autoSaveStatus');
-    indicator.style.display = 'block';
-    indicator.textContent = "✅ Saved to Local Storage";
-    setTimeout(() => indicator.style.display = 'none', 2000);
-}
-
-/* ================== AUTOMATION LOGIC ================== */
+/* LOCAL STORAGE */
 function saveDraft() {
-    saveAllToLocal();
-    const indicator = document.getElementById('autoSaveStatus');
-    indicator.style.display = 'block';
-    indicator.textContent = "Draft Saved Locally";
-    setTimeout(() => indicator.style.display = 'none', 1500);
+  const data = {
+    cafeName: document.getElementById('cafeName').textContent,
+    tagline: document.getElementById('tagline').textContent,
+    footer: document.getElementById('footerText').textContent,
+    logo: document.getElementById('logoURL').value,
+    banner: document.getElementById('bannerURL').value,
+    wa: whatsappNumber,
+    menu: menuSections,
+    ctaText: document.getElementById('ctaText').value,
+    ctaUrl: document.getElementById('ctaUrl').value
+  };
+  localStorage.setItem('webstore_pro_draft', JSON.stringify(data));
+  
+  const status = document.getElementById('autoSaveStatus');
+  status.style.display = 'block';
+  status.textContent = '✅ Saved to Local Storage';
+  setTimeout(() => status.style.display = 'none', 1500);
 }
 
 function loadDraft() {
-    loadAllFromLocal();
-    renderMenu();
-    renderEditor();
+  const saved = localStorage.getItem('webstore_pro_draft');
+  if (!saved) return;
+  const d = JSON.parse(saved);
+  
+  menuSections = d.menu || menuSections;
+  whatsappNumber = d.wa || whatsappNumber;
+  
+  document.getElementById('cafeName').textContent = d.cafeName || "YOUR WEB STORE BUSINESS";
+  document.getElementById('tagline').textContent = d.tagline || "With Live Preview";
+  document.getElementById('footerText').textContent = d.footer || "© 2026 YOUR BUSINESS";
+  if (d.logo) document.getElementById('logo').src = d.logo;
+  if (d.banner) document.getElementById('header').style.backgroundImage = `url(${d.banner})`;
+  
+  document.getElementById('editName').value = d.cafeName || "";
+  document.getElementById('editTag').value = d.tagline || "";
+  document.getElementById('editFooter').value = d.footer || "";
+  document.getElementById('editWA').value = d.wa || "+27660000000";
+  document.getElementById('logoURL').value = d.logo || "";
+  document.getElementById('bannerURL').value = d.banner || "";
+  document.getElementById('ctaText').value = d.ctaText || "";
+  document.getElementById('ctaUrl').value = d.ctaUrl || "";
 }
 
-/* ================== CORE LOGIC ================== */
-function setCurrency(c){ activeCurrency=c; localStorage.setItem('tiffyai_currency',c); renderMenu(); renderEditor(); renderSalesLog(); }
-
-function toggleMarketingMode() {
-  marketingMode = !marketingMode;
-  document.body.classList.toggle('marketing-active');
-  const btn = document.getElementById('mktBtn');
-  btn.textContent = marketingMode ? "🔥 MARKETING MODE LIVE" : "⚡ ACTIVATE MARKETING MODE";
-  btn.style.background = marketingMode ? "var(--gold)" : "#1a1a1a";
-  btn.style.color = marketingMode ? "#000" : "var(--gold)";
-  renderMenu();
-}
-
-function uploadImage(input, cb){
-  const f = input.files[0]; if (!f) return;
-  const r = new FileReader(); r.onload = e => {
-      cb(e.target.result);
-      saveDraft();
-  };
-  r.readAsDataURL(f);
+/* Core Functions */
+function addSection() {
+  menuSections.push({ title: "New Section", items: [] });
+  renderEditor(); renderMenu(); saveDraft();
 }
 
 function triggerPaymentFlow() {
   document.getElementById('paymentModal').classList.remove('hidden');
 }
 
-function downloadHTML(){
-  actualDownload();
+function closePayment() {
+  document.getElementById('paymentModal').classList.add('hidden');
 }
 
-function actualDownload(){
+function updateCTA() {
+  const text = document.getElementById('ctaText').value;
+  const url = document.getElementById('ctaUrl').value;
+  const btn = document.getElementById('ctaBtn');
+  if(text && url) {
+    btn.textContent = text.toUpperCase();
+    btn.href = url;
+    btn.style.display = "inline-block";
+  } else btn.style.display = "none";
+}
+
+function uploadImage(input, cb){
+  const f = input.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => { cb(e.target.result); saveDraft(); };
+  r.readAsDataURL(f);
+}
+
+function downloadHTML() {
   const doc = document.documentElement.cloneNode(true);
-  ['#editor', '#paymentModal', '#activationPanel', '.support-btn', '#autoSaveStatus'].forEach(id => doc.querySelector(id)?.remove());
- 
-  const script = Array.from(doc.querySelectorAll('script')).find(s => s.textContent.includes('let menuSections'));
-  if(script){
-    script.textContent = script.textContent.replace(/let activeCurrency = "[^"]*";/, `let activeCurrency = "${activeCurrency}";`)
-                         .replace(/let whatsappNumber = "[^"]*";/, `let whatsappNumber = "${whatsappNumber}";`)
-                         .replace(/let menuSections = \[[\s\S]*?\];/, `let menuSections = ${JSON.stringify(menuSections)};`);
-  }
-  const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], { type: 'text/html' });
-  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'WebStore.html'; a.click();
+  ['#editor', '#paymentModal', '#controlPanel', '#autoSaveStatus'].forEach(sel => {
+    const el = doc.querySelector(sel);
+    if (el) el.remove();
+  });
+  
+  const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], {type: 'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'MyWebStore.html';
+  a.click();
 }
 
-function payWithPaypal(){
-  window.open('https://paypal.me/CatHostProWebsites/70', '_blank');
-  confirmManualPayment();
-}
-
-function confirmManualPayment(){
-  const code = generateRequestCode();
-  const msg = `TIFFYAI CREDIT REQUEST\nCode: ${code}\nFNB\nAcc: 62912507433\nBranch: 250655\nSwift: FIRNZAJJ`;
-  window.open('https://wa.me/27766314246?text=' + encodeURIComponent(msg), '_blank');
-}
-
-/* ================== MENU RENDERING (unchanged) ================== */
-let menuSections = [{ title: "Products", items: [{ name: 'Sample Item', price: 100, desc: "Description here", img: "", rating: 5, badge: 'none', stock: 5 }] }];
-
-function renderMenu(){ /* ... same as original ... */ 
-  const menuRender = document.getElementById('menuRender');
-  menuRender.innerHTML = '';
+/* Render Functions */
+function renderMenu() {
+  const container = document.getElementById('menuRender');
+  container.innerHTML = '';
   const sym = {ZAR:'R',INR:'₹',USD:'\( ',EUR:'€',GBP:'£',NGN:'₦'}[activeCurrency] || ' \)';
 
   menuSections.forEach((sec, s) => {
     const h2 = document.createElement('h2');
     h2.className = 'section-title'; h2.textContent = sec.title;
+    container.appendChild(h2);
+
     const grid = document.createElement('div');
     grid.className = 'menu-grid';
 
@@ -595,15 +277,11 @@ function renderMenu(){ /* ... same as original ... */
       const qty = orderState[key] || 0;
       const stars = "★".repeat(it.rating || 5) + "☆".repeat(5 - (it.rating || 5));
       let badgeHtml = (marketingMode && it.badge && it.badge !== 'none') ?
-        `<div class="badge badge-\( {it.badge}"> \){it.badge === 'scarcity' ? `ONLY ${it.stock || 3} LEFT` : it.badge.replace('-', ' ')}</div>` : '';
+        `<div class="badge badge-\( {it.badge}"> \){it.badge === 'scarcity' ? `ONLY ${it.stock || 3} LEFT` : it.badge}</div>` : '';
 
       const card = document.createElement('div');
       card.className = 'menu-item';
-      let mktTools = marketingMode ? `
-        <button class="status-saver-btn" onclick='generateStatusFlyer(${JSON.stringify(it).replace(/'/g, "&apos;")})'>📲 STATUS</button>
-        <div class="share-btn" onclick="shareItem('\( {it.name}', ' \){it.price}', '${it.desc}')">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8M16 6l-4-4-4 4M12 2v13"/></svg>
-        </div>` : '';
+      let mktTools = marketingMode ? `<button class="status-saver-btn" onclick='generateStatusFlyer(${JSON.stringify(it).replace(/'/g,"&apos;")})'>📲 STATUS</button>` : '';
 
       card.innerHTML = `\( {badgeHtml} \){mktTools}<img src="${it.img || 'https://via.placeholder.com/300?text=No+Image'}">
         <div class="card"><h3>\( {it.name}</h3><div class="rating-stars"> \){stars}</div><p>${it.desc}</p>
@@ -612,145 +290,99 @@ function renderMenu(){ /* ... same as original ... */
         </div>`;
       grid.appendChild(card);
     });
-    menuRender.appendChild(h2); menuRender.appendChild(grid);
+    container.appendChild(grid);
   });
   renderWhatsapp();
 }
 
-function changeQty(key, delta){ orderState[key] = Math.max(0, (orderState[key] || 0) + delta); renderMenu(); }
+function changeQty(key, delta) {
+  orderState[key] = Math.max(0, (orderState[key] || 0) + delta);
+  renderMenu();
+}
 
-function renderWhatsapp(){ /* unchanged from original */ 
+function renderWhatsapp() {
   const total = Object.values(orderState).reduce((a,b)=>a+b,0);
-  let btn = document.getElementById('whatsappOrderBtn');
-  let qBtn = document.getElementById('quoteBtn');
-  if (total === 0){ if(btn) btn.remove(); if(qBtn) qBtn.remove(); return; }
- 
+  if (total === 0) return;
+
   const sym = {ZAR:'R',INR:'₹',USD:'\( ',EUR:'€',GBP:'£',NGN:'₦'}[activeCurrency] || ' \)';
   let msg = `🛍️ NEW ORDER\n\n`;
   let grand = 0;
-  menuSections.forEach((sec, s)=>{
-    sec.items.forEach((it, i)=>{
+  menuSections.forEach((sec, s) => {
+    sec.items.forEach((it, i) => {
       const q = orderState[`\( {s}- \){i}`] || 0;
-      if(q){ grand += (q * it.price); msg += `✅ ${q}x ${it.name} - \( {sym} \){q*it.price}\n`; }
+      if (q) {
+        grand += q * it.price;
+        msg += `✅ ${q}x ${it.name} - \( {sym} \){q*it.price}\n`;
+      }
     });
   });
   msg += `\nTOTAL: \( {sym} \){grand}`;
 
-  if(!btn){
-    btn = document.createElement('a'); btn.id = 'whatsappOrderBtn'; document.body.appendChild(btn);
-    qBtn = document.createElement('button'); qBtn.id = 'quoteBtn'; qBtn.className = 'quote-btn';
-    qBtn.textContent = "📄 PRINT QUOTE"; document.body.appendChild(qBtn);
+  let btn = document.getElementById('whatsappOrderBtn');
+  if (!btn) {
+    btn = document.createElement('a');
+    btn.id = 'whatsappOrderBtn';
+    document.body.appendChild(btn);
   }
-  qBtn.onclick = () => { printReceipt({date: new Date().toLocaleString(), total: grand, msg: msg}); };
-  btn.onclick = () => { logSale(msg, grand); };
   btn.href = `https://wa.me/${whatsappNumber}?text=` + encodeURIComponent(msg);
   btn.textContent = `ORDER NOW (${total})`;
 }
 
-function logSale(msg, total) {
-    const sales = JSON.parse(localStorage.getItem('tiffyai_sales') || '[]');
-    sales.unshift({ id: Date.now(), date: new Date().toLocaleString(), total: total, msg: msg });
-    localStorage.setItem('tiffyai_sales', JSON.stringify(sales));
-    renderSalesLog();
-}
-
-function renderSalesLog() {
-    const log = document.getElementById('salesLog');
-    const sales = JSON.parse(localStorage.getItem('tiffyai_sales') || '[]');
-    log.innerHTML = sales.map(s => `<div class="log-entry"><span>\( {s.date} <br> <strong> \){{ZAR:'R',INR:'₹',USD:'\( ',EUR:'€',GBP:'£',NGN:'₦'}[activeCurrency] || ' \)'}${s.total}</strong></span>
-            <button onclick='printReceipt(${JSON.stringify(s)})' style="padding:2px 10px; font-size:0.7rem; color:#000;">PRINT</button></div>`)
-            .join('') || '<p style="color:#666">No sales recorded.</p>';
-}
-
-function printReceipt(s) {
-    const frame = document.getElementById('printFrame');
-    const doc = frame.contentWindow.document;
-    doc.open();
-    doc.write(`<html><body style="font-family:monospace;padding:20px;text-align:center;"><h2>\( {document.getElementById('cafeName').textContent}</h2><p> \){s.date}</p><hr>${s.msg.replace(/\n/g,'<br>')}<hr><h3>TOTAL: \( {{ZAR:'R',INR:'₹',USD:' \)',EUR:'€',GBP:'£',NGN:'₦'}[activeCurrency] || '\( '} \){s.total}</h3></body></html>`);
-    doc.close();
-    setTimeout(() => { frame.contentWindow.focus(); frame.contentWindow.print(); }, 500);
-}
-
-function startBulk() {
-    promoQueue = document.getElementById('bulkNumbers').value.split(/[\n,]+/).map(n=>n.trim()).filter(n=>n.length > 5);
-    nextInQueue();
-}
-
-function nextInQueue() {
-    if(!promoQueue.length) { document.getElementById('bulkStatus').textContent = "Done!"; return; }
-    const num = promoQueue.shift();
-    window.open(`https://wa.me/\( {num}?text= \){encodeURIComponent('Check out our store: ' + window.location.href)}`, '_blank');
-    document.getElementById('bulkStatus').textContent = `Chat opened for ${num}. ${promoQueue.length} left. Click again.`;
-}
-
-function shareItem(name, price, desc) {
-  const text = `🔥 ${name}\n💰 \( {{ZAR:'R',INR:'₹',USD:' \)',EUR:'€',GBP:'£',NGN:'₦'}[activeCurrency] || '\( '} \){price}\n\n${desc}\n\n🛒 Shop: ${window.location.href}`;
-  if (navigator.share) navigator.share({ title: name, text: text });
-  else { navigator.clipboard.writeText(text); alert("Marketing info copied!"); }
-}
-
-function generateStatusFlyer(it) {
-  const canvas = document.getElementById('statusCanvas'); const ctx = canvas.getContext('2d');
-  ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,1080,1920);
-  const img = new Image(); img.crossOrigin = "anonymous"; img.src = it.img || 'https://via.placeholder.com/600';
-  img.onload = () => {
-    ctx.drawImage(img, 0, 300, 1080, 1080);
-    ctx.fillStyle = "rgba(212,163,115,0.9)"; ctx.fillRect(0, 1400, 1080, 250);
-    ctx.fillStyle = "#000"; ctx.font = "bold 90px Arial"; ctx.textAlign = "center";
-    ctx.fillText(it.name.toUpperCase(), 540, 1500);
-    ctx.font = "bold 130px Arial"; ctx.fillText({{ZAR:'R',INR:'₹',USD:'\( ',EUR:'€',GBP:'£',NGN:'₦'}[activeCurrency] || ' \)' + it.price, 540, 1620);
-    const link = document.createElement('a'); link.download='flyer.png'; link.href=canvas.toDataURL(); link.click();
-  };
-}
-
-function renderEditor(){
-  const me = document.getElementById('menuEditor'); me.innerHTML = '';
-  menuSections.forEach((sec, s)=>{
-    const b = document.createElement('div'); b.className = 'editor-block';
-    b.innerHTML = `<div class="section-head"><input value="\( {sec.title}" oninput="menuSections[ \){s}].title=this.value;renderMenu();saveDraft()"><button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu();saveDraft()">✕</button></div>
-      ${sec.items.map((it,i)=>`<div style="border-top:1px solid #333; margin-top:10px; padding-top:10px;">
-          <label>Item Name</label><input value="\( {it.name}" oninput="menuSections[ \){s}].items[${i}].name=this.value;renderMenu();saveDraft()">
-          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-            <div><label>Badge</label><select onchange="menuSections[\( {s}].items[ \){i}].badge=this.value;renderMenu();saveDraft()"><option value="none" ${it.badge=='none'?'selected':''}>None</option><option value="scarcity" ${it.badge=='scarcity'?'selected':''}>Scarcity</option><option value="hot" ${it.badge=='hot'?'selected':''}>Hot Deal</option><option value="new" ${it.badge=='new'?'selected':''}>New Stock</option></select></div>
-            <div><label>Stock</label><input type="number" value="\( {it.stock||5}" oninput="menuSections[ \){s}].items[${i}].stock=this.value;renderMenu();saveDraft()"></div>
-          </div>
-          <label>Rating (1-5)</label><input type="number" min="1" max="5" value="\( {it.rating||5}" oninput="menuSections[ \){s}].items[${i}].rating=this.value;renderMenu();saveDraft()">
-          <label>Price</label><input type="number" value="\( {it.price}" oninput="menuSections[ \){s}].items[${i}].price=this.value;renderMenu();saveDraft()">
-          <label>Description</label><textarea oninput="menuSections[\( {s}].items[ \){i}].desc=this.value;renderMenu();saveDraft()">${it.desc}</textarea>
-          <label>Image</label><button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD</button>
-          <input value="\( {it.img}" oninput="menuSections[ \){s}].items[${i}].img=this.value;renderMenu();saveDraft()">
-          <input type="file" style="display:none" onchange="uploadImage(this,img=>{menuSections[\( {s}].items[ \){i}].img=img;renderMenu();saveDraft()})">
-          <button class="remove" onclick="menuSections[\( {s}].items.splice( \){i},1);renderEditor();renderMenu();saveDraft()">Remove Item</button></div>`).join('')}
+function renderEditor() {
+  const me = document.getElementById('menuEditor');
+  me.innerHTML = '';
+  menuSections.forEach((sec, s) => {
+    const b = document.createElement('div');
+    b.className = 'editor-block';
+    b.innerHTML = `<div><input value="\( {sec.title}" oninput="menuSections[ \){s}].title=this.value;renderMenu();saveDraft()"><button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu();saveDraft()">✕</button></div>
+      ${sec.items.map((it,i) => `
+        <div style="border-top:1px solid #333;margin-top:10px;padding-top:10px;">
+          <input value="\( {it.name}" oninput="menuSections[ \){s}].items[${i}].name=this.value;renderMenu();saveDraft()">
+          <input type="number" value="\( {it.price}" oninput="menuSections[ \){s}].items[${i}].price=this.value;renderMenu();saveDraft()">
+          <textarea oninput="menuSections[\( {s}].items[ \){i}].desc=this.value;renderMenu();saveDraft()">${it.desc}</textarea>
+          <input value="\( {it.img||''}" oninput="menuSections[ \){s}].items[${i}].img=this.value;renderMenu();saveDraft()" placeholder="Image URL">
+          <button onclick="menuSections[\( {s}].items.splice( \){i},1);renderEditor();renderMenu();saveDraft()">Remove Item</button>
+        </div>`).join('')}
       <button onclick="menuSections[${s}].items.push({name:'New Item',price:0,desc:'',img:'',rating:5,badge:'none'});renderEditor();renderMenu();saveDraft()">+ Add Item</button>`;
     me.appendChild(b);
   });
 }
 
-function addSection(){ menuSections.push({ title: "New Section", items: [] }); renderEditor(); renderMenu(); saveDraft(); }
-
-function generateRequestCode(){
-  let d = ''; while(d.length < 14) d += Math.floor(Math.random()*10);
-  return d.match(/.{1,4}/g).join('-');
+function toggleMarketingMode() {
+  marketingMode = !marketingMode;
+  document.body.classList.toggle('marketing-active');
+  renderMenu();
 }
 
-function submitActivation(){
-  alert("Activation works locally. Full features are already unlocked.");
-  localStorage.setItem('tiffyai_activated', 'true');
-  location.reload();
+function generateStatusFlyer(it) {
+  const canvas = document.getElementById('statusCanvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,0,1080,1920);
+  const img = new Image();
+  img.src = it.img || 'https://via.placeholder.com/600';
+  img.onload = () => {
+    ctx.drawImage(img, 0, 300, 1080, 1080);
+    ctx.fillStyle = "rgba(212,163,115,0.9)"; ctx.fillRect(0, 1400, 1080, 250);
+    ctx.fillStyle = "#000"; ctx.font = "bold 90px Arial"; ctx.textAlign = "center";
+    ctx.fillText(it.name.toUpperCase(), 540, 1500);
+    ctx.font = "bold 130px Arial";
+    ctx.fillText({ZAR:'R',INR:'₹',USD:'$',EUR:'€',GBP:'£',NGN:'₦'}[activeCurrency] + it.price, 540, 1620);
+    const link = document.createElement('a');
+    link.download = 'status.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  };
 }
 
-function closePayment(){ document.getElementById('paymentModal').classList.add('hidden'); }
+function payWithPaypal(){ window.open('https://paypal.me/CatHostProWebsites/70','_blank'); }
+function confirmManualPayment(){ alert("Manual EFT ready (local version)"); closePayment(); }
 
+/* Init */
 document.addEventListener('DOMContentLoaded', () => {
-    loadAllFromLocal();
-    document.getElementById('editor').addEventListener('input', () => {
-        clearTimeout(autoSaveTimer);
-        autoSaveTimer = setTimeout(saveDraft, 1500);
-    });
-    updateCreditDisplay(); 
-    renderMenu(); 
-    renderEditor(); 
-    renderSalesLog();
+  loadDraft();
+  renderMenu();
+  renderEditor();
+  updateCTA();
 });
 </script>
 </body>
