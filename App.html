@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+    :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
+
+    #scannerModal {position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;padding:20px;}
+    #paymentLanding {background:#1a1a1a; padding:20px; border:2px solid var(--gold); border-radius:12px; text-align:center; width: 90%; max-width: 400px;}
+    #supportFloating {position:fixed;bottom:20px;right:20px;z-index:9998;cursor:pointer;}
+    #supportFloating img {width:60px;height:60px;border-radius:50%;border:2px solid var(--gold);}
+    #autoSaveStatus {position:fixed;top:10px;left:10px;z-index:5000;font-size:0.7rem;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;border:1px solid var(--gold);color:var(--gold);display:none;}
+    #controlPanel {background:#1a1a1a;padding:20px;margin:15px;border:2px solid var(--gold);border-radius:12px;text-align:center;}
+    header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative; width: 100%;}
+    header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
+    header *{position:relative;z-index:2}
+    .logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;cursor:pointer;}
+    h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
+    .tagline{font-family:'Bebas Neue';color:var(--gold)}
+    .cta-container {margin-top:25px;z-index:10;}
+    .btn-cta {display:inline-block;background:linear-gradient(180deg,var(--gold),var(--gold2));color:#000;padding:12px 28px;border-radius:50px;font-family:'Bebas Neue';text-decoration:none;font-size:1.2rem;box-shadow:0 4px 15px rgba(212,163,115,0.4);}
+    #menu{max-width:1200px;margin:auto;padding:4rem 5%}
+    .section-title{font-family:'Bebas Neue';font-size:2.4rem;color:var(--gold);margin:2rem 0 1rem;}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem; width: 100%;}
+    .menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;position:relative;}
+    .menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid var(--gold);cursor:pointer;}
+    .card{padding:1rem;}
+    .menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
+    .price{font-family:'Bebas Neue';color:var(--gold2)}
+    .qr-img{width:80px;height:80px;margin-top:10px;border:1px solid #fff;cursor:pointer;}
+    #editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:#0a0a0a;}
+    .editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
+    #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;}
+    #zoomModal img{max-width:90%;max-height:90%;}
+    label{display:block;margin-top:1rem;color:var(--gold)}
+    input,textarea,select{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;border-radius:6px;}
+    button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;margin:5px;}
+    .remove{background:#900;color:#fff}
+    .btn-small{font-size:0.8rem;padding:5px 10px;margin-top:10px;display:inline-block;}
+</style>
+</head>
+<body>
+
+<div id="scannerModal">
+    <div id="paymentLanding">
+        <h2 id="amountDisplay" style="color:var(--gold); margin-bottom:15px;">Confirm Payment</h2>
+        <button onclick="confirmAndPay()">CONFIRM & PAY</button>
+        <button class="remove" onclick="stopScanner()">CANCEL</button>
+    </div>
+</div>
+
+<div id="zoomModal" onclick="this.style.display='none'"><img id="zoomImg"></div>
+<div id="supportFloating" onclick="showPayment()"><img src="support.png" onerror="this.style.display='none'"></div>
+<div id="autoSaveStatus">Saved Draft</div>
+
+<div id="controlPanel" class="editor-block">
+    <h1>Control Panel</h1>
+    <button onclick="addSection()">+ Add Section</button>
+    <button onclick="showPayment()">Show Payment (Support)</button>
+    <button onclick="saveDraft()">💾 Save Draft</button>
+    <button onclick="downloadHTML()">📥 Download HTML</button>
+    <button onclick="printReceipt()">🖨️ Print Receipt</button>
+    <button class="remove" onclick="clearAllCart()">🗑️ Clear Cart</button>
+</div>
+
+<header id="header">
+  <img id="logo" class="logo" onclick="zoom(this.src)">
+  <h1 id="cafeName">YOUR WEB STORE BUSINESS</h1>
+  <p id="tagline" class="tagline">With Live Preview</p>
+  <div class="cta-container">
+      <a href="#" id="ctaBtn" class="btn-cta" target="_blank">ORDER NOW</a>
+  </div>
+</header>
+
+<section id="menu"><div id="menuRender"></div></section>
+<footer><p id="footerText" style="text-align:center; padding:20px; color:#666;">© 2026 YOUR BUSINESS</p></footer>
+
+<div id="editor">
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">GLOBAL SETTINGS</h2>
+    <div class="editor-block">
+        <label>Store Currency</label>
+        <select id="editCurrency" onchange="saveDraft(); renderMenu()">
+            <option value="R">South African Rand (R)</option>
+            <option value="$">US Dollar ($)</option>
+            <option value="€">Euro (€)</option>
+        </select>
+    </div>
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
+    <div class="editor-block">
+      <label>Business Name</label>
+      <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
+      <label>Tagline</label>
+      <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value;saveDraft()">
+      <label>WhatsApp Number</label>
+      <input id="editPhone" placeholder="27xxxxxxxx" oninput="saveDraft()">
+      <label>CTA Button Text</label>
+      <input id="editCtaText" value="ORDER NOW" oninput="document.getElementById('ctaBtn').textContent=this.value;saveDraft()">
+      <label>CTA Button Link</label>
+      <input id="editCtaLink" placeholder="https://..." oninput="document.getElementById('ctaBtn').href=this.value;saveDraft()">
+      <label>Footer Text</label>
+      <input id="editFooter" oninput="document.getElementById('footerText').textContent=this.value;saveDraft()">
+      <label>Logo</label>
+      <input type="file" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; saveDraft()})">
+      <button class="remove" onclick="document.getElementById('logo').src=''; saveDraft()">Remove Logo</button>
+      <label>Banner Image</label>
+      <input type="file" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; saveDraft()})">
+      <button class="remove" onclick="document.getElementById('header').style.backgroundImage='none'; saveDraft()">Remove Banner</button>
+    </div>
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
+    <div id="menuEditor"></div>
+    <button onclick="addSection()">+ ADD SECTION</button>
+</div>
+
+<script>
+let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
+window.pendingPaymentPrice = 0;
+
+function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
+function saveDraft() {
+  const data = {
+    name: document.getElementById('cafeName').textContent,
+    tag: document.getElementById('tagline').textContent,
+    phone: document.getElementById('editPhone').value,
+    ctaText: document.getElementById('editCtaText').value,
+    ctaLink: document.getElementById('editCtaLink').value,
+    footer: document.getElementById('footerText').textContent,
+    menu: menuSections,
+    currency: document.getElementById('editCurrency').value,
+    logo: document.getElementById('logo').src,
+    banner: document.getElementById('header').style.backgroundImage
+  };
+  localStorage.setItem('webstore_pro_draft', JSON.stringify(data));
+  document.getElementById('autoSaveStatus').style.display = 'block';
+  setTimeout(() => document.getElementById('autoSaveStatus').style.display = 'none', 2000);
+}
+
+function loadDraft() {
+  const saved = localStorage.getItem('webstore_pro_draft');
+  if (!saved) return;
+  const d = JSON.parse(saved);
+  menuSections = d.menu || menuSections;
+  document.getElementById('cafeName').textContent = d.name || "";
+  document.getElementById('tagline').textContent = d.tag || "";
+  document.getElementById('editPhone').value = d.phone || "";
+  document.getElementById('editCtaText').value = d.ctaText || "ORDER NOW";
+  document.getElementById('ctaBtn').textContent = d.ctaText || "ORDER NOW";
+  document.getElementById('editCtaLink').value = d.ctaLink || "#";
+  document.getElementById('ctaBtn').href = d.ctaLink || "#";
+  document.getElementById('editCurrency').value = d.currency || "R";
+  document.getElementById('editFooter').value = d.footer || "© 2026 YOUR BUSINESS";
+  document.getElementById('footerText').textContent = d.footer || "© 2026 YOUR BUSINESS";
+  if(d.logo) document.getElementById('logo').src = d.logo;
+  if(d.banner) document.getElementById('header').style.backgroundImage = d.banner;
+  renderMenu(); renderEditor();
+}
+
+function uploadImage(input, cb) {
+  const reader = new FileReader();
+  reader.onload = e => cb(e.target.result);
+  reader.readAsDataURL(input.files[0]);
+}
+
+function renderMenu() {
+  const cur = document.getElementById('editCurrency').value;
+  const container = document.getElementById('menuRender');
+  container.innerHTML = '';
+  menuSections.forEach(sec => {
+    container.innerHTML += `<h2 class="section-title">${sec.title}</h2>`;
+    const grid = document.createElement('div');
+    grid.className = 'menu-grid';
+    sec.items.forEach((it, i) => {
+      grid.innerHTML += `<div class="menu-item">${it.img ? `<img src="${it.img}" onclick="zoom(this.src)">` : ''}<div class="card"><h3>${it.name}</h3><p>${it.desc}</p><div class="price">${cur}${it.price}</div>
+      <button class="btn-small" onclick="addToCart('${it.name}')">Add to Cart</button>
+      <button class="btn-small remove" onclick="clearItem('${it.name}')">Clear</button>
+      <button class="btn-small" style="background:#00f0ff; color:#000;" onclick="payWithTiffy('${it.name}', ${it.price})">SCAN TO PAY</button>
+      ${it.qr ? `<br><img src="${it.qr}" class="qr-img" onclick="zoom(this.src)">` : ''}
+      </div></div>`;
+    });
+    container.appendChild(grid);
+  });
+  container.innerHTML += `<button onclick="sendWhatsApp()" style="display:block; margin:20px auto; padding:15px 40px; background:var(--whatsapp);">ORDER ON WHATSAPP</button>`;
+}
+
+function payWithTiffy(name, price) {
+    window.pendingPaymentPrice = price;
+    document.getElementById('scannerModal').style.display = 'flex';
+    document.getElementById('amountDisplay').textContent = "Pay: " + document.getElementById('editCurrency').value + parseFloat(price).toFixed(2);
+}
+
+function confirmAndPay() {
+    if (localStorage.getItem("TUSD_LOCK") === "true") return;
+    localStorage.setItem("TUSD_LOCK", "true");
+    const price = parseFloat(window.pendingPaymentPrice);
+    const bal = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0");
+    if (bal < price) { alert("Insufficient funds!"); localStorage.removeItem("TUSD_LOCK"); stopScanner(); return; }
+    localStorage.setItem("TUSD_Nitro_Storage", (bal - price).toFixed(2));
+    localStorage.removeItem("TUSD_LOCK");
+    window.location.href = "https://tiffyai-usd.github.io/Transact/Transfer-Cash.html?amount=" + price.toFixed(2);
+}
+
+function stopScanner() { document.getElementById('scannerModal').style.display = 'none'; }
+function addToCart(name) { menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty++; })); alert(name + " added!"); saveDraft(); }
+function clearItem(name) { menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty = 0; })); renderMenu(); saveDraft(); }
+function sendWhatsApp() {
+  let msg = "Order Request:%0A";
+  let hasItems = false;
+  menuSections.forEach(s => s.items.forEach(it => { if(it.qty > 0) { msg += it.name + " x " + it.qty + "%0A"; hasItems = true; } }));
+  const phone = document.getElementById('editPhone').value;
+  if(hasItems) window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+  else alert("Cart is empty");
+}
+
+function showPayment() {
+    const w = window.open("", "_blank", "width=400,height=500");
+    w.document.write("<h2>Support Payment</h2><img src='support.png' style='width:100%'> <p>Your support helps keep this service running.</p><a href='https://paypal.me/CatHostProWebsites/70'>Pay with PayPal</a>");
+}
+
+function clearAllCart() { menuSections.forEach(s => s.items.forEach(it => it.qty = 0)); renderMenu(); saveDraft(); }
+function printReceipt() {
+  let receipt = "RECEIPT\n----------\n";
+  menuSections.forEach(s => s.items.forEach(it => { if(it.qty > 0) receipt += it.name + " x " + it.qty + " - " + document.getElementById('editCurrency').value + (it.price*it.qty) + "\n"; }));
+  const w = window.open(); w.document.write("<pre>"+receipt+"</pre>"); w.print();
+}
+
+function renderEditor() {
+  const me = document.getElementById('menuEditor');
+  me.innerHTML = '';
+  menuSections.forEach((sec, s) => {
+    me.innerHTML += `
+      <div class="editor-block">
+        <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
+        ${sec.items.map((it, i) => `
+          <div style="border:1px solid #333; padding:10px; margin:5px 0;">
+            <input value="${it.name}" placeholder="Name" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+            <input type="number" value="${it.price}" placeholder="Price" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+            <label>Product Photo</label>
+            <input type="file" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].img=img; renderMenu(); saveDraft()})">
+            <button class="remove" onclick="menuSections[${s}].items[${i}].img=''; renderMenu(); saveDraft()">Remove Photo</button>
+            <label>Payment QR</label>
+            <input type="file" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].qr=img; renderMenu(); saveDraft()})">
+            <button class="remove" onclick="menuSections[${s}].items[${i}].qr=''; renderMenu(); saveDraft()">Remove QR</button>
+          </div>
+        `).join('')}
+      </div>`;
+  });
+}
+
+function addSection() { menuSections.push({ title: "New", items: [{name:'Item', price:10, desc:'', img:'', qr:'', qty:0}] }); renderEditor(); }
+
+function downloadHTML() {
+    document.querySelector('#editor').style.display = 'none';
+    document.querySelector('#controlPanel').style.display = 'none';
+    const fullHtml = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+    const blob = new Blob([fullHtml], {type: 'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'MyWebStore.html';
+    a.click();
+    document.querySelector('#editor').style.display = 'block';
+    document.querySelector('#controlPanel').style.display = 'block';
+}
+document.addEventListener('DOMContentLoaded', loadDraft);
+</script>
+</body>
+</html>
