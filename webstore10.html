@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+    :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
+
+    #supportFloating {position:fixed;bottom:20px;right:20px;z-index:9998;cursor:pointer;}
+    #supportFloating img {width:60px;height:60px;border-radius:50%;border:2px solid var(--gold);}
+
+    #controlPanel {background:#1a1a1a;padding:20px;margin:15px;border:2px solid var(--gold);border-radius:12px;text-align:center;}
+    header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
+    header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
+    header *{position:relative;z-index:2}
+    .logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;cursor:pointer;}
+    h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
+    .tagline{font-family:'Bebas Neue';color:var(--gold)}
+    
+    #menu{max-width:1200px;margin:auto;padding:4rem 5%}
+    .section-title{font-family:'Bebas Neue';font-size:2.4rem;color:var(--gold);margin:2rem 0 1rem;}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;}
+    .menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;position:relative;}
+    .menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid var(--gold);cursor:pointer;}
+    .card{padding:1rem;}
+    .menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
+    .price{font-family:'Bebas Neue';color:var(--gold2)}
+    .qr-img{width:80px;height:80px;margin-top:10px;border:1px solid #fff;cursor:pointer;}
+
+    #editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:#0a0a0a;}
+    .editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;}
+    #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;}
+    #zoomModal img{max-width:90%;max-height:90%;}
+
+    button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;margin:5px;}
+    .remove{background:#900;color:#fff}
+    .btn-small{font-size:0.8rem;padding:5px 10px;margin-top:10px;display:inline-block;}
+</style>
+</head>
+
+<body>
+<div id="zoomModal" onclick="this.style.display='none'"><img id="zoomImg"></div>
+<div id="supportFloating" onclick="showPayment()"><img src="support.png" onerror="this.style.display='none'"></div>
+
+<div id="controlPanel" class="editor-block">
+    <h1>Control Panel</h1>
+    <button onclick="addSection()">+ Add Section</button>
+    <button onclick="downloadHTML()">📥 DOWNLOAD FULL STORE</button>
+</div>
+
+<header id="header">
+  <img id="logo" class="logo">
+  <h1 id="cafeName">YOUR WEB STORE</h1>
+</header>
+
+<section id="menu"><div id="menuRender"></div></section>
+
+<div id="editor">
+    <div id="menuEditor"></div>
+</div>
+
+<script>
+let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 100, img: "", qr: "", qty: 0 }] }];
+
+function showPayment() {
+    const w = window.open("", "_blank", "width=400,height=500");
+    w.document.write("<h2>Support Payment</h2><img src='support.png' style='width:100%'> <p>Your support helps keep this service running.</p><a href='https://paypal.me/CatHostProWebsites/70'>Pay with PayPal</a>");
+}
+
+function renderMenu() {
+    const container = document.getElementById('menuRender');
+    container.innerHTML = '';
+    menuSections.forEach(sec => {
+        container.innerHTML += `<h2 class="section-title">${sec.title}</h2>`;
+        const grid = document.createElement('div');
+        grid.className = 'menu-grid';
+        sec.items.forEach(it => {
+            grid.innerHTML += `<div class="menu-item"><img src="${it.img}"><div class="card"><h3>${it.name}</h3><div class="price">R${it.price}</div></div></div>`;
+        });
+        container.appendChild(grid);
+    });
+}
+
+function downloadHTML() {
+    const doc = document.documentElement.cloneNode(true);
+    // Forcefully remove editor parts
+    const editor = doc.querySelector('#editor');
+    const panel = doc.querySelector('#controlPanel');
+    if(editor) editor.remove();
+    if(panel) panel.remove();
+    
+    // Inject runtime logic
+    const script = doc.createElement('script');
+    script.textContent = `
+        function showPayment() { const w = window.open("", "_blank", "width=400,height=500"); w.document.write("<h2>Support Payment</h2><img src='support.png' style='width:100%'> <p>Your support helps keep this service running.</p><a href='https://paypal.me/CatHostProWebsites/70'>Pay with PayPal</a>"); }
+    `;
+    doc.body.appendChild(script);
+    
+    const blob = new Blob([doc.outerHTML], {type: 'text/html'});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'MyWebStore.html';
+    link.click();
+}
+
+renderMenu();
+</script>
+</body>
+</html>
