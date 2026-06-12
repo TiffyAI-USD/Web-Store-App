@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+    :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
+    #controlPanel {background:#1a1a1a;padding:20px;margin:15px;border:2px solid var(--gold);border-radius:12px;text-align:center;}
+    header{min-height:50vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
+    header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
+    header *{position:relative;z-index:2}
+    h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
+    #menu{max-width:1200px;margin:auto;padding:4rem 5%}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;}
+    .menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;padding:20px;text-align:center;}
+    .price{font-family:'Bebas Neue';color:var(--gold2);margin:10px 0;font-size:1.5rem;}
+    input,button{padding:10px;border-radius:6px;border:1px solid #444;margin:5px;}
+    button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;cursor:pointer;font-family:'Bebas Neue';font-size:1rem;}
+    .remove{background:#900;color:#fff;}
+    .editor-block{background:#1a1a1a;padding:20px;margin:15px;border-radius:12px;border:1px solid var(--gold);}
+</style>
+</head>
+<body>
+
+<div id="controlPanel">
+    <h1>Control Panel</h1>
+    <button onclick="addSection()">+ Add Section</button>
+    <button onclick="downloadHTML()">📥 DOWNLOAD AS FILE</button>
+    <button onclick="saveDraft()">💾 SAVE DRAFT</button>
+</div>
+
+<header id="header">
+  <h1 id="cafeName">MY STORE</h1>
+</header>
+
+<section id="menu">
+    <div id="menuRender"></div>
+</section>
+
+<div id="editor" class="editor-block">
+    <label>WhatsApp Number</label>
+    <input id="editPhone" placeholder="27xxxxxxxx" oninput="saveDraft()">
+    <label>Store Name</label>
+    <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
+    <h2 style="color:var(--gold); margin-top:20px;">MENU BUILDER</h2>
+    <div id="menuEditor"></div>
+</div>
+
+<script>
+let menuSections = [{ title: "Main Menu", items: [{ name: 'Item', price: 100, qty: 0 }] }];
+
+function render() {
+    // Live View
+    const container = document.getElementById('menuRender');
+    container.innerHTML = menuSections.map((sec, s) => `
+        <h2 style="color:var(--gold);margin-top:40px;">${sec.title}</h2>
+        <div class="menu-grid">
+            ${sec.items.map((it, i) => `
+                <div class="menu-item">
+                    <h3>${it.name}</h3>
+                    <div class="price">R${it.price}</div>
+                    <button onclick="changeQty(${s}, ${i}, 1)">+</button>
+                    <span class="qty">${it.qty || 0}</span>
+                    <button onclick="changeQty(${s}, ${i}, -1)">-</button>
+                </div>
+            `).join('')}
+        </div>
+    `).join('') + `<button id="whatsappBtn" onclick="sendWhatsApp()" style="display:block; width:100%; padding:20px; margin-top:30px; background:var(--whatsapp); font-size:1.5rem;">ORDER ON WHATSAPP</button>`;
+    
+    // Editor View
+    document.getElementById('menuEditor').innerHTML = menuSections.map((sec, s) => `
+        <div class="editor-block">
+            <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;render()">
+            ${sec.items.map((it, i) => `
+                <div style="margin-top:10px;">
+                    <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;render()">
+                    <input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;render()">
+                    <button class="remove" onclick="menuSections[${s}].items.splice(${i},1);render()">Delete</button>
+                </div>
+            `).join('')}
+            <button onclick="menuSections[${s}].items.push({name:'Item', price:0, qty:0});render()">+ Add Item</button>
+        </div>
+    `).join('');
+}
+
+function changeQty(s, i, delta) {
+    menuSections[s].items[i].qty = Math.max(0, (menuSections[s].items[i].qty || 0) + delta);
+    render();
+}
+
+function sendWhatsApp() {
+    let phone = document.getElementById('editPhone').value;
+    let msg = "Order Request:%0A";
+    let hasItems = false;
+    menuSections.forEach(s => s.items.forEach(it => {
+        if(it.qty > 0) { msg += it.name + " x " + it.qty + "%0A"; hasItems = true; }
+    }));
+    if(hasItems) window.open(`https://wa.me/${phone}?text=${msg}`, '_blank');
+    else alert("Cart is empty");
+}
+
+function addSection() { menuSections.push({ title: "New Section", items: [] }); render(); }
+function saveDraft() { localStorage.setItem('webstore_data', JSON.stringify({ sections: menuSections, phone: document.getElementById('editPhone').value, name: document.getElementById('editName').value })); }
+
+function downloadHTML() {
+    let doc = document.documentElement.cloneNode(true);
+    doc.querySelector('#controlPanel').remove();
+    doc.querySelector('#editor').remove();
+    
+    // Inject the current state and logic directly into the file so it works standalone
+    let script = doc.createElement('script');
+    script.textContent = `
+        let menuSections = ${JSON.stringify(menuSections)};
+        let phone = "${document.getElementById('editPhone').value}";
+        function render() {
+            const container = document.getElementById('menuRender');
+            container.innerHTML = menuSections.map((sec, s) => '<h2 style="color:var(--gold);margin-top:40px;">'+sec.title+'</h2><div class="menu-grid">'+
+                sec.items.map((it, i) => '<div class="menu-item"><h3>'+it.name+'</h3><div class="price">R'+it.price+'</div><button onclick="changeQty('+s+','+i+',1)">+</button><span class="qty">'+(it.qty||0)+'</span><button onclick="changeQty('+s+','+i+',-1)">-</button></div>').join('') + '</div>').join('') + 
+                '<button onclick="sendWhatsApp()" style="display:block; width:100%; padding:20px; margin-top:30px; background:var(--whatsapp); font-size:1.5rem;">ORDER ON WHATSAPP</button>';
+        }
+        function changeQty(s, i, delta) { menuSections[s].items[i].qty = Math.max(0, (menuSections[s].items[i].qty || 0) + delta); render(); }
+        function sendWhatsApp() {
+            let msg = "Order Request:%0A";
+            menuSections.forEach(s => s.items.forEach(it => { if(it.qty > 0) msg += it.name + " x " + it.qty + "%0A"; }));
+            window.open('https://wa.me/'+phone+'?text='+msg, '_blank');
+        }
+        render();
+    `;
+    doc.body.appendChild(script);
+    
+    let blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], {type:'text/html'});
+    let a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'MyWebStore.html'; a.click();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    let saved = localStorage.getItem('webstore_data');
+    if(saved) { 
+        let d = JSON.parse(saved); 
+        menuSections = d.sections; 
+        document.getElementById('editPhone').value = d.phone;
+        document.getElementById('editName').value = d.name;
+        document.getElementById('cafeName').textContent = d.name;
+    }
+    render();
+});
+</script>
+</body>
+</html>
