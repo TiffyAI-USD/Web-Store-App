@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>Webstore Pro - Local Edition</title>
+<title>Webstore Pro - Cloud Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
     *{box-sizing:border-box;margin:0;padding:0}
@@ -10,109 +10,74 @@
     :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
 
     #autoSaveStatus {position:fixed;top:10px;left:10px;z-index:5000;font-size:0.7rem;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;border:1px solid var(--gold);color:var(--gold);display:none;}
-    #controlPanel {background:#1a1a1a;padding:20px;margin:15px;border:2px solid var(--gold);border-radius:12px;text-align:center;}
-
     header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
     header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
     header *{position:relative;z-index:2}
     .logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;}
     h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
     .tagline{font-family:'Bebas Neue';color:var(--gold)}
-
     .cta-container {margin-top:25px;z-index:10;}
     .btn-cta {display:inline-block;background:linear-gradient(180deg,var(--gold),var(--gold2));color:#000;padding:12px 28px;border-radius:50px;font-family:'Bebas Neue';text-decoration:none;font-size:1.2rem;box-shadow:0 4px 15px rgba(212,163,115,0.4);}
-
     #menu{max-width:1200px;margin:auto;padding:4rem 5%}
-    .section-title{font-family:'Bebas Neue';font-size:2.4rem;color:var(--gold);margin:2rem 0 1rem;}
     .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;}
     .menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;position:relative;}
     .menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid var(--gold);}
     .card{padding:1rem;}
-    .menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
     .price{font-family:'Bebas Neue';color:var(--gold2)}
-
     #editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:#0a0a0a;}
-    .editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
-
-    label{display:block;margin-top:1rem;color:var(--gold)}
-    input,textarea,select{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;border-radius:6px;}
-    button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;margin:5px;}
-    .remove{background:#900;color:#fff}
-    .cloud-btn { background: #3498db; color: white; margin-top: 5px; font-size: 0.8rem; }
+    .editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;}
+    input,textarea{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;margin:5px 0;}
+    button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';cursor:pointer;}
 </style>
 </head>
-
 <body>
 <div id="autoSaveStatus">Saved Draft</div>
 
-<div id="controlPanel" class="editor-block">
-    <h1>Control Panel</h1>
-    <button onclick="addSection()">+ Add Section</button>
-    <button onclick="triggerPaymentFlow()">Show Payment</button>
-    <button onclick="saveDraft()">💾 Save Draft</button>
-    <button onclick="downloadHTML()">📥 Download HTML</button>
-</div>
-
-<div id="paymentModal" class="modal hidden" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:2000;">
-  <div style="background:#222;padding:30px;border-radius:12px;max-width:400px;text-align:center;border:2px solid var(--gold);">
-    <h2 style="color:var(--gold)">Payment</h2>
-    <img id="qrDisplay" style="width:200px; margin:10px auto; border:2px solid white; display:block;">
-    <button onclick="payWithPaypal()" style="width:100%;margin:10px 0;padding:12px;">Pay with PayPal</button>
-    <button onclick="confirmManualPayment()" style="width:100%;margin:10px 0;padding:12px;">I will send EFT</button>
-    <button onclick="closePayment()" style="background:none;color:#aaa;">Cancel</button>
-  </div>
-</div>
-
 <header id="header">
   <img id="logo" class="logo">
-  <h1 id="cafeName">YOUR WEB STORE BUSINESS</h1>
-  <p id="tagline" class="tagline">With Live Preview</p>
+  <h1 id="cafeName">YOUR WEB STORE</h1>
+  <p id="tagline" class="tagline">...</p>
   <div class="cta-container">
       <a href="#" id="ctaBtn" class="btn-cta" style="display:none;">ORDER NOW</a>
   </div>
 </header>
 
 <section id="menu"><div id="menuRender"></div></section>
-<footer><p id="footerText">© 2026 YOUR BUSINESS</p></footer>
 
 <div id="editor">
-    <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
     <div class="editor-block">
-      <label>Business Name</label>
-      <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
-      <label>Tagline</label>
-      <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value;saveDraft()">
-      <label>Logo</label>
-      <button onclick="document.getElementById('logoFile').click()">Upload Logo</button>
-      <input type="file" id="logoFile" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; document.getElementById('logoURL').value=img; saveDraft();})">
-      <input id="logoURL" placeholder="Logo URL" oninput="document.getElementById('logo').src=this.value;saveDraft()">
-      
-      <label>Banner</label>
-      <button onclick="document.getElementById('bannerFile').click()">Upload Banner</button>
-      <input type="file" id="bannerFile" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; document.getElementById('bannerURL').value=img; saveDraft();})">
-      <input id="bannerURL" placeholder="Banner URL" oninput="document.getElementById('header').style.backgroundImage='url('+this.value+')';saveDraft()">
-
-      <label>Payment QR Image</label>
-      <button onclick="document.getElementById('qrFile').click()">Upload QR</button>
-      <input type="file" id="qrFile" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('qrDisplay').src=img; document.getElementById('qrURL').value=img; saveDraft();})">
-      <input id="qrURL" placeholder="QR Image URL" oninput="document.getElementById('qrDisplay').src=this.value;saveDraft()">
+      <label>CTA Text</label>
+      <input id="ctaText" oninput="updateCTA();saveDraft()">
+      <label>CTA URL</label>
+      <input id="ctaUrl" oninput="updateCTA();saveDraft()">
     </div>
-
-    <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
     <div id="menuEditor"></div>
 </div>
 
+<div id="paymentModal" style="position:fixed;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:2000;">
+    <div style="background:#222;padding:20px;border-radius:12px;">
+        <img id="qrDisplay" style="width:200px; height:200px; display:block;">
+        <button onclick="document.getElementById('paymentModal').style.display='none'">Close</button>
+    </div>
+</div>
+
 <script>
-let menuSections = [{ title: "Products", items: [{ name: 'Sample', price: 100, desc: "Desc", img: "" }] }];
+let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 100, desc: "Desc", img: "" }] }];
+
+function updateCTA() {
+    const btn = document.getElementById('ctaBtn');
+    btn.textContent = document.getElementById('ctaText').value.toUpperCase();
+    btn.href = document.getElementById('ctaUrl').value;
+    btn.style.display = document.getElementById('ctaText').value ? "inline-block" : "none";
+}
 
 function saveDraft() {
   const data = {
     name: document.getElementById('cafeName').textContent,
-    tag: document.getElementById('tagline').textContent,
-    logo: document.getElementById('logoURL').value,
-    banner: document.getElementById('bannerURL').value,
-    qr: document.getElementById('qrURL').value,
-    menu: menuSections
+    ctaText: document.getElementById('ctaText').value,
+    ctaUrl: document.getElementById('ctaUrl').value,
+    menu: menuSections,
+    qr: document.getElementById('qrDisplay').src
   };
   localStorage.setItem('webstore_pro_draft', JSON.stringify(data));
 }
@@ -121,37 +86,27 @@ function loadDraft() {
   const saved = localStorage.getItem('webstore_pro_draft');
   if (!saved) return;
   const d = JSON.parse(saved);
-  menuSections = d.menu || menuSections;
-  document.getElementById('cafeName').textContent = d.name || "";
-  document.getElementById('tagline').textContent = d.tag || "";
-  document.getElementById('logoURL').value = d.logo || "";
-  document.getElementById('bannerURL').value = d.banner || "";
-  document.getElementById('qrURL').value = d.qr || "";
-  document.getElementById('logo').src = d.logo || "";
-  document.getElementById('header').style.backgroundImage = 'url('+d.banner+')';
-  document.getElementById('qrDisplay').src = d.qr || "";
-  renderMenu(); renderEditor();
+  menuSections = d.menu;
+  document.getElementById('ctaText').value = d.ctaText || "";
+  document.getElementById('ctaUrl').value = d.ctaUrl || "";
+  if(d.qr) document.getElementById('qrDisplay').src = d.qr;
+  updateCTA(); renderMenu(); renderEditor();
 }
 
 function uploadImage(input, cb) {
-  const file = input.files[0];
-  if (!file) return;
   const reader = new FileReader();
   reader.onload = e => cb(e.target.result);
-  reader.readAsDataURL(file);
+  reader.readAsDataURL(input.files[0]);
 }
 
 function renderMenu() {
   const container = document.getElementById('menuRender');
   container.innerHTML = '';
   menuSections.forEach(sec => {
-    container.innerHTML += `<h2 class="section-title">${sec.title}</h2>`;
-    const grid = document.createElement('div');
-    grid.className = 'menu-grid';
+    container.innerHTML += `<h2>${sec.title}</h2>`;
     sec.items.forEach(it => {
-      grid.innerHTML += `<div class="menu-item"><img src="${it.img}"><div class="card"><h3>${it.name}</h3><p>${it.desc}</p><div class="price">${it.price}</div></div></div>`;
+      container.innerHTML += `<div class="menu-item"><img src="${it.img}"><div class="card"><h3>${it.name}</h3><div class="price">R${it.price}</div></div></div>`;
     });
-    container.appendChild(grid);
   });
 }
 
@@ -159,25 +114,16 @@ function renderEditor() {
   const me = document.getElementById('menuEditor');
   me.innerHTML = '';
   menuSections.forEach((sec, s) => {
-    me.innerHTML += `
-      <div class="editor-block">
-        <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
-        ${sec.items.map((it, i) => `
-          <div style="border:1px solid #333; padding:10px; margin:5px 0;">
-            <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
-            <button onclick="document.getElementById('file-${s}-${i}').click()">☁️ UPLOAD</button>
-            <input type="file" id="file-${s}-${i}" style="display:none" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].img=img;renderEditor();renderMenu();saveDraft()})">
-          </div>
-        `).join('')}
-      </div>`;
+    sec.items.forEach((it, i) => {
+      me.innerHTML += `
+        <div class="editor-block">
+          <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+          <input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+          <input type="file" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].img=img; renderMenu(); saveDraft()})">
+        </div>`;
+    });
   });
 }
-
-function addSection() { menuSections.push({ title: "New", items: [{name:'Item', price:0, desc:'', img:''}] }); renderEditor(); }
-function triggerPaymentFlow() { document.getElementById('paymentModal').style.display = 'flex'; }
-function closePayment() { document.getElementById('paymentModal').style.display = 'none'; }
-function payWithPaypal(){ window.open('https://paypal.me/CatHostProWebsites/70','_blank'); }
-function confirmManualPayment(){ alert("EFT details copied"); closePayment(); }
 
 document.addEventListener('DOMContentLoaded', loadDraft);
 </script>
