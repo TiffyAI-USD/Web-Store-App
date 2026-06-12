@@ -211,24 +211,22 @@ function renderEditor() {
 
 function addSection() { menuSections.push({ title: "New", items: [{name:'Item', price:0, desc:'', img:'', qr:'', qty:0}] }); renderEditor(); }
 
-/* ================== FIXED DOWNLOAD FUNCTION ================== */
+/* ================== FIXED DOWNLOAD (only change) ================== */
 function downloadHTML() {
     const doc = document.documentElement.cloneNode(true);
     
     // Remove editor and control panel
-    const editor = doc.querySelector('#editor');
-    const panel = doc.querySelector('#controlPanel');
-    if(editor) editor.remove();
-    if(panel) panel.remove();
+    doc.querySelector('#editor')?.remove();
+    doc.querySelector('#controlPanel')?.remove();
 
-    // Update menu data in the final file
-    const finalMenuData = JSON.stringify(menuSections);
-    const finalPhone = document.getElementById('editPhone').value || "";
+    // Get current data
+    const currentMenu = JSON.stringify(menuSections);
+    const currentPhone = document.getElementById('editPhone').value || "";
 
-    // Create clean final script
-    const finalScript = `
-        let menuSections = ${finalMenuData};
-        let currentPhone = "${finalPhone}";
+    // Create the final script that will be in the downloaded file
+    const finalScriptContent = `
+        let menuSections = ${currentMenu};
+        const phone = "${currentPhone}";
 
         function zoom(src) { 
             if(src) { 
@@ -236,14 +234,17 @@ function downloadHTML() {
                 document.getElementById('zoomModal').style.display = 'flex'; 
             } 
         }
+        
         function addToCart(name) {
-            menuSections.forEach(s => s.items.forEach(it => { if(it.name === name) it.qty++; }));
+            menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty++; }));
             alert(name + " added!");
         }
+        
         function clearItem(name) {
-            menuSections.forEach(s => s.items.forEach(it => { if(it.name === name) it.qty = 0; }));
+            menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty = 0; }));
             renderMenu();
         }
+        
         function sendWhatsApp() {
             let msg = "Order Request:%0A";
             let hasItems = false;
@@ -253,51 +254,43 @@ function downloadHTML() {
                     hasItems = true; 
                 } 
             }));
-            if(hasItems) window.open('https://wa.me/' + currentPhone + '?text=' + msg, '_blank');
+            if(hasItems) window.open('https://wa.me/' + phone + '?text=' + msg, '_blank');
             else alert("Cart is empty");
         }
+        
         function renderMenu() {
             const container = document.getElementById('menuRender');
             container.innerHTML = '';
             menuSections.forEach(sec => {
-                container.innerHTML += '<h2 class="section-title">' + sec.title + '</h2>';
+                container.innerHTML += \`<h2 class="section-title">\${sec.title}</h2>\`;
                 const grid = document.createElement('div');
                 grid.className = 'menu-grid';
-                sec.items.forEach(it => {
-                    grid.innerHTML += '<div class="menu-item">' + 
-                        (it.img ? '<img src="' + it.img + '" onclick="zoom(this.src)">' : '') + 
-                        '<div class="card"><h3>' + it.name + '</h3><p>' + it.desc + '</p><div class="price">R' + it.price + '</div>' +
-                        '<button class="btn-small" onclick="addToCart(\'' + it.name + '\')">Add to Cart</button>' +
-                        '<button class="btn-small remove" onclick="clearItem(\'' + it.name + '\')">Clear</button>' +
-                        (it.qr ? '<br><img src="' + it.qr + '" class="qr-img" onclick="zoom(this.src)">' : '') + 
-                        '</div></div>';
+                sec.items.forEach((it) => {
+                    grid.innerHTML += \`<div class="menu-item">\${it.img ? \`<img src="\${it.img}" onclick="zoom(this.src)">\` : ''}<div class="card"><h3>\${it.name}</h3><p>\${it.desc}</p><div class="price">R\${it.price}</div>
+                    <button class="btn-small" onclick="addToCart('\${it.name}')">Add to Cart</button>
+                    <button class="btn-small remove" onclick="clearItem('\${it.name}')">Clear</button>
+                    \${it.qr ? \`<br><img src="\${it.qr}" class="qr-img" onclick="zoom(this.src)">\` : ''}
+                    </div></div>\`;
                 });
                 container.appendChild(grid);
             });
-            container.innerHTML += '<button onclick="sendWhatsApp()" style="display:block; margin:20px auto; padding:15px 40px; background:var(--whatsapp);">ORDER ON WHATSAPP</button>';
+            container.innerHTML += \`<button onclick="sendWhatsApp()" style="display:block; margin:20px auto; padding:15px 40px; background:var(--whatsapp);">ORDER ON WHATSAPP</button>\`;
         }
+        
         document.addEventListener('DOMContentLoaded', renderMenu);
     `;
 
-    // Replace old script with clean one
-    const oldScript = doc.querySelector('script');
-    if (oldScript) oldScript.remove();
+    // Replace the old script with clean final script
+    const scripts = doc.querySelectorAll('script');
+    if (scripts.length > 0) {
+        scripts[scripts.length-1].textContent = finalScriptContent;
+    }
 
-    const newScript = doc.createElement('script');
-    newScript.textContent = finalScript;
-    doc.body.appendChild(newScript);
-
-    const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], { type: 'text/html' });
-    const url = URL.createObjectURL(blob);
-    
+    const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], {type: 'text/html'});
     const a = document.createElement('a');
-    a.href = url;
+    a.href = URL.createObjectURL(blob);
     a.download = 'MyWebStore.html';
-    document.body.appendChild(a);
     a.click();
-    document.body.removeChild(a);
-    
-    setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
 document.addEventListener('DOMContentLoaded', loadDraft);
