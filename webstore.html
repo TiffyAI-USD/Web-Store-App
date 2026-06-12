@@ -5,46 +5,46 @@
 <title>Webstore Pro - Local Edition</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
-:root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+    :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
 
-#autoSaveStatus {position:fixed;top:10px;left:10px;z-index:5000;font-size:0.7rem;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;border:1px solid var(--gold);color:var(--gold);display:none;}
-#controlPanel {background:#1a1a1a;padding:20px;margin:15px;border:2px solid var(--gold);border-radius:12px;text-align:center;}
+    #autoSaveStatus {position:fixed;top:10px;left:10px;z-index:5000;font-size:0.7rem;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;border:1px solid var(--gold);color:var(--gold);display:none;}
+    #controlPanel {background:#1a1a1a;padding:20px;margin:15px;border:2px solid var(--gold);border-radius:12px;text-align:center;}
 
-header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
-header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
-header *{position:relative;z-index:2}
-.logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;}
-h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
-.tagline{font-family:'Bebas Neue';color:var(--gold)}
+    header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;}
+    header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
+    header *{position:relative;z-index:2}
+    .logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;}
+    h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
+    .tagline{font-family:'Bebas Neue';color:var(--gold)}
 
-.cta-container {margin-top:25px;z-index:10;}
-.btn-cta {display:inline-block;background:linear-gradient(180deg,var(--gold),var(--gold2));color:#000;padding:12px 28px;border-radius:50px;font-family:'Bebas Neue';text-decoration:none;font-size:1.2rem;box-shadow:0 4px 15px rgba(212,163,115,0.4);}
+    .cta-container {margin-top:25px;z-index:10;}
+    .btn-cta {display:inline-block;background:linear-gradient(180deg,var(--gold),var(--gold2));color:#000;padding:12px 28px;border-radius:50px;font-family:'Bebas Neue';text-decoration:none;font-size:1.2rem;box-shadow:0 4px 15px rgba(212,163,115,0.4);}
 
-#menu{max-width:1200px;margin:auto;padding:4rem 5%}
-.section-title{font-family:'Bebas Neue';font-size:2.4rem;color:var(--gold);margin:2rem 0 1rem;}
-.menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;}
-.menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;position:relative;}
-.menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid var(--gold);}
-.card{padding:1rem;}
-.menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
-.price{font-family:'Bebas Neue';color:var(--gold2)}
+    #menu{max-width:1200px;margin:auto;padding:4rem 5%}
+    .section-title{font-family:'Bebas Neue';font-size:2.4rem;color:var(--gold);margin:2rem 0 1rem;}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem;}
+    .menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;position:relative;}
+    .menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid var(--gold);}
+    .card{padding:1rem;}
+    .menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
+    .price{font-family:'Bebas Neue';color:var(--gold2)}
 
-#editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:#0a0a0a;}
-.editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
+    #editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:#0a0a0a;}
+    .editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
 
-label{display:block;margin-top:1rem;color:var(--gold)}
-input,textarea,select{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;border-radius:6px;}
-button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;margin:5px;}
-.remove{background:#900;color:#fff}
+    label{display:block;margin-top:1rem;color:var(--gold)}
+    input,textarea,select{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;border-radius:6px;}
+    button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;margin:5px;}
+    .remove{background:#900;color:#fff}
+    .cloud-btn { background: #3498db; color: white; margin-top: 5px; font-size: 0.8rem; }
 </style>
 </head>
 
 <body>
 <div id="autoSaveStatus">Saved Draft</div>
 
-<!-- CONTROL PANEL -->
 <div id="controlPanel" class="editor-block">
     <h1>Control Panel</h1>
     <button onclick="addSection()">+ Add Section</button>
@@ -76,52 +76,38 @@ button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;p
 <footer><p id="footerText">© 2026 YOUR BUSINESS</p></footer>
 
 <div id="editor">
-<h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
-<div class="editor-block">
-  <label>Business Name</label>
-  <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
+    <div class="editor-block">
+      <label>Business Name</label>
+      <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
+      <label>Tagline</label>
+      <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value;saveDraft()">
+      <label>Call to Action Text</label>
+      <input id="ctaText" placeholder="ORDER NOW" oninput="updateCTA();saveDraft()">
+      <label>Call to Action URL</label>
+      <input id="ctaUrl" placeholder="https://..." oninput="updateCTA();saveDraft()">
+      <label>Currency</label>
+      <select id="editCurr" onchange="setCurrency(this.value);saveDraft()">
+        <option value="ZAR">ZAR (R)</option>
+        <option value="USD">USD ($)</option>
+        <option value="EUR">EUR (€)</option>
+      </select>
+      <label>Logo</label>
+      <button onclick="this.nextElementSibling.click()">Upload Logo</button>
+      <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; document.getElementById('logoURL').value=img; saveDraft();})">
+      <input id="logoURL" placeholder="Image URL" oninput="document.getElementById('logo').src=this.value;saveDraft()">
+    </div>
 
-  <label>Tagline</label>
-  <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value;saveDraft()">
-
-  <label>Call to Action Text</label>
-  <input id="ctaText" placeholder="ORDER NOW" oninput="updateCTA();saveDraft()">
-
-  <label>Call to Action URL</label>
-  <input id="ctaUrl" placeholder="https://..." oninput="updateCTA();saveDraft()">
-
-  <label>Currency</label>
-  <select id="editCurr" onchange="setCurrency(this.value);saveDraft()">
-    <option value="ZAR">ZAR (R)</option>
-    <option value="USD">USD ($)</option>
-    <option value="EUR">EUR (€)</option>
-  </select>
-
-  <label>Logo</label>
-  <button onclick="this.nextElementSibling.click()">Upload Logo</button>
-  <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; document.getElementById('logoURL').value=img; saveDraft();})">
-  <input id="logoURL" placeholder="Image URL" oninput="document.getElementById('logo').src=this.value;saveDraft()">
-
-  <label>Banner</label>
-  <button onclick="this.nextElementSibling.click()">Upload Banner</button>
-  <input type="file" style="display:none" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; document.getElementById('bannerURL').value=img; saveDraft();})">
-  <input id="bannerURL" placeholder="Banner URL" oninput="document.getElementById('header').style.backgroundImage='url('+this.value+')';saveDraft()">
-</div>
-
-<h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
-<div id="menuEditor"></div>
-<button onclick="addSection()">+ ADD SECTION</button>
-<button onclick="downloadHTML()">📥 DOWNLOAD WEBSITE HTML</button>
-<button onclick="saveDraft()" style="background:#3498db;">💾 SAVE TO LOCAL STORAGE</button>
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
+    <div id="menuEditor"></div>
+    <button onclick="addSection()">+ ADD SECTION</button>
+    <button onclick="downloadHTML()">📥 DOWNLOAD WEBSITE HTML</button>
 </div>
 
 <script>
-let whatsappNumber = "+27660000000";
-let activeCurrency = "ZAR";
 let menuSections = [{ title: "Products", items: [{ name: 'Sample Item', price: 100, desc: "Description here", img: "", rating: 5, badge: 'none' }] }];
-const orderState = {};
+let activeCurrency = "ZAR";
 
-/* Local Storage */
 function saveDraft() {
   const data = {
     cafeName: document.getElementById('cafeName').textContent,
@@ -133,10 +119,9 @@ function saveDraft() {
     menu: menuSections
   };
   localStorage.setItem('webstore_pro_draft', JSON.stringify(data));
-  
   const status = document.getElementById('autoSaveStatus');
   status.style.display = 'block';
-  status.textContent = '✅ Saved to Local Storage';
+  status.textContent = '✅ Saved';
   setTimeout(() => status.style.display = 'none', 1500);
 }
 
@@ -144,21 +129,15 @@ function loadDraft() {
   const saved = localStorage.getItem('webstore_pro_draft');
   if (!saved) return;
   const d = JSON.parse(saved);
-  
   menuSections = d.menu || menuSections;
-  
-  document.getElementById('cafeName').textContent = d.cafeName || "YOUR WEB STORE BUSINESS";
-  document.getElementById('tagline').textContent = d.tagline || "With Live Preview";
-  document.getElementById('logoURL').value = d.logo || "";
-  document.getElementById('bannerURL').value = d.banner || "";
-  document.getElementById('ctaText').value = d.ctaText || "";
-  document.getElementById('ctaUrl').value = d.ctaUrl || "";
-
+  document.getElementById('cafeName').textContent = d.cafeName;
+  document.getElementById('tagline').textContent = d.tagline;
+  document.getElementById('logoURL').value = d.logo;
+  document.getElementById('ctaText').value = d.ctaText;
+  document.getElementById('ctaUrl').value = d.ctaUrl;
   if (d.logo) document.getElementById('logo').src = d.logo;
-  if (d.banner) document.getElementById('header').style.backgroundImage = `url(${d.banner})`;
 }
 
-/* Upload */
 function uploadImage(input, cb) {
   const file = input.files[0];
   if (!file) return;
@@ -167,50 +146,28 @@ function uploadImage(input, cb) {
   reader.readAsDataURL(file);
 }
 
-/* CTA */
 function updateCTA() {
-  const text = document.getElementById('ctaText').value;
-  const url = document.getElementById('ctaUrl').value;
   const btn = document.getElementById('ctaBtn');
-  if (text && url) {
-    btn.textContent = text.toUpperCase();
-    btn.href = url;
-    btn.style.display = "inline-block";
-  } else {
-    btn.style.display = "none";
-  }
+  btn.textContent = document.getElementById('ctaText').value.toUpperCase();
+  btn.href = document.getElementById('ctaUrl').value;
+  btn.style.display = btn.textContent ? "inline-block" : "none";
 }
 
-function setCurrency(c) {
-  activeCurrency = c;
-  renderMenu();
-}
-
-/* Menu & Editor */
 function renderMenu() {
   const container = document.getElementById('menuRender');
   container.innerHTML = '';
   const sym = activeCurrency === 'ZAR' ? 'R' : activeCurrency === 'USD' ? '$' : '€';
-
-  menuSections.forEach((sec, s) => {
+  menuSections.forEach((sec) => {
     const h2 = document.createElement('h2');
     h2.className = 'section-title';
     h2.textContent = sec.title;
     container.appendChild(h2);
-
     const grid = document.createElement('div');
     grid.className = 'menu-grid';
-
     sec.items.forEach(it => {
       const card = document.createElement('div');
       card.className = 'menu-item';
-      card.innerHTML = `
-        <img src="${it.img || 'https://via.placeholder.com/300?text=No+Image'}">
-        <div class="card">
-          <h3>${it.name}</h3>
-          <p>${it.desc}</p>
-          <div class="price">\( {sym} \){it.price}</div>
-        </div>`;
+      card.innerHTML = `<img src="${it.img || 'https://via.placeholder.com/300'}"><div class="card"><h3>${it.name}</h3><p>${it.desc}</p><div class="price">${sym}${it.price}</div></div>`;
       grid.appendChild(card);
     });
     container.appendChild(grid);
@@ -220,68 +177,42 @@ function renderMenu() {
 function renderEditor() {
   const me = document.getElementById('menuEditor');
   me.innerHTML = '';
-
   menuSections.forEach((sec, s) => {
     const block = document.createElement('div');
     block.className = 'editor-block';
     block.innerHTML = `
-      <input value="\( {sec.title}" oninput="menuSections[ \){s}].title=this.value;renderMenu();saveDraft()" style="font-size:1.3rem;">
+      <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu();saveDraft()" style="font-size:1.3rem;">
       <button class="remove" onclick="menuSections.splice(${s},1);renderEditor();renderMenu();saveDraft()">Remove Section</button>
-      
       ${sec.items.map((it,i) => `
         <div style="border-top:1px solid #333;margin:15px 0;padding-top:10px;">
-          <input value="\( {it.name}" oninput="menuSections[ \){s}].items[${i}].name=this.value;renderMenu();saveDraft()">
-          <input type="number" value="\( {it.price}" oninput="menuSections[ \){s}].items[${i}].price=this.value;renderMenu();saveDraft()">
-          <textarea oninput="menuSections[\( {s}].items[ \){i}].desc=this.value;renderMenu();saveDraft()">${it.desc||''}</textarea>
-          <input value="\( {it.img||''}" oninput="menuSections[ \){s}].items[${i}].img=this.value;renderMenu();saveDraft()" placeholder="Image URL">
-          <button onclick="menuSections[\( {s}].items.splice( \){i},1);renderEditor();renderMenu();saveDraft()" class="remove">Remove Item</button>
+          <input value="${it.name}" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu();saveDraft()">
+          <input type="number" value="${it.price}" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu();saveDraft()">
+          <textarea oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu();saveDraft()">${it.desc||''}</textarea>
+          <button class="cloud-btn" onclick="this.nextElementSibling.nextElementSibling.click()">☁️ UPLOAD</button>
+          <input type="file" style="display:none" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].img=img;renderEditor();renderMenu();saveDraft()})">
+          <input value="${it.img||''}" oninput="menuSections[${s}].items[${i}].img=this.value;renderMenu();saveDraft()" placeholder="Image URL">
+          <button onclick="menuSections[${s}].items.splice(${i},1);renderEditor();renderMenu();saveDraft()" class="remove">Remove Item</button>
         </div>
       `).join('')}
-      
       <button onclick="menuSections[${s}].items.push({name:'New Item',price:0,desc:'',img:''});renderEditor();renderMenu();saveDraft()">+ Add Item</button>
     `;
     me.appendChild(block);
   });
 }
 
-function addSection() {
-  menuSections.push({ title: "New Section", items: [] });
-  renderEditor();
-  renderMenu();
-  saveDraft();
-}
-
-function triggerPaymentFlow() {
-  document.getElementById('paymentModal').style.display = 'flex';
-}
-
-function closePayment() {
-  document.getElementById('paymentModal').style.display = 'none';
-}
-
+function addSection() { menuSections.push({ title: "New Section", items: [] }); renderEditor(); renderMenu(); saveDraft(); }
+function triggerPaymentFlow() { document.getElementById('paymentModal').style.display = 'flex'; }
+function closePayment() { document.getElementById('paymentModal').style.display = 'none'; }
 function downloadHTML() {
   const doc = document.documentElement.cloneNode(true);
-  ['#editor','#controlPanel','#paymentModal'].forEach(id => {
-    const el = doc.querySelector(id);
-    if(el) el.remove();
-  });
+  ['#editor','#controlPanel','#paymentModal'].forEach(id => { const el = doc.querySelector(id); if(el) el.remove(); });
   const blob = new Blob(['<!DOCTYPE html>\n' + doc.outerHTML], {type:'text/html'});
-  const a = document.createElement('a');
-  a.href = URL.createObjectURL(blob);
-  a.download = 'MyWebStore.html';
-  a.click();
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'MyWebStore.html'; a.click();
 }
-
 function payWithPaypal(){ window.open('https://paypal.me/CatHostProWebsites/70','_blank'); }
 function confirmManualPayment(){ alert("EFT details copied"); closePayment(); }
 
-/* START */
-document.addEventListener('DOMContentLoaded', () => {
-  loadDraft();
-  renderMenu();
-  renderEditor();
-  updateCTA();
-});
+document.addEventListener('DOMContentLoaded', () => { loadDraft(); renderMenu(); renderEditor(); updateCTA(); });
 </script>
 </body>
 </html>
