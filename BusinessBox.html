@@ -253,33 +253,16 @@ function renderEditor() {
 function addSection() { menuSections.push({ title: "New", items: [{name:'Item', price:10, desc:'', img:'', qr:'', qty:0}] }); renderEditor(); }
 
 function downloadHTML() {
-    const currentData = { 
-        name: document.getElementById('cafeName').textContent, 
-        tag: document.getElementById('tagline').textContent, 
-        phone: document.getElementById('editPhone').value, 
-        ctaText: document.getElementById('editCtaText').value, 
-        ctaLink: document.getElementById('editCtaLink').value, 
-        footer: document.getElementById('footerText').textContent, 
-        menu: menuSections, 
-        currency: document.getElementById('editCurrency').value, 
-        logo: document.getElementById('logo').src, 
-        banner: document.getElementById('header').style.backgroundImage 
-    };
-    
-    const encodedState = btoa(unescape(encodeURIComponent(JSON.stringify(currentData))));
-    const stateInjection = `<script>const INITIAL_STATE = JSON.parse(decodeURIComponent(escape(atob("${encodedState}"))));<\/script>`;
-    
+    const currentData = { name: document.getElementById('cafeName').textContent, tag: document.getElementById('tagline').textContent, phone: document.getElementById('editPhone').value, ctaText: document.getElementById('editCtaText').value, ctaLink: document.getElementById('editCtaLink').value, footer: document.getElementById('footerText').textContent, menu: menuSections, currency: document.getElementById('editCurrency').value, logo: document.getElementById('logo').src, banner: document.getElementById('header').style.backgroundImage };
+    const stateInjection = `<script>const INITIAL_STATE = ${JSON.stringify(currentData)};<\/script>`;
     document.querySelector('#editor').style.display = 'none';
     document.querySelector('#controlPanel').style.display = 'none';
-    
     const fullHtml = document.documentElement.outerHTML.replace('</head>', stateInjection + '</head>');
-    
     const blob = new Blob([fullHtml], {type: 'text/html'});
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
     a.download = 'MyWebStore.html';
     a.click();
-    
     document.querySelector('#editor').style.display = 'block';
     document.querySelector('#controlPanel').style.display = 'block';
 }
