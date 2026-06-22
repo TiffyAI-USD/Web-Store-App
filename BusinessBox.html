@@ -111,9 +111,6 @@
 <script>
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
 let currentTransactionPrice = 0;
-// Added exchange rates for the payment math fix
-const EXCHANGE_RATES = { "R": 18.5, "$": 1.0, "€": 0.92 };
-
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
 function saveDraft() {
   const data = {
@@ -183,18 +180,10 @@ function payWithTiffy(price) {
 }
 function confirmAndPay() {
     let bal = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0");
-    let currencySymbol = document.getElementById('editCurrency').value;
-    let rate = EXCHANGE_RATES[currencySymbol] || 1.0;
-    
-    // Convert price (local currency) to base Nitro units before subtraction
+    let cur = document.getElementById('editCurrency').value;
+    let rate = (cur === 'R') ? 18.5 : (cur === '€' ? 0.92 : 1.0);
     let costInNitro = currentTransactionPrice / rate;
-    
-    if (bal < costInNitro) { 
-        alert("Insufficient funds! Available: " + bal.toFixed(2) + " Nitro"); 
-        stopScanner(); 
-        return; 
-    }
-    
+    if (bal < costInNitro) { alert("Insufficient funds! Available: " + bal.toFixed(2)); stopScanner(); return; }
     localStorage.setItem("TUSD_Nitro_Storage", (bal - costInNitro).toFixed(2));
     alert("Payment successful! Redirecting...");
     window.location.href = "https://tiffyai-usd.github.io/Transact/Transfer-Cash.html";
