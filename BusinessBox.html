@@ -44,6 +44,13 @@
 </style>
 </head>
 <body>
+<div id="scannerModal">
+    <div id="paymentLanding">
+        <h2 style="color:var(--gold); margin-bottom:15px;">Scan to Pay</h2>
+        <div id="reader" style="width:100%"></div>
+        <button class="remove" onclick="stopScanner()">CLOSE</button>
+    </div>
+</div>
 <div id="zoomModal" onclick="this.style.display='none'"><img id="zoomImg"></div>
 <div id="supportFloating" onclick="showPayment()"><img src="support.png" onerror="this.style.display='none'"></div>
 <div id="autoSaveStatus">Saved Draft</div>
@@ -103,7 +110,10 @@
 </div>
 <script>
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
+let html5QrCode;
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
+function triggerScanner() { document.getElementById('scannerModal').style.display = 'flex'; html5QrCode = new Html5Qrcode("reader"); html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, qrCodeMessage => { alert("Scan Result: " + qrCodeMessage); stopScanner(); }); }
+function stopScanner() { if(html5QrCode) html5QrCode.stop().then(() => { document.getElementById('scannerModal').style.display = 'none'; }).catch(err => { document.getElementById('scannerModal').style.display = 'none'; }); else document.getElementById('scannerModal').style.display = 'none'; }
 function saveDraft() {
   const data = {
     name: document.getElementById('cafeName').textContent,
@@ -156,7 +166,7 @@ function renderMenu() {
       grid.innerHTML += `<div class="menu-item">${it.img ? `<img src="${it.img}" onclick="zoom(this.src)">` : ''}<div class="card"><h3>${it.name}</h3><p>${it.desc}</p><div class="price">${cur}${it.price}</div>
       <button class="btn-small" onclick="addToCart('${it.name}')">Add to Cart</button>
       <button class="btn-small remove" onclick="clearItem('${it.name}')">Clear</button>
-      <button class="btn-small" style="background:#00f0ff; color:#000;">SCAN TO PAY</button>
+      <button class="btn-small" style="background:#00f0ff; color:#000;" onclick="triggerScanner()">SCAN TO PAY</button>
       ${it.qr ? `<br><img src="${it.qr}" class="qr-img" onclick="zoom(this.src)">` : ''}
       </div></div>`;
     });
