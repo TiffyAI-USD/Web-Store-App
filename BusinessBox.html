@@ -109,6 +109,13 @@
     <button onclick="addSection()">+ ADD SECTION</button>
 </div>
 <script>
+// UPDATE THESE RATES TO MATCH YOUR SYSTEM'S BASE USD VALUE
+const CONVERSION_RATES = {
+    "R": 0.055, // Example: 1 Rand = 0.055 USD
+    "$": 1.0,   // Base
+    "€": 1.08   // Example: 1 Euro = 1.08 USD
+};
+
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
 let currentTransactionPrice = 0;
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
@@ -179,9 +186,19 @@ function payWithTiffy(price) {
 }
 function confirmAndPay() {
     let bal = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0");
-    let price = currentTransactionPrice; 
-    if (bal < price) { alert("Insufficient funds! Available: " + bal.toFixed(2)); stopScanner(); return; }
-    localStorage.setItem("TUSD_Nitro_Storage", (bal - price).toFixed(2));
+    let currency = document.getElementById('editCurrency').value;
+    let rate = CONVERSION_RATES[currency] || 1.0;
+    
+    // Calculate the deduction based on currency rate
+    let deduction = currentTransactionPrice * rate;
+
+    if (bal < deduction) { 
+        alert("Insufficient funds! Available: " + bal.toFixed(2) + " USD\nRequired: " + deduction.toFixed(2) + " USD"); 
+        stopScanner(); 
+        return; 
+    }
+    
+    localStorage.setItem("TUSD_Nitro_Storage", (bal - deduction).toFixed(2));
     alert("Payment successful! Redirecting...");
     window.location.href = "https://tiffyai-usd.github.io/Transact/Transfer-Cash.html";
 }
