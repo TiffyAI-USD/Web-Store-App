@@ -193,6 +193,7 @@ function renderEditor() {
         ${sec.items.map((it, i) => `
           <div style="border:1px solid #333; padding:10px; margin:5px 0;">
             <input value="${it.name}" placeholder="Name" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
+            <input value="${it.desc}" placeholder="Description" oninput="menuSections[${s}].items[${i}].desc=this.value;renderMenu()">
             <input type="number" value="${it.price}" placeholder="Price" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
             <label>Product Photo</label>
             <input type="file" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].img=img; renderMenu(); saveDraft()})">
