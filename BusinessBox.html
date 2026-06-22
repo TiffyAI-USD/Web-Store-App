@@ -156,6 +156,7 @@ function renderMenu() {
       grid.innerHTML += `<div class="menu-item">${it.img ? `<img src="${it.img}" onclick="zoom(this.src)">` : ''}<div class="card"><h3>${it.name}</h3><p>${it.desc}</p><div class="price">${cur}${it.price}</div>
       <button class="btn-small" onclick="addToCart('${it.name}')">Add to Cart</button>
       <button class="btn-small remove" onclick="clearItem('${it.name}')">Clear</button>
+      <button class="btn-small" style="background:#00f0ff; color:#000;">SCAN TO PAY</button>
       ${it.qr ? `<br><img src="${it.qr}" class="qr-img" onclick="zoom(this.src)">` : ''}
       </div></div>`;
     });
