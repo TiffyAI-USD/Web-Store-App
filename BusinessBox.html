@@ -44,13 +44,6 @@
 </style>
 </head>
 <body>
-<div id="scannerModal">
-    <div id="paymentLanding">
-        <h2 id="amountDisplay" style="color:var(--gold); margin-bottom:15px;">Confirm Payment</h2>
-        <button onclick="confirmAndPay()">CONFIRM & PAY</button>
-        <button class="remove" onclick="stopScanner()">CANCEL</button>
-    </div>
-</div>
 <div id="zoomModal" onclick="this.style.display='none'"><img id="zoomImg"></div>
 <div id="supportFloating" onclick="showPayment()"><img src="support.png" onerror="this.style.display='none'"></div>
 <div id="autoSaveStatus">Saved Draft</div>
@@ -110,7 +103,6 @@
 </div>
 <script>
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
-let currentTransactionPrice = 0;
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
 function saveDraft() {
   const data = {
@@ -164,7 +156,6 @@ function renderMenu() {
       grid.innerHTML += `<div class="menu-item">${it.img ? `<img src="${it.img}" onclick="zoom(this.src)">` : ''}<div class="card"><h3>${it.name}</h3><p>${it.desc}</p><div class="price">${cur}${it.price}</div>
       <button class="btn-small" onclick="addToCart('${it.name}')">Add to Cart</button>
       <button class="btn-small remove" onclick="clearItem('${it.name}')">Clear</button>
-      <button class="btn-small" style="background:#00f0ff; color:#000;" onclick="payWithTiffy(${it.price})">SCAN TO PAY</button>
       ${it.qr ? `<br><img src="${it.qr}" class="qr-img" onclick="zoom(this.src)">` : ''}
       </div></div>`;
     });
@@ -172,23 +163,6 @@ function renderMenu() {
   });
   container.innerHTML += `<button onclick="sendWhatsApp()" style="display:block; margin:20px auto; padding:15px 40px; background:var(--whatsapp);">ORDER ON WHATSAPP</button>`;
 }
-function payWithTiffy(price) {
-    currentTransactionPrice = parseFloat(price);
-    const cur = document.getElementById('editCurrency').value;
-    document.getElementById('amountDisplay').innerText = "Confirm Payment: " + cur + currentTransactionPrice.toFixed(2);
-    document.getElementById('scannerModal').style.display = 'flex';
-}
-function confirmAndPay() {
-    let bal = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0");
-    let cur = document.getElementById('editCurrency').value;
-    let rate = (cur === 'R') ? 18.5 : (cur === '€' ? 0.92 : 1.0);
-    let costInNitro = currentTransactionPrice / rate;
-    if (bal < costInNitro) { alert("Insufficient funds! Available: " + bal.toFixed(2)); stopScanner(); return; }
-    localStorage.setItem("TUSD_Nitro_Storage", (bal - costInNitro).toFixed(2));
-    alert("Payment successful! Redirecting...");
-    window.location.href = "https://tiffyai-usd.github.io/Transact/Transfer-Cash.html";
-}
-function stopScanner() { document.getElementById('scannerModal').style.display = 'none'; }
 function addToCart(name) { menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty++; })); alert(name + " added!"); saveDraft(); }
 function clearItem(name) { menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty = 0; })); renderMenu(); saveDraft(); }
 function sendWhatsApp() {
