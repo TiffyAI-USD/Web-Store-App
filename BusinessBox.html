@@ -111,14 +111,7 @@
     <button onclick="addSection()">+ ADD SECTION</button>
 </div>
 <script>
-const CONVERSION_RATES = {
-    "R": 0.061,
-    "$": 1.000,
-    "€": 1.146,
-    "£": 1.322,
-    "¥": 0.006
-};
-
+const CONVERSION_RATES = { "R": 0.061, "$": 1.000, "€": 1.146, "£": 1.322, "¥": 0.006 };
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
 let currentTransactionPrice = 0;
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
@@ -139,11 +132,9 @@ function saveDraft() {
   document.getElementById('autoSaveStatus').style.display = 'block';
   setTimeout(() => document.getElementById('autoSaveStatus').style.display = 'none', 2000);
 }
-
 function loadDraft() {
   const localDraft = JSON.parse(localStorage.getItem('webstore_pro_draft') || '{}');
   const d = (Object.keys(localDraft).length > 0) ? localDraft : (typeof INITIAL_STATE !== 'undefined' ? INITIAL_STATE : {});
-
   if (d.menu) menuSections = d.menu;
   document.getElementById('cafeName').textContent = d.name || "";
   document.getElementById('tagline').textContent = d.tag || "";
@@ -159,7 +150,6 @@ function loadDraft() {
   if(d.banner) document.getElementById('header').style.backgroundImage = d.banner;
   renderMenu(); renderEditor();
 }
-
 function uploadImage(input, cb) {
   const reader = new FileReader();
   reader.onload = e => cb(e.target.result);
@@ -196,13 +186,9 @@ function confirmAndPay() {
     let currency = document.getElementById('editCurrency').value;
     let rate = CONVERSION_RATES[currency] || 1.0;
     let deduction = currentTransactionPrice * rate;
-    if (bal < deduction) { 
-        alert("Insufficient funds! Available: " + bal.toFixed(2) + " USD\nRequired: " + deduction.toFixed(2) + " USD"); 
-        stopScanner(); 
-        return; 
-    }
+    if (bal < deduction) { alert("Insufficient funds!"); stopScanner(); return; }
     localStorage.setItem("TUSD_Nitro_Storage", (bal - deduction).toFixed(2));
-    alert("Payment successful! Remaining: " + (bal - deduction).toFixed(2) + " USD");
+    alert("Payment successful!");
     window.location.href = "https://tiffyai-usd.github.io/Transact/Transfer-Cash.html";
 }
 function stopScanner() { document.getElementById('scannerModal').style.display = 'none'; }
@@ -232,11 +218,11 @@ function renderEditor() {
   menuSections.forEach((sec, s) => {
     me.innerHTML += `
       <div class="editor-block">
-        <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;renderMenu()">
+        <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;saveDraft()">
         ${sec.items.map((it, i) => `
           <div style="border:1px solid #333; padding:10px; margin:5px 0;">
-            <input value="${it.name}" placeholder="Name" oninput="menuSections[${s}].items[${i}].name=this.value;renderMenu()">
-            <input type="number" value="${it.price}" placeholder="Price" oninput="menuSections[${s}].items[${i}].price=this.value;renderMenu()">
+            <input value="${it.name}" placeholder="Name" oninput="menuSections[${s}].items[${i}].name=this.value;saveDraft()">
+            <input type="number" step="0.01" value="${it.price}" placeholder="Price" oninput="menuSections[${s}].items[${i}].price=parseFloat(this.value);saveDraft()">
             <label>Product Photo</label>
             <input type="file" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].img=img; renderMenu(); saveDraft()})">
             <button class="remove" onclick="menuSections[${s}].items[${i}].img=''; renderMenu(); saveDraft()">Remove Photo</button>
