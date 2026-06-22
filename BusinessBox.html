@@ -109,7 +109,7 @@
     <button onclick="addSection()">+ ADD SECTION</button>
 </div>
 <script>
-let menuSections = [];
+let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
 let currentTransactionPrice = 0;
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
 function saveDraft() {
@@ -228,7 +228,7 @@ function renderEditor() {
       </div>`;
   });
 }
-function addSection() { menuSections.push({ title: "New", items: [] }); renderEditor(); }
+function addSection() { menuSections.push({ title: "New", items: [{name:'Item', price:10, desc:'', img:'', qr:'', qty:0}] }); renderEditor(); }
 function downloadHTML() {
     const currentData = { name: document.getElementById('cafeName').textContent, tag: document.getElementById('tagline').textContent, phone: document.getElementById('editPhone').value, ctaText: document.getElementById('editCtaText').value, ctaLink: document.getElementById('editCtaLink').value, footer: document.getElementById('footerText').textContent, menu: menuSections, currency: document.getElementById('editCurrency').value, logo: document.getElementById('logo').src, banner: document.getElementById('header').style.backgroundImage };
     const stateInjection = `<script>const INITIAL_STATE = ${JSON.stringify(currentData)};<\/script>`;
