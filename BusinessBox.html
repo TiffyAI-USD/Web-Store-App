@@ -109,7 +109,7 @@
     <button onclick="addSection()">+ ADD SECTION</button>
 </div>
 <script>
-let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
+let menuSections = [{ title: "Products", items: [] }];
 let html5QrCode;
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
 function triggerScanner() { document.getElementById('scannerModal').style.display = 'flex'; html5QrCode = new Html5Qrcode("reader"); html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, qrCodeMessage => { alert("Scan Result: " + qrCodeMessage); stopScanner(); }); }
@@ -220,12 +220,12 @@ function renderEditor() {
         </div>`;
     });
     
-    html += `<button onclick="menuSections[${s}].items.push({name:'New Item', price:10, desc:'Desc', img:'', qr:''}); renderEditor(); saveDraft()">+ Add Item</button>`;
+    html += `<button onclick="menuSections[${s}].items.push({name:'New Item', price:0, desc:'', img:'', qr:''}); renderEditor(); saveDraft()">+ Add Item</button>`;
     sectionDiv.innerHTML = html;
     me.appendChild(sectionDiv);
   });
 }
-function addSection() { menuSections.push({ title: "New", items: [{name:'Item', price:10, desc:'Desc', img:'', qr:'', qty:0}] }); renderEditor(); }
+function addSection() { menuSections.push({ title: "New Section", items: [] }); renderEditor(); saveDraft(); }
 function downloadHTML() {
     const currentData = { name: document.getElementById('cafeName').textContent, tag: document.getElementById('tagline').textContent, phone: document.getElementById('editPhone').value, ctaText: document.getElementById('editCtaText').value, ctaLink: document.getElementById('editCtaLink').value, footer: document.getElementById('footerText').textContent, menu: menuSections, currency: document.getElementById('editCurrency').value, logo: document.getElementById('logo').src, banner: document.getElementById('header').style.backgroundImage };
     const stateInjection = `<script>const INITIAL_STATE = ${JSON.stringify(currentData)};<\/script>`;
@@ -240,7 +240,10 @@ function downloadHTML() {
     document.querySelector('#editor').style.display = 'block';
     document.querySelector('#controlPanel').style.display = 'block';
 }
-document.addEventListener('DOMContentLoaded', loadDraft);
+document.addEventListener('DOMContentLoaded', () => {
+    localStorage.clear(); 
+    loadDraft();
+});
 </script>
 </body>
 </html>
