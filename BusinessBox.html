@@ -109,11 +109,11 @@
     <button onclick="addSection()">+ ADD SECTION</button>
 </div>
 <script>
-// UPDATE THESE RATES TO MATCH YOUR SYSTEM'S BASE USD VALUE
+// Fixed rate: 10 Rand = 0.55 USD (Multiplier: 0.055)
 const CONVERSION_RATES = {
-    "R": 0.055, // Example: 1 Rand = 0.055 USD
-    "$": 1.0,   // Base
-    "€": 1.08   // Example: 1 Euro = 1.08 USD
+    "R": 0.055,
+    "$": 1.0,
+    "€": 1.08
 };
 
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
@@ -189,7 +189,7 @@ function confirmAndPay() {
     let currency = document.getElementById('editCurrency').value;
     let rate = CONVERSION_RATES[currency] || 1.0;
     
-    // Calculate the deduction based on currency rate
+    // Exact Math: price * rate (e.g., 10 * 0.055 = 0.55)
     let deduction = currentTransactionPrice * rate;
 
     if (bal < deduction) { 
