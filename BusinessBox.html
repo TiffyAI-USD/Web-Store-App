@@ -109,7 +109,7 @@
     <button onclick="addSection()">+ ADD SECTION</button>
 </div>
 <script>
-let menuSections = [{ title: "Products", items: [] }];
+let menuSections = [];
 let html5QrCode;
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
 function triggerScanner() { document.getElementById('scannerModal').style.display = 'flex'; html5QrCode = new Html5Qrcode("reader"); html5QrCode.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, qrCodeMessage => { alert("Scan Result: " + qrCodeMessage); stopScanner(); }); }
@@ -240,10 +240,7 @@ function downloadHTML() {
     document.querySelector('#editor').style.display = 'block';
     document.querySelector('#controlPanel').style.display = 'block';
 }
-document.addEventListener('DOMContentLoaded', () => {
-    localStorage.clear(); 
-    loadDraft();
-});
+document.addEventListener('DOMContentLoaded', loadDraft);
 </script>
 </body>
 </html>
