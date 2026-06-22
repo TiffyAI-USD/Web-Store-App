@@ -131,8 +131,7 @@ function saveDraft() {
 }
 function loadDraft() {
   const d = (typeof INITIAL_STATE !== 'undefined') ? INITIAL_STATE : JSON.parse(localStorage.getItem('webstore_pro_draft') || '{}');
-  if (!d.menu) return;
-  menuSections = d.menu;
+  if (d.menu) menuSections = d.menu;
   document.getElementById('cafeName').textContent = d.name || "";
   document.getElementById('tagline').textContent = d.tag || "";
   document.getElementById('editPhone').value = d.phone || "";
