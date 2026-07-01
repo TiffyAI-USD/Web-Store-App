@@ -162,8 +162,7 @@ function saveDraft() {
   setTimeout(() => document.getElementById('autoSaveStatus').style.display = 'none', 2000);
 }
 function loadDraft() {
-  const localDraft = JSON.parse(localStorage.getItem('webstore_pro_draft') || '{}');
-  const d = (Object.keys(localDraft).length > 0) ? localDraft : (typeof INITIAL_STATE !== 'undefined' ? INITIAL_STATE : {});
+  const d = (typeof INITIAL_STATE !== 'undefined') ? INITIAL_STATE : JSON.parse(localStorage.getItem('webstore_pro_draft') || '{}');
   if (d.menu) menuSections = d.menu;
   document.getElementById('cafeName').textContent = d.name || "";
   document.getElementById('tagline').textContent = d.tag || "";
@@ -214,9 +213,7 @@ function enterMarketplace() {
         <div style="font-family:'Inter', sans-serif; background:#0a0a0a; color:#e6e6e6; text-align:center; padding:50px; height:100vh;">
             <h2 style="color:#d4a373; font-family:'Bebas Neue'; font-size:3.5rem; margin-bottom:10px;">GLOBAL BUSINESS SUITE</h2>
             <p style="color:#25D366; font-family:'Bebas Neue'; font-size:1.6rem; margin-bottom:30px;">SECURE, ZERO-FEE INTERNATIONAL BANKING & AR MARKETPLACE</p>
-            
             <img src='support.png' style='width:180px; border-radius:20px; border:3px solid #d4a373; margin-bottom:30px;' onerror="this.style.display='none'">
-            
             <div style="background:#1a1a1a; padding:30px; border-radius:15px; margin-bottom:30px; text-align:left; border:1px solid #333;">
                 <h3 style="color:#d4a373; margin-bottom:15px; font-family:'Bebas Neue';">PARTNER BENEFITS:</h3>
                 <ul style="list-style:none; line-height:2.4; font-size:1.1rem;">
@@ -226,9 +223,7 @@ function enterMarketplace() {
                     <li>✓ <strong>AR Marketplace Integration:</strong> Direct access to B2B global trading.</li>
                 </ul>
             </div>
-            
             <a href='https://paypal.me/CatHostProWebsites/70' target="_blank" style="display:block; background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:22px; text-decoration:none; border-radius:50px; font-weight:bold; font-family:'Bebas Neue'; font-size:1.6rem; box-shadow:0 10px 25px rgba(212,163,115,0.4);">ACTIVATE YOUR BANK & MARKETPLACE</a>
-            
             <a href="https://wa.me/27766314246?text=I need assistance with my Marketplace activation." target="_blank" style="display:block; margin-top:25px; color:#25D366; font-weight:bold; text-decoration:none; font-size:1.1rem;">💬 Contact Support on WhatsApp</a>
         </div>
     `);
@@ -256,14 +251,18 @@ function downloadHTML() {
 function triggerActualDownload() {
     const currentData = { name: document.getElementById('cafeName').textContent, tag: document.getElementById('tagline').textContent, phone: document.getElementById('editPhone').value, ctaText: document.getElementById('editCtaText').value, ctaLink: document.getElementById('editCtaLink').value, footer: document.getElementById('footerText').textContent, menu: menuSections, currency: document.getElementById('editCurrency').value, logo: document.getElementById('logo').src, banner: document.getElementById('header').style.backgroundImage };
     const stateInjection = `<script>const INITIAL_STATE = ${JSON.stringify(currentData)};<\/script>`;
-    document.querySelector('#editor').style.display = 'none'; document.querySelector('#floatingDownload').style.display = 'none';
+    document.querySelector('#editor').style.display = 'none';
+    document.querySelector('#floatingDownload').style.display = 'none';
     const fullHtml = document.documentElement.outerHTML.replace('</head>', stateInjection + '</head>');
-    const blob = new Blob([fullHtml], {type: 'text/html'}); const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'MyWebStore.html'; a.click();
-    document.querySelector('#editor').style.display = 'block'; document.querySelector('#floatingDownload').style.display = 'block';
+    const blob = new Blob([fullHtml], {type: 'text/html'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'MyWebStore.html';
+    a.click();
+    document.querySelector('#editor').style.display = 'block';
+    document.querySelector('#floatingDownload').style.display = 'block';
 }
 
-function clearAllCart() { menuSections.forEach(s => s.items.forEach(it => it.qty = 0)); renderMenu(); saveDraft(); }
-function printReceipt() { const curSym = CURRENCY_SYMBOLS[document.getElementById('editCurrency').value]; let receipt = "RECEIPT\n----------\n"; menuSections.forEach(s => s.items.forEach(it => { if(it.qty > 0) receipt += it.name + " x " + it.qty + " - " + curSym + (it.price*it.qty).toFixed(2) + "\n"; })); const w = window.open(); w.document.write("<pre>"+receipt+"</pre>"); w.print(); }
 function renderEditor() {
   const me = document.getElementById('menuEditor'); me.innerHTML = '';
   menuSections.forEach((sec, s) => {
