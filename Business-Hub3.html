@@ -147,10 +147,16 @@ const confirmations = ["Understood, that’s updated.", "Perfect, we’re making
 
 // Re-initialized logic to ensure speech and flow are robust
 function startAiMode() {
+    // 1. Force Audio Unlock (browsers allow this if it happens inside the click event)
+    const unlock = new SpeechSynthesisUtterance("");
+    window.speechSynthesis.speak(unlock);
     window.speechSynthesis.cancel();
+
+    // 2. Original Video logic
     const video = document.getElementById('aiVideo');
     video.muted = false;
     video.play();
+    
     const overlay = document.getElementById('aiOverlay');
     overlay.style.display = 'flex';
     setTimeout(() => overlay.style.opacity = '1', 50);
