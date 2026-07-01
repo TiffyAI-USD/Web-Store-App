@@ -150,18 +150,26 @@ function startAiMode() {
     const video = document.getElementById('aiVideo');
     const overlay = document.getElementById('aiOverlay');
     
+    // Reset
     video.currentTime = 0;
-    video.play();
-    overlay.style.display = 'flex';
-    setTimeout(() => overlay.style.opacity = '1', 50);
     
+    // Show Overlay
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+    
+    // Play Video
+    video.play();
+    
+    // Set a clean 5.5s timer for the switch
     setTimeout(() => {
         overlay.style.opacity = '0';
-        setTimeout(() => { 
-            overlay.style.display = 'none'; 
-            video.pause(); 
-            video.currentTime = 0; 
-            runInterview(); 
+        setTimeout(() => {
+            overlay.style.display = 'none';
+            video.pause();
+            video.currentTime = 0;
+            
+            // This is the trigger for the voice
+            runInterview();
         }, 500);
     }, 5500);
 }
