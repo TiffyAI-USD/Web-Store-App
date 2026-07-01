@@ -151,20 +151,33 @@ function startAiMode() {
     window.speechSynthesis.cancel();
     const video = document.getElementById('aiVideo');
     const overlay = document.getElementById('aiOverlay');
-    overlay.style.display = 'flex';
-    setTimeout(() => { overlay.style.opacity = '1'; video.play(); }, 50);
     
-    speak("Hello! I am your AI Builder. Let's start by setting up your logo and banner in the storefront editor, then we will refine your details.", () => {
-        runInterview();
-    });
+    // Ensure video plays just once without overlapping audio
+    video.loop = false; 
+    video.currentTime = 0;
+    
+    overlay.style.display = 'flex';
+    setTimeout(() => { 
+        overlay.style.opacity = '1'; 
+        video.play(); 
+    }, 50);
+
+    // AI starts speaking only after video ends
+    video.onended = () => {
+        speak("Hello! I am your AI Builder. Let's start by setting up your logo and banner in the storefront editor, then we will refine your details.", () => {
+            runInterview();
+        });
+    };
 }
 
 function speak(text, callback) {
+    window.speechSynthesis.cancel(); // Clear any queued speech
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 0.9;
     if(callback) u.onend = callback;
     window.speechSynthesis.speak(u);
 }
+
 
 async function runInterview() {
     const fields = ['editName', 'editTag', 'editCurrency', 'editPhone', 'editCtaText', 'editCtaLink', 'editFooter'];
