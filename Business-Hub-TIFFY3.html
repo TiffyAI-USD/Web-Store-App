@@ -152,14 +152,20 @@ function startAiMode() {
     const video = document.getElementById('aiVideo');
     const overlay = document.getElementById('aiOverlay');
     
+    // Force the video to stop looping and play once
+    video.loop = false;
     video.muted = false;
     video.currentTime = 0;
     video.play();
-    overlay.style.display = 'flex';
-    setTimeout(() => overlay.style.opacity = '1', 50);
     
-    // Fixed 5.5s delay before AI speaks
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+    
+    // Hard-locked 5.5s delay before ANY speech starts
     setTimeout(() => {
+        video.pause();
+        video.currentTime = 0;
+        
         speak("Hello! I am your AI Builder. Let's start by setting up your logo and banner in the storefront editor, then we will refine your details.", () => {
              runInterview();
         });
@@ -170,9 +176,11 @@ function speak(text, callback) {
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.rate = 0.9;
+    // This callback is what ensures the interview only moves on when she is done speaking
     if(callback) u.onend = callback;
     window.speechSynthesis.speak(u);
 }
+
 
 async function runInterview() {
     const fields = ['editName', 'editTag', 'editCurrency', 'editPhone', 'editCtaText', 'editCtaLink', 'editFooter'];
