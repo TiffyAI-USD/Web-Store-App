@@ -175,28 +175,32 @@ function startAiMode() {
 }
 
 async function runInterview() {
-    const fields = ['editName', 'editTag', 'editCurrency', 'editPhone', 'editCtaText', 'editCtaLink', 'editFooter'];
-    fields.forEach(id => document.getElementById(id).parentElement.classList.add('input-inactive'));
-    for (const fieldId of fields) {
-        const el = document.getElementById(fieldId);
-        const parent = el.parentElement;
-        parent.classList.remove('input-inactive');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        el.classList.add('ai-highlight');
-        const q = questionScripts[fieldId][Math.floor(Math.random() * questionScripts[fieldId].length)];
-        const u = new SpeechSynthesisUtterance(q); u.rate = 0.9; window.speechSynthesis.speak(u);
-        await new Promise(r => { el.addEventListener('blur', () => { 
-            const c = new SpeechSynthesisUtterance(confirmations[Math.floor(Math.random() * confirmations.length)]); 
-            window.speechSynthesis.speak(c);
-            parent.classList.add('input-inactive');
-            r(); 
-        }, { once: true }); });
-        el.classList.remove('ai-highlight');
-    }
-    const final = new SpeechSynthesisUtterance("Storefront configuration is complete. Now, let's build out your product menu with descriptions and pricing."); 
-    window.speechSynthesis.speak(final);
-    window.scrollTo({ top: document.getElementById('menuEditor').offsetTop - 100, behavior: 'smooth' });
+async function runInterview() {
+    // 1. Logo and Banner intro
+    speak("Let's set your logo.");
+    await highlightAndTap('logo');
+    
+    speak("Now, let's set your banner.");
+    await highlightAndTap('header');
+    
+    // 2. Move to storefront
+    speak("Now, we move to your storefront.");
+    await highlightAndTap('menu');
+    
+    // 3. Reach products, congratulate, show progress
+    speak("Congratulations on your progress. Let me show you what you have built so far.");
+    window.scrollTo({ top: 0, behavior: 'smooth' }); 
+    await new Promise(r => setTimeout(r, 2000));
+    
+    // 4. Products, download, support icon activation
+    speak("Now, for your products. When you are finished, use the download button to save your file. Then, click the support icon to follow the activation steps.");
+    await highlightAndTap('supportFloating');
+    
+    // 5. Finalize
+    speak("I am done now.");
+    document.getElementById('menuEditor').classList.add('section-flash');
 }
+
 
 // ... rest of your existing functions (saveDraft, loadDraft, etc.) remain unchanged
 const CONVERSION_RATES = { "USD": 1.0, "ZAR": 18.5, "EUR": 0.92, "NGN": 1500.0, "INR": 83.0, "CNY": 7.20, "AUD": 1.5 };
