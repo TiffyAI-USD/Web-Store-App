@@ -9,31 +9,15 @@
     *{box-sizing:border-box;margin:0;padding:0}
     body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
     :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
-    
-    #floatingDownload {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        z-index: 9999;
-        background: #000;
-        color: var(--gold);
-        padding: 12px 20px;
-        border: 2px solid var(--gold);
-        border-radius: 30px;
-        font-family: 'Bebas Neue';
-        cursor: pointer;
-        font-size: 1rem;
-        box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-    }
-
+    .ai-highlight { outline: 6px solid var(--gold) !important; transform: scale(1.02); transition: 0.3s; box-shadow: 0 0 20px var(--gold); z-index: 9999; position: relative; }
+    .input-inactive { opacity: 0.3; pointer-events: none; transition: opacity 0.5s; }
+    #aiOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; opacity: 0; transition: opacity 0.5s ease; }
+    #floatingDownload { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: #000; color: var(--gold); padding: 12px 20px; border: 2px solid var(--gold); border-radius: 30px; font-family: 'Bebas Neue'; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
     #scannerModal {position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;padding:20px;}
     #paymentLanding {background:#1a1a1a; padding:20px; border:2px solid var(--gold); border-radius:12px; text-align:center; width: 90%; max-width: 400px;}
-    
     #supportFloating {position:fixed;bottom:20px;right:20px;z-index:9998;cursor:pointer;}
     #supportFloating img {width:60px;height:60px;border-radius:50%;border:2px solid var(--gold);}
-    
     #autoSaveStatus {position:fixed;top:10px;left:10px;z-index:5000;font-size:0.7rem;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;border:1px solid var(--gold);color:var(--gold);display:none;}
-    
     header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative; width: 100%;}
     header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
     header *{position:relative;z-index:2}
@@ -51,27 +35,7 @@
     .menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
     .price{font-family:'Bebas Neue';color:var(--gold2)}
     .qr-img{width:80px;height:80px;margin-top:10px;border:1px solid #fff;cursor:pointer;}
-    
-    #editor{
-        position:relative;
-        border-top:3px dashed var(--gold);
-        padding:3rem 5%;
-        background: #0a0a0a url('https://tiffyai-usd.github.io/Web-Store-App/silky.jpeg') no-repeat center center;
-        background-size: cover;
-        background-attachment: fixed;
-    }
-    #editor::before {
-        content: '';
-        position: absolute;
-        inset: 0;
-        background: rgba(0, 0, 0, 0.6);
-        pointer-events: none;
-    }
-    #editor > * {
-        position: relative;
-        z-index: 1;
-    }
-    
+    #editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:#0a0a0a;background-attachment:fixed;}
     .editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
     #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;}
     #zoomModal img{max-width:90%;max-height:90%;}
@@ -83,6 +47,20 @@
 </style>
 </head>
 <body>
+
+<div id="aiOverlay">
+    <div style="width:300px; height:300px; border-radius:50%; overflow:hidden; border:4px solid var(--gold); margin-bottom:20px;">
+        <video id="aiVideo" playsinline loop style="width:100%; height:100%; object-fit:cover;">
+            <source src="TiffyAI-Business-Hub.mp4" type="video/mp4">
+        </video>
+    </div>
+    <p id="aiMsg" style="font-family:'Bebas Neue'; color:var(--gold); font-size:1.5rem; text-align:center; padding:0 20px;"></p>
+    <div id="aiChoiceContainer" style="margin-top:20px;"></div>
+</div>
+
+<div id="aiBtnContainer" style="position:fixed; top:20px; right:20px; z-index:9997;">
+    <button onclick="startAiMode()" style="background:var(--gold); color:#000;">AI BUILDER</button>
+</div>
 
 <div id="floatingDownload" onclick="downloadHTML()">💾 DOWNLOAD</div>
 
@@ -124,24 +102,22 @@
     </div>
     <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
     <div class="editor-block">
-      <label>Business Name</label>
+      <label>1. Upload Business Logo</label>
+      <input type="file" id="editLogo" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; saveDraft()})">
+      <label>2. Upload Banner Image</label>
+      <input type="file" id="editBanner" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; saveDraft()})">
+      <label>3. Business Name</label>
       <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
-      <label>Tagline</label>
+      <label>4. Tagline</label>
       <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value;saveDraft()">
-      <label>WhatsApp Number</label>
+      <label>5. WhatsApp Number</label>
       <input id="editPhone" placeholder="27xxxxxxxx" oninput="saveDraft()">
-      <label>CTA Button Text</label>
+      <label>6. CTA Button Text</label>
       <input id="editCtaText" value="ORDER NOW" oninput="document.getElementById('ctaBtn').textContent=this.value;saveDraft()">
-      <label>CTA Button Link</label>
+      <label>7. CTA Button Link</label>
       <input id="editCtaLink" placeholder="https://..." oninput="document.getElementById('ctaBtn').href=this.value;saveDraft()">
-      <label>Footer Text</label>
+      <label>8. Footer Text</label>
       <input id="editFooter" oninput="document.getElementById('footerText').textContent=this.value;saveDraft()">
-      <label>Logo</label>
-      <input type="file" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; saveDraft()})">
-      <button class="remove" onclick="document.getElementById('logo').src=''; saveDraft()">Remove Logo</button>
-      <label>Banner Image</label>
-      <input type="file" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; saveDraft()})">
-      <button class="remove" onclick="document.getElementById('header').style.backgroundImage='none'; saveDraft()">Remove Banner</button>
     </div>
     <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
     <div id="menuEditor"></div>
@@ -149,6 +125,89 @@
 </div>
 
 <script>
+const questionScripts = {
+    editLogo: ["Let's begin. Start by uploading your business logo."],
+    editBanner: ["Now, upload a banner image for your store header."],
+    editName: ["Excellent. What is the name of your business?"],
+    editTag: ["Give me a snappy tagline for your brand."],
+    editPhone: ["I need your WhatsApp number to capture client sales."],
+    editCtaText: ["What should the call-to-action button say?"],
+    editCtaLink: ["Where should that button lead your customers?"],
+    editFooter: ["And finally, what text should go in your footer?"]
+};
+const confirmations = [
+    "Understood, logo updated.", "Perfect, banner applied.", "Got it, name saved.",
+    "Excellent choice, tagline set.", "Understood, WhatsApp number saved.",
+    "Perfect, button text updated.", "Got it, link configured.", "Excellent, footer updated."
+];
+
+async function startAiMode() {
+    window.speechSynthesis.cancel();
+    const video = document.getElementById('aiVideo');
+    const overlay = document.getElementById('aiOverlay');
+    overlay.style.display = 'flex';
+    setTimeout(() => overlay.style.opacity = '1', 50);
+    video.currentTime = 0; video.play();
+    await new Promise(r => setTimeout(r, 5500));
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; video.pause(); video.currentTime = 0; runInterview(); }, 500);
+}
+
+async function speak(text) {
+    document.getElementById('aiMsg').textContent = text;
+    return new Promise(r => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.onend = r;
+        window.speechSynthesis.speak(u);
+    });
+}
+
+async function runInterview() {
+    const fields = ['editLogo', 'editBanner', 'editName', 'editTag', 'editPhone', 'editCtaText', 'editCtaLink', 'editFooter'];
+    fields.forEach(id => document.getElementById(id).parentElement.classList.add('input-inactive'));
+    
+    for (let i = 0; i < fields.length; i++) {
+        const fieldId = fields[i];
+        const el = document.getElementById(fieldId);
+        const parent = el.parentElement;
+        parent.classList.remove('input-inactive');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ai-highlight');
+        await speak(questionScripts[fieldId][0]);
+        await new Promise(r => { 
+            const eventType = (fieldId === 'editLogo' || fieldId === 'editBanner') ? 'change' : 'blur';
+            el.addEventListener(eventType, () => { 
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(confirmations[i])); 
+                parent.classList.add('input-inactive');
+                r(); 
+            }, { once: true }); 
+        });
+        el.classList.remove('ai-highlight');
+    }
+
+    await speak("Storefront configuration complete. Congratulations on setting up your professional storefront!");
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    await speak("Take a look at your beautiful store preview above.");
+    
+    document.getElementById('editor').scrollIntoView({ behavior: 'smooth' });
+    await speak("Now, let's move to your product section. Add your items, prices, and descriptions. You can load product photos and QR codes for payments. To add more products, just add a section here.");
+    
+    const overlay = document.getElementById('aiOverlay');
+    const container = document.getElementById('aiChoiceContainer');
+    container.innerHTML = ''; overlay.style.display = 'flex'; overlay.style.opacity = '1';
+    
+    await speak("Have you got a payment QR code ready yet?");
+    
+    const yesBtn = document.createElement('button'); yesBtn.textContent = "YES";
+    yesBtn.onclick = () => { overlay.style.display = 'none'; speak("Great! Upload your QR code in the product settings."); };
+    const noBtn = document.createElement('button'); noBtn.textContent = "NO (GET ONE)";
+    noBtn.className = "remove";
+    noBtn.onclick = () => { window.open("https://tiffyai-usd.github.io/Transact/Transfer-Cash.html", "_blank"); overlay.style.display = 'none'; };
+    container.appendChild(yesBtn); container.appendChild(noBtn);
+    
+    await speak("Download your store. After that, click the support chat icon. Let's get your store live!");
+}
+
 const CONVERSION_RATES = { "USD": 1.0, "ZAR": 18.5, "EUR": 0.92, "NGN": 1500.0, "INR": 83.0, "CNY": 7.20, "AUD": 1.5 };
 const CURRENCY_SYMBOLS = { "USD": "$", "ZAR": "R", "EUR": "€", "NGN": "₦", "INR": "₹", "CNY": "¥", "AUD": "$" };
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
@@ -206,63 +265,38 @@ function stopScanner() { document.getElementById('scannerModal').style.display =
 function addToCart(name) { menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty++; })); alert(name + " added!"); saveDraft(); }
 function clearItem(name) { menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty = 0; })); renderMenu(); saveDraft(); }
 function sendWhatsApp() { let msg = "Order Request:%0A"; let hasItems = false; menuSections.forEach(s => s.items.forEach(it => { if(it.qty > 0) { msg += it.name + " x " + it.qty + "%0A"; hasItems = true; } })); const phone = document.getElementById('editPhone').value; if(hasItems) window.open(`https://wa.me/${phone}?text=${msg}`, '_blank'); else alert("Cart is empty"); }
-
 function enterMarketplace() {
+    const phone = document.getElementById('editPhone').value;
     const w = window.open("", "_blank", "width=700,height=900");
-    w.document.write(`
-        <div style="font-family:'Inter', sans-serif; background:#0a0a0a; color:#e6e6e6; text-align:center; padding:50px; height:100vh;">
+    w.document.write(`<div style="font-family:'Inter', sans-serif; background:#0a0a0a; color:#e6e6e6; text-align:center; padding:50px; height:100vh;">
             <h2 style="color:#d4a373; font-family:'Bebas Neue'; font-size:3.5rem; margin-bottom:10px;">GLOBAL BUSINESS SUITE</h2>
-            <p style="color:#25D366; font-family:'Bebas Neue'; font-size:1.6rem; margin-bottom:30px;">SECURE, ZERO-FEE INTERNATIONAL BANKING & AR MARKETPLACE</p>
-            <img src='support.png' style='width:180px; border-radius:20px; border:3px solid #d4a373; margin-bottom:30px;' onerror="this.style.display='none'">
             <div style="background:#1a1a1a; padding:30px; border-radius:15px; margin-bottom:30px; text-align:left; border:1px solid #333;">
-                <h3 style="color:#d4a373; margin-bottom:15px; font-family:'Bebas Neue';">PARTNER BENEFITS:</h3>
-                <ul style="list-style:none; line-height:2.4; font-size:1.1rem;">
-                    <li>✓ <strong>100% Free Ecosystem:</strong> No gas fees, no transaction costs.</li>
-                    <li>✓ <strong>International Account Top-up:</strong> Your $70 activation is a credit to your own bank account.</li>
-                    <li>✓ <strong>$70 Cashback Bonus:</strong> Instant liquidity upon successful KYC completion.</li>
-                    <li>✓ <strong>AR Marketplace Integration:</strong> Direct access to B2B global trading.</li>
-                </ul>
+                <h3 style="color:#d4a373; margin-bottom:15px; font-family:'Bebas Neue';">YOUR SUPPORT HUB:</h3>
+                <a href='https://wa.me/${phone}' target="_blank" style="display:block; margin:20px 0; color:#25D366; font-size:1.5rem;">MESSAGE US ON WHATSAPP</a>
+                <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+                <h3 style="color:#d4a373; margin-bottom:15px; font-family:'Bebas Neue';">ACTIVATE MARKETPLACE:</h3>
+                <p>✓ 100% Capital Credit: Your $70 investment is credited to your sovereign bank account.</p>
+                <p>✓ Integrated Suite: Access AI Store Builder and Marketplace Control Panel.</p>
+                <p>✓ Turnkey Independence: A capital-backed system ready for immediate operations.</p>
             </div>
-            <a href='https://paypal.me/CatHostProWebsites/70' target="_blank" style="display:block; background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:22px; text-decoration:none; border-radius:50px; font-weight:bold; font-family:'Bebas Neue'; font-size:1.6rem; box-shadow:0 10px 25px rgba(212,163,115,0.4);">ACTIVATE YOUR BANK & MARKETPLACE</a>
-            <a href="https://wa.me/27766314246?text=I need assistance with my Marketplace activation." target="_blank" style="display:block; margin-top:25px; color:#25D366; font-weight:bold; text-decoration:none; font-size:1.1rem;">💬 Contact Support on WhatsApp</a>
-        </div>
-    `);
+            <a href='https://tiffyai-usd.github.io/KYC/' target="_blank" style="background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:15px 30px; border-radius:30px; font-family:'Bebas Neue'; border:none; cursor:pointer; text-decoration:none; display:inline-block; margin-bottom:20px;">COMPLETE KYC</a>
+            <br>
+            <a href='https://paypal.me/CatHostProWebsites/70' target="_blank" style="display:block; background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:22px; text-decoration:none; border-radius:50px; font-weight:bold; font-family:'Bebas Neue'; font-size:1.6rem; box-shadow:0 10px 25px rgba(212,163,115,0.4);">ACTIVATE ACCOUNT</a>
+        </div>`);
 }
-
 function downloadHTML() {
-    const w = window.open("", "_blank", "width=700,height=800");
-    w.document.write(`
-        <div style="font-family:'Inter', sans-serif; background:#0a0a0a; color:#e6e6e6; text-align:center; padding:40px;">
-            <h2 style="color:#d4a373; font-family:'Bebas Neue'; font-size:2.5rem; margin-bottom:20px;">YOUR STORE IS READY!</h2>
-            <p style="margin-bottom:20px;">Follow these steps to launch your business:</p>
-            <div style="background:#1a1a1a; padding:25px; border-radius:15px; text-align:left; border:1px solid #333; line-height:2;">
-                <p>1. 💾 <strong>Download</strong> your HTML file.</p>
-                <p>2. 🚀 Click the <strong>floating icon</strong> in the bottom right corner.</p>
-                <p>3. 💳 <strong>Activate</strong> your account with the partner payment.</p>
-                <p>4. 🛂 <strong>KYC Verification:</strong> Upload ID to unlock your bank terminal.</p>
-                <p>5. 🌐 <strong>Upload:</strong> Drop your HTML file into the Marketplace.</p>
-                <p>6. 💼 <strong>Trade:</strong> Chat and transact with ZERO gas fees.</p>
-            </div>
-            <button onclick="window.opener.triggerActualDownload(); window.close();" style="margin-top:30px; background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:15px 40px; border-radius:50px; font-weight:bold; border:none; cursor:pointer; font-size:1.2rem;">DOWNLOAD MY STORE</button>
-        </div>
-    `);
-}
-
-function triggerActualDownload() {
+    document.getElementById('aiBtnContainer').style.display = 'none';
     const currentData = { name: document.getElementById('cafeName').textContent, tag: document.getElementById('tagline').textContent, phone: document.getElementById('editPhone').value, ctaText: document.getElementById('editCtaText').value, ctaLink: document.getElementById('editCtaLink').value, footer: document.getElementById('footerText').textContent, menu: menuSections, currency: document.getElementById('editCurrency').value, logo: document.getElementById('logo').src, banner: document.getElementById('header').style.backgroundImage };
     const stateInjection = `<script>const INITIAL_STATE = ${JSON.stringify(currentData)};<\/script>`;
     document.querySelector('#editor').style.display = 'none';
     document.querySelector('#floatingDownload').style.display = 'none';
     const fullHtml = document.documentElement.outerHTML.replace('</head>', stateInjection + '</head>');
     const blob = new Blob([fullHtml], {type: 'text/html'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'MyWebStore.html';
-    a.click();
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'MyWebStore.html'; a.click();
     document.querySelector('#editor').style.display = 'block';
     document.querySelector('#floatingDownload').style.display = 'block';
+    document.getElementById('aiBtnContainer').style.display = 'block';
 }
-
 function renderEditor() {
   const me = document.getElementById('menuEditor'); me.innerHTML = '';
   menuSections.forEach((sec, s) => {
