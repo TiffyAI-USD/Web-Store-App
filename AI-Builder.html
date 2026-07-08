@@ -1,0 +1,332 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+    :root{--gold:#d4a373;--gold2:#f1b86b;--whatsapp:#25D366}
+    .ai-highlight { outline: 6px solid var(--gold) !important; transform: scale(1.02); transition: 0.3s; box-shadow: 0 0 20px var(--gold); z-index: 9999; position: relative; }
+    .input-inactive { opacity: 0.3; pointer-events: none; transition: opacity 0.5s; }
+    #aiOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; opacity: 0; transition: opacity 0.5s ease; }
+    #floatingDownload { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: #000; color: var(--gold); padding: 12px 20px; border: 2px solid var(--gold); border-radius: 30px; font-family: 'Bebas Neue'; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    #scannerModal {position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;padding:20px;}
+    #paymentLanding {background:#1a1a1a; padding:20px; border:2px solid var(--gold); border-radius:12px; text-align:center; width: 90%; max-width: 400px;}
+    #supportFloating {position:fixed;bottom:20px;right:20px;z-index:9998;cursor:pointer;}
+    #supportFloating img {width:60px;height:60px;border-radius:50%;border:2px solid var(--gold);}
+    #autoSaveStatus {position:fixed;top:10px;left:10px;z-index:5000;font-size:0.7rem;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;border:1px solid var(--gold);color:var(--gold);display:none;}
+    header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative; width: 100%;}
+    header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
+    header *{position:relative;z-index:2}
+    .logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;cursor:pointer;}
+    h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
+    .tagline{font-family:'Bebas Neue';color:var(--gold)}
+    .cta-container {margin-top:25px;z-index:10;}
+    .btn-cta {display:inline-block;background:linear-gradient(180deg,var(--gold),var(--gold2));color:#000;padding:12px 28px;border-radius:50px;font-family:'Bebas Neue';text-decoration:none;font-size:1.2rem;box-shadow:0 4px 15px rgba(212,163,115,0.4);}
+    #menu{max-width:1200px;margin:auto;padding:4rem 5%}
+    .section-title{font-family:'Bebas Neue';font-size:2.4rem;color:var(--gold);margin:2rem 0 1rem;}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem; width: 100%;}
+    .menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;position:relative;}
+    .menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid var(--gold);cursor:pointer;}
+    .card{padding:1rem;}
+    .menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
+    .price{font-family:'Bebas Neue';color:var(--gold2)}
+    .qr-img{width:80px;height:80px;margin-top:10px;border:1px solid #fff;cursor:pointer;}
+    #editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:#0a0a0a;background-attachment:fixed;}
+    .editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
+    #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;}
+    #zoomModal img{max-width:90%;max-height:90%;}
+    label{display:block;margin-top:1rem;color:var(--gold)}
+    input,textarea,select{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;border-radius:6px;}
+    button{background:linear-gradient(180deg,var(--gold),var(--gold2));border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;margin:5px;}
+    .remove{background:#900;color:#fff}
+    .btn-small{font-size:0.8rem;padding:5px 10px;margin-top:10px;display:inline-block;}
+</style>
+</head>
+<body>
+
+<div id="aiOverlay">
+    <div style="width:300px; height:300px; border-radius:50%; overflow:hidden; border:4px solid var(--gold); margin-bottom:20px;">
+        <video id="aiVideo" playsinline loop style="width:100%; height:100%; object-fit:cover;">
+            <source src="TiffyAI-Business-Hub.mp4" type="video/mp4">
+        </video>
+    </div>
+    <p id="aiMsg" style="font-family:'Bebas Neue'; color:var(--gold); font-size:1.5rem; text-align:center; padding:0 20px;"></p>
+    <div id="aiChoiceContainer" style="margin-top:20px;"></div>
+</div>
+
+<div id="aiBtnContainer" style="position:fixed; top:20px; right:20px; z-index:9997;">
+    <button onclick="startAiMode()" style="background:var(--gold); color:#000;">AI BUILDER</button>
+</div>
+
+<div id="floatingDownload" onclick="downloadHTML()">💾 DOWNLOAD</div>
+
+<div id="scannerModal">
+    <div id="paymentLanding">
+        <h2 id="amountDisplay" style="color:var(--gold); margin-bottom:15px;">Confirm Payment</h2>
+        <button onclick="confirmAndPay()">CONFIRM & PAY</button>
+        <button class="remove" onclick="stopScanner()">CANCEL</button>
+    </div>
+</div>
+<div id="zoomModal" onclick="this.style.display='none'"><img id="zoomImg"></div>
+<div id="supportFloating" onclick="enterMarketplace()"><img src="support.png" onerror="this.style.display='none'"></div>
+<div id="autoSaveStatus">Saved Draft</div>
+
+<header id="header">
+  <img id="logo" class="logo" onclick="zoom(this.src)">
+  <h1 id="cafeName">Create your Store In Mere Minutes</h1>
+  <p id="tagline" class="tagline">Tap to Activate your AI Builder</p>
+  <div class="cta-container">
+      <a href="#" id="ctaBtn" class="btn-cta" target="_blank">Powered By TiffyAI</a>
+  </div>
+</header>
+<section id="menu"><div id="menuRender"></div></section>
+<footer><p id="footerText" style="text-align:center; padding:20px; color:#666;">© 2026 YOUR BUSINESS</p></footer>
+
+<div id="editor">
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">GLOBAL SETTINGS</h2>
+    <div class="editor-block">
+        <label>Store Currency</label>
+        <select id="editCurrency" onchange="saveDraft(); renderMenu()">
+            <option value="USD">USD ($)</option>
+            <option value="ZAR">ZAR (R)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="NGN">NGN (₦)</option>
+            <option value="INR">INR (₹)</option>
+            <option value="CNY">CNY (¥)</option>
+            <option value="AUD">AUD ($)</option>
+        </select>
+    </div>
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
+    <div class="editor-block">
+      <label>1. Upload Business Logo</label>
+      <input type="file" id="editLogo" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; saveDraft()})">
+      <label>2. Upload Banner Image</label>
+      <input type="file" id="editBanner" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; saveDraft()})">
+      <label>3. Business Name</label>
+      <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
+      <label>4. Tagline</label>
+      <input id="editTag" oninput="document.getElementById('tagline').textContent=this.value;saveDraft()">
+      <label>5. WhatsApp Number</label>
+      <input id="editPhone" placeholder="27xxxxxxxx" oninput="saveDraft()">
+      <label>6. CTA Button Text</label>
+      <input id="editCtaText" value="ORDER NOW" oninput="document.getElementById('ctaBtn').textContent=this.value;saveDraft()">
+      <label>7. CTA Button Link</label>
+      <input id="editCtaLink" placeholder="https://..." oninput="document.getElementById('ctaBtn').href=this.value;saveDraft()">
+      <label>8. Footer Text</label>
+      <input id="editFooter" oninput="document.getElementById('footerText').textContent=this.value;saveDraft()">
+    </div>
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
+    <div id="menuEditor"></div>
+    <button onclick="addSection()">+ ADD SECTION</button>
+</div>
+
+<script>
+const questionScripts = {
+    editLogo: ["Let's begin. Start by uploading your business logo."],
+    editBanner: ["Now, upload a banner image for your store header."],
+    editName: ["Excellent. What is the name of your business?"],
+    editTag: ["Give me a snappy tagline for your brand."],
+    editPhone: ["I need your WhatsApp number to capture client sales."],
+    editCtaText: ["What should the call-to-action button say?"],
+    editCtaLink: ["Where should that button lead your customers?"],
+    editFooter: ["And finally, what text should go in your footer?"]
+};
+const confirmations = [
+    "Understood, logo updated.", "Perfect, banner applied.", "Got it, name saved.",
+    "Excellent choice, tagline set.", "Understood, WhatsApp number saved.",
+    "Perfect, button text updated.", "Got it, link configured.", "Excellent, footer updated."
+];
+
+async function startAiMode() {
+    window.speechSynthesis.cancel();
+    const video = document.getElementById('aiVideo');
+    const overlay = document.getElementById('aiOverlay');
+    overlay.style.display = 'flex';
+    setTimeout(() => overlay.style.opacity = '1', 50);
+    video.currentTime = 0; video.play();
+    await new Promise(r => setTimeout(r, 5500));
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; video.pause(); video.currentTime = 0; runInterview(); }, 500);
+}
+
+async function speak(text) {
+    document.getElementById('aiMsg').textContent = text;
+    return new Promise(r => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.onend = r;
+        window.speechSynthesis.speak(u);
+    });
+}
+
+async function runInterview() {
+    const fields = ['editLogo', 'editBanner', 'editName', 'editTag', 'editPhone', 'editCtaText', 'editCtaLink', 'editFooter'];
+    fields.forEach(id => document.getElementById(id).parentElement.classList.add('input-inactive'));
+   
+    for (let i = 0; i < fields.length; i++) {
+        const fieldId = fields[i];
+        const el = document.getElementById(fieldId);
+        const parent = el.parentElement;
+        parent.classList.remove('input-inactive');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ai-highlight');
+        await speak(questionScripts[fieldId][0]);
+        await new Promise(r => {
+            const eventType = (fieldId === 'editLogo' || fieldId === 'editBanner') ? 'change' : 'blur';
+            el.addEventListener(eventType, () => {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(confirmations[i]));
+                parent.classList.add('input-inactive');
+                r();
+            }, { once: true });
+        });
+        el.classList.remove('ai-highlight');
+    }
+
+    await speak("Storefront configuration complete. Congratulations on setting up your professional storefront!");
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    await speak("Take a look at your beautiful store preview above.");
+   
+    document.getElementById('editor').scrollIntoView({ behavior: 'smooth' });
+    await speak("Now, let's move to your product section. quickly choos your store currency, scroll down, Add your items, prices, and descriptions. You can load two product photos on each section . To add more products, tap the add a section button thats half behind the download button.");
+   
+    const overlay = document.getElementById('aiOverlay');
+    const container = document.getElementById('aiChoiceContainer');
+    container.innerHTML = ''; overlay.style.display = 'flex'; overlay.style.opacity = '1';
+   
+    await speak("Ok cool, quick question. Have you got the hang of this now? see its super easy");
+   
+    const yesBtn = document.createElement('button'); yesBtn.textContent = "YES";
+    yesBtn.onclick = () => { overlay.style.display = 'none'; speak(" great, thats awesome!, you will see the products is very easy to tweak at the bottom there"); };
+    const noBtn = document.createElement('button'); noBtn.textContent = "NO";
+    noBtn.className = "remove";
+    noBtn.onclick = () => { window.open("https://tiffyai-usd.github.io/Info/Intro.html", "_blank"); overlay.style.display = 'none'; };
+    container.appendChild(yesBtn); container.appendChild(noBtn);
+   
+    await speak("after you got your products loaded. Download your store and save it. After that, click next to it, its the support chat icon. Let's get your account topped up and your store hosted already! Theres millions of people in the marketplace");
+}
+
+const CONVERSION_RATES = { "USD": 1.0, "ZAR": 18.5, "EUR": 0.92, "NGN": 1500.0, "INR": 83.0, "CNY": 7.20, "AUD": 1.5 };
+const CURRENCY_SYMBOLS = { "USD": "$", "ZAR": "R", "EUR": "€", "NGN": "₦", "INR": "₹", "CNY": "¥", "AUD": "$" };
+let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
+let currentTransactionPrice = 0;
+
+function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
+function saveDraft() {
+  const data = { name: document.getElementById('cafeName').textContent, tag: document.getElementById('tagline').textContent, phone: document.getElementById('editPhone').value, ctaText: document.getElementById('editCtaText').value, ctaLink: document.getElementById('editCtaLink').value, footer: document.getElementById('footerText').textContent, menu: menuSections, currency: document.getElementById('editCurrency').value, logo: document.getElementById('logo').src, banner: document.getElementById('header').style.backgroundImage };
+  localStorage.setItem('webstore_pro_draft', JSON.stringify(data));
+  document.getElementById('autoSaveStatus').style.display = 'block';
+  setTimeout(() => document.getElementById('autoSaveStatus').style.display = 'none', 2000);
+}
+function loadDraft() {
+  const d = (typeof INITIAL_STATE !== 'undefined') ? INITIAL_STATE : JSON.parse(localStorage.getItem('webstore_pro_draft') || '{}');
+  if (d.menu) menuSections = d.menu;
+  document.getElementById('cafeName').textContent = d.name || "";
+  document.getElementById('tagline').textContent = d.tag || "";
+  document.getElementById('editPhone').value = d.phone || "";
+  document.getElementById('editCtaText').value = d.ctaText || "Powered By TiffyAI";
+  document.getElementById('ctaBtn').textContent = d.ctaText || "Powered By TiffyAI";
+  document.getElementById('editCtaLink').value = d.ctaLink || "#";
+  document.getElementById('ctaBtn').href = d.ctaLink || "#";
+  document.getElementById('editCurrency').value = d.currency || "USD";
+  document.getElementById('editFooter').value = d.footer || "© 2026 YOUR BUSINESS SUITE";
+  document.getElementById('footerText').textContent = d.footer || "© 2026 YOUR BUSINESS SUITE";
+  if(d.logo) document.getElementById('logo').src = d.logo;
+  if(d.banner) document.getElementById('header').style.backgroundImage = d.banner;
+  renderMenu(); renderEditor();
+}
+function uploadImage(input, cb) { const reader = new FileReader(); reader.onload = e => cb(e.target.result); reader.readAsDataURL(input.files[0]); }
+function renderMenu() {
+  const curCode = document.getElementById('editCurrency').value;
+  const curSym = CURRENCY_SYMBOLS[curCode];
+  const container = document.getElementById('menuRender');
+  container.innerHTML = '';
+  menuSections.forEach(sec => {
+    container.innerHTML += `<h2 class="section-title">${sec.title}</h2>`;
+    const grid = document.createElement('div'); grid.className = 'menu-grid';
+    sec.items.forEach((it) => {
+      const displayPrice = parseFloat(it.price).toFixed(2);
+      grid.innerHTML += `<div class="menu-item">${it.img ? `<img src="${it.img}" onclick="zoom(this.src)">` : ''}<div class="card"><h3>${it.name}</h3><p>${it.desc}</p><div class="price">${curSym}${displayPrice}</div>
+      <button class="btn-small" onclick="addToCart('${it.name}')">Add to Cart</button>
+      <button class="btn-small remove" onclick="clearItem('${it.name}')">Clear</button>
+      <button class="btn-small" style="background:#00f0ff; color:#000;" onclick="payWithTiffy(${it.price})">SCAN TO PAY</button>
+      ${it.qr ? `<br><img src="${it.qr}" class="qr-img" onclick="zoom(this.src)">` : ''}
+      </div></div>`;
+    });
+    container.appendChild(grid);
+  });
+  container.innerHTML += `<button onclick="sendWhatsApp()" style="display:block; margin:20px auto; padding:15px 40px; background:var(--whatsapp);">ORDER ON WHATSAPP</button>`;
+}
+function payWithTiffy(price) { currentTransactionPrice = parseFloat(price); const curCode = document.getElementById('editCurrency').value; const curSym = CURRENCY_SYMBOLS[curCode]; document.getElementById('amountDisplay').innerText = "Confirm Payment: " + curSym + currentTransactionPrice.toFixed(2); document.getElementById('scannerModal').style.display = 'flex'; }
+function confirmAndPay() { let bal = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0"); let currency = document.getElementById('editCurrency').value; let rate = CONVERSION_RATES[currency] || 1.0; let deduction = currentTransactionPrice / rate; if (bal < deduction) { alert("Insufficient funds!"); stopScanner(); return; } localStorage.setItem("TUSD_Nitro_Storage", (bal - deduction).toFixed(2)); alert("Payment successful!"); window.location.href = "https://tiffyai-usd.github.io/Transact/Transfer-Cash.html"; }
+function stopScanner() { document.getElementById('scannerModal').style.display = 'none'; }
+function addToCart(name) { menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty++; })); alert(name + " added!"); saveDraft(); }
+function clearItem(name) { menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty = 0; })); renderMenu(); saveDraft(); }
+function sendWhatsApp() { let msg = "Order Request:%0A"; let hasItems = false; menuSections.forEach(s => s.items.forEach(it => { if(it.qty > 0) { msg += it.name + " x " + it.qty + "%0A"; hasItems = true; } })); const phone = document.getElementById('editPhone').value; if(hasItems) window.open(`https://wa.me/${phone}?text=${msg}`, '_blank'); else alert("Cart is empty"); }
+function enterMarketplace() {
+    const phone = document.getElementById('editPhone').value;
+    const w = window.open("", "_blank", "width=700,height=900");
+    w.document.write(`<div style="font-family:'Inter', sans-serif; background:#0a0a0a; color:#e6e6e6; text-align:center; padding:50px; height:100vh;">
+            <h2 style="color:#d4a373; font-family:'Bebas Neue'; font-size:3.5rem; margin-bottom:10px;">GLOBAL BUSINESS SUITE</h2>
+            <div style="background:#1a1a1a; padding:30px; border-radius:15px; margin-bottom:30px; text-align:left; border:1px solid #333;">
+                <h3 style="color:#d4a373; margin-bottom:15px; font-family:'Bebas Neue';">YOUR SUPPORT HUB:</h3>
+                <a href='https://wa.me/${phone}' target="_blank" style="display:block; margin:20px 0; color:#25D366; font-size:1.5rem;">MESSAGE TIFFYAI SUPPORT ON WHATSAPP</a>
+                <hr style="border:0; border-top:1px solid #333; margin:20px 0;">
+                <h3 style="color:#d4a373; margin-bottom:15px; font-family:'Bebas Neue';">ACTIVATE YOUR FULL FINANCIAL ECONOMY:</h3>
+                <p>✓ 100% Capital Credit: Your $70 investment is credited to your TIFFY sovereign international bank account, ready to trade or earn you 8% interest on your holdings and to do business anywhere in the world.</p>
+                <p>✓ Integrated Suite: Access your AI Store Builder and Host your Store Live in the Tiffyverse Marketplace using your Business Suite Control Panel.</p>
+                <p>✓ Turnkey Independence: A capital-backed system ready for immediate operations. Send & Receive INSTANT Payments Globally.</p>
+                <p>✓ Secure Live Chat Feed: Talk to other members in real time</p>
+                <p>✓ Income Streams & Earnings: Claim & Trade TiffyAI tokens and TUSD Nitro throughout the marketplace</p>
+            </div>
+            <a href='https://tiffyai-usd.github.io/KYC/' target="_blank" style="background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:15px 30px; border-radius:30px; font-family:'Bebas Neue'; border:none; cursor:pointer; text-decoration:none; display:inline-block; margin-bottom:20px;">COMPLETE KYC</a>
+            <br>
+            <a href='https://tiffyai-usd.github.io/Web-Agent/agent1.html' target="_blank" style="background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:15px 30px; border-radius:30px; font-family:'Bebas Neue'; border:none; cursor:pointer; text-decoration:none; display:inline-block; margin-bottom:20px;">BECOME A 50% PARTNER</a>
+            <br>
+            <a href='https://tiffyai-usd.github.io/Trader/Verse6.html' target="_blank" style="background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:15px 30px; border-radius:30px; font-family:'Bebas Neue'; border:none; cursor:pointer; text-decoration:none; display:inline-block; margin-bottom:20px;">VISIT THE TIFFYVERSE</a>
+            <br>
+            <a href='https://paypal.me/CatHostProWebsites/70' target="_blank" style="display:block; background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:22px; text-decoration:none; border-radius:50px; font-weight:bold; font-family:'Bebas Neue'; font-size:1.6rem; box-shadow:0 10px 25px rgba(212,163,115,0.4);">ACTIVATE ACCOUNT</a>
+        </div>`);
+}
+function downloadHTML() {
+    document.getElementById('aiBtnContainer').style.display = 'none';
+    const currentData = { name: document.getElementById('cafeName').textContent, tag: document.getElementById('tagline').textContent, phone: document.getElementById('editPhone').value, ctaText: document.getElementById('editCtaText').value, ctaLink: document.getElementById('editCtaLink').value, footer: document.getElementById('footerText').textContent, menu: menuSections, currency: document.getElementById('editCurrency').value, logo: document.getElementById('logo').src, banner: document.getElementById('header').style.backgroundImage };
+    const stateInjection = `<script>const INITIAL_STATE = ${JSON.stringify(currentData)};<\/script>`;
+    document.querySelector('#editor').style.display = 'none';
+    document.querySelector('#floatingDownload').style.display = 'none';
+    const fullHtml = document.documentElement.outerHTML.replace('</head>', stateInjection + '</head>');
+    const blob = new Blob([fullHtml], {type: 'text/html'});
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'MyWebStore.html'; a.click();
+    document.querySelector('#editor').style.display = 'block';
+    document.querySelector('#floatingDownload').style.display = 'block';
+    document.getElementById('aiBtnContainer').style.display = 'block';
+}
+function renderEditor() {
+  const me = document.getElementById('menuEditor'); me.innerHTML = '';
+  menuSections.forEach((sec, s) => {
+    me.innerHTML += `
+      <div class="editor-block">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;saveDraft()">
+            <button class="remove" onclick="menuSections.splice(${s}, 1); renderEditor(); renderMenu(); saveDraft()">Delete Section</button>
+        </div>
+        ${sec.items.map((it, i) => `
+          <div style="border:1px solid #333; padding:10px; margin:5px 0;">
+            <input value="${it.name}" placeholder="Name" oninput="menuSections[${s}].items[${i}].name=this.value;saveDraft()">
+            <input type="number" step="0.01" value="${it.price}" placeholder="Price" oninput="menuSections[${s}].items[${i}].price=parseFloat(this.value);saveDraft()">
+            <label>Product Photo</label> <input type="file" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].img=img; renderMenu(); saveDraft()})">
+            <button class="remove" onclick="menuSections[${s}].items[${i}].img=''; renderMenu(); saveDraft()">Remove Photo</button>
+            <label>Product Photo</label> <input type="file" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].qr=img; renderMenu(); saveDraft()})">
+            <button class="remove" onclick="menuSections[${s}].items[${i}].qr=''; renderMenu(); saveDraft()">Remove QR</button>
+          </div>
+        `).join('')}
+      </div>`;
+  });
+}
+function addSection() { menuSections.push({ title: "New", items: [{name:'Item', price:10, desc:'', img:'', qr:'', qty:0}] }); renderEditor(); }
+document.addEventListener('DOMContentLoaded', loadDraft);
+</script>
+</body>
+</html>
