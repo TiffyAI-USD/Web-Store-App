@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Clear Webstore Pro Draft</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a0a;
+            color: #e6e6e6;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 { color: #d4a373; }
+        button {
+            background: #d4a373;
+            color: #000;
+            font-size: 1.2rem;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            margin: 20px;
+        }
+        button:hover { background: #f1b86b; }
+        #status { margin-top: 20px; font-size: 1.1rem; }
+    </style>
+</head>
+<body>
+    <h1>🧹 Clear Webstore Pro Draft</h1>
+    <p>This will completely remove all saved data (logo, banner, products, etc.)</p>
+    <button onclick="clearDraft()">CLEAR DRAFT NOW</button>
+    
+    <div id="status"></div>
+
+    <script>
+        const DB_NAME = 'TiffyStoreDB';
+        const STORE_NAME = 'StoreData';
+
+        async function clearDraft() {
+            const status = document.getElementById('status');
+            status.textContent = "Clearing...";
+
+            // Clear localStorage
+            localStorage.removeItem('webstore_pro_draft');
+
+            // Clear IndexedDB
+            try {
+                const request = indexedDB.deleteDatabase(DB_NAME);
+                await new Promise((resolve, reject) => {
+                    request.onsuccess = resolve;
+                    request.onerror = reject;
+                });
+                status.innerHTML = "✅ <strong>All draft data cleared successfully!</strong><br><br>You can now close this page and refresh your Webstore.";
+            } catch (e) {
+                status.innerHTML = "⚠️ Something went wrong, but localStorage was cleared.";
+                console.error(e);
+            }
+        }
+    </script>
+</body>
+</html>
