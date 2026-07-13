@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+    :root{
+        --gold: #d4a373;
+        --gold2: #f1b86b;
+        --whatsapp: #25D366;
+        --gold-gradient: linear-gradient(180deg,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c);
+    }
+    .ai-highlight { outline: 6px solid var(--gold) !important; transform: scale(1.02); transition: 0.3s; box-shadow: 0 0 20px var(--gold); z-index: 9999; position: relative; }
+    .input-inactive { opacity: 0.3; pointer-events: none; transition: opacity 0.5s; }
+    #aiOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; opacity: 0; transition: opacity 0.5s ease; }
+    #floatingDownload { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: #000; color: var(--gold); padding: 12px 20px; border: 2px solid var(--gold); border-radius: 30px; font-family: 'Bebas Neue'; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    #scannerModal {position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;padding:20px;}
+    #paymentLanding {background:#1a1a1a; padding:20px; border:2px solid var(--gold); border-radius:12px; text-align:center; width: 90%; max-width: 400px;}
+    #supportFloating {position:fixed;bottom:20px;right:20px;z-index:9998;cursor:pointer;}
+    #supportFloating img {width:60px;height:60px;border-radius:50%;border:2px solid var(--gold);}
+    #autoSaveStatus {position:fixed;top:10px;left:10px;z-index:5000;font-size:0.7rem;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;border:1px solid var(--gold);color:var(--gold);display:none;}
+    header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative; width: 100%;}
+    header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
+    header *{position:relative;z-index:2}
+    .logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;cursor:pointer;}
+    h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
+    .tagline{font-family:'Bebas Neue';color:var(--gold); padding: 0 5%;}
+    .cta-container {margin-top:25px;z-index:10;}
+    .btn-cta {display:inline-block;background:var(--gold-gradient);color:#000;padding:12px 28px;border-radius:50px;font-family:'Bebas Neue';text-decoration:none;font-size:1.2rem;box-shadow:0 4px 15px rgba(212,163,115,0.4);font-weight:bold;}
+    #menu{max-width:1200px;margin:auto;padding:4rem 5%}
+    .section-title{font-family:'Bebas Neue';font-size:2.4rem;color:var(--gold);margin:2rem 0 1rem;}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem; width: 100%;}
+    .menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;position:relative;}
+    .menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid var(--gold);cursor:pointer;}
+    .card{padding:1rem;}
+    .menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
+    .price{font-family:'Bebas Neue';color:var(--gold2)}
+    .qr-img{width:80px;height:80px;margin-top:10px;border:1px solid #fff;cursor:pointer;}
+    #editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:url('silky.jpeg') no-repeat center center/cover;background-attachment:fixed;}
+    #editor::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 0; }
+    #editor > * { position: relative; z-index: 1; }
+    .editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
+    #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;}
+    #zoomModal img{max-width:90%;max-height:90%;}
+    label{display:block;margin-top:1rem;color:var(--gold)}
+    input,textarea,select{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;border-radius:6px;}
+    button{background:var(--gold-gradient);border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;margin:5px;color:#000;font-weight:bold;}
+    .remove{background:#900 !important;color:#fff !important;}
+    .btn-small{font-size:0.8rem;padding:5px 10px;margin-top:10px;display:inline-block;}
+</style>
+</head>
+<body>
+
+<div id="aiOverlay"> ... (your existing aiOverlay content) </div>
+<div id="aiBtnContainer" style="position:fixed; top:20px; right:20px; z-index:9997;">
+    <button onclick="startAiMode()">AI BUILDER</button>
+</div>
+
+<div id="floatingDownload" onclick="downloadHTML()">💾 DOWNLOAD</div>
+<!-- Rest of your HTML elements remain the same -->
+
+<header id="header"> ... </header>
+<section id="menu"><div id="menuRender"></div></section>
+<footer><p id="footerText" style="text-align:center; padding:20px; color:#666;">© 2026 YOUR BUSINESS</p></footer>
+
+<div id="editor"> ... (your editor content) </div>
+
+<script>
+// === STORAGE FIXES START HERE ===
+const DB_NAME = 'TiffyStoreDB';
+const STORE_NAME = 'StoreData';
+
+async function getDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => e.target.result.createObjectStore(STORE_NAME);
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e);
+    });
+}
+
+async function saveToIDB(key, value) {
+    try {
+        const db = await getDB();
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(value, key);
+        return true;
+    } catch (e) {
+        console.error("IDB save failed", e);
+        return false;
+    }
+}
+
+async function getFromIDB(key) {
+    try {
+        const db = await getDB();
+        return new Promise(resolve => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).get(key);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => resolve(null);
+        });
+    } catch (e) {
+        console.error("IDB read failed", e);
+        return null;
+    }
+}
+
+// Improved saveDraft with quota handling
+async function saveDraft() {
+    const data = { 
+        name: document.getElementById('cafeName').textContent, 
+        tag: document.getElementById('tagline').textContent, 
+        phone: document.getElementById('editPhone').value, 
+        ctaText: document.getElementById('editCtaText').value, 
+        ctaLink: document.getElementById('editCtaLink').value, 
+        footer: document.getElementById('footerText').textContent, 
+        menu: menuSections, 
+        currency: document.getElementById('editCurrency').value, 
+        logo: document.getElementById('logo').src, 
+        banner: document.getElementById('header').style.backgroundImage 
+    };
+
+    // Try localStorage first (for small data)
+    try {
+        localStorage.setItem('webstore_pro_draft', JSON.stringify(data));
+    } catch (e) {
+        console.warn("localStorage quota exceeded - using IndexedDB only");
+        localStorage.removeItem('webstore_pro_draft');
+    }
+
+    // Always save to IDB (handles large images)
+    await saveToIDB('webstore_pro_draft', data);
+
+    document.getElementById('autoSaveStatus').style.display = 'block';
+    setTimeout(() => document.getElementById('autoSaveStatus').style.display = 'none', 1500);
+}
+
+// Improved loadDraft
+async function loadDraft() {
+    let d = null;
+
+    // Try localStorage first
+    const saved = localStorage.getItem('webstore_pro_draft');
+    if (saved) {
+        try {
+            d = JSON.parse(saved);
+        } catch (e) {}
+    }
+
+    // If localStorage failed or is empty → use IndexedDB
+    if (!d || !d.banner || !d.menu) {
+        d = await getFromIDB('webstore_pro_draft');
+    }
+
+    if (!d && typeof INITIAL_STATE !== 'undefined') d = INITIAL_STATE;
+    if (!d || Object.keys(d).length === 0) return;
+
+    if (d.menu) menuSections = d.menu;
+    
+    document.getElementById('cafeName').textContent = d.name || "Create your Store In Mere Minutes";
+    document.getElementById('tagline').textContent = d.tag || DEFAULT_TAG;
+    document.getElementById('editName').value = d.name || "";
+    document.getElementById('editTag').value = d.tag || DEFAULT_TAG;
+    document.getElementById('editPhone').value = d.phone || "";
+    document.getElementById('editCtaText').value = d.ctaText || "Powered By TiffyAI";
+    document.getElementById('ctaBtn').textContent = d.ctaText || "Powered By TiffyAI";
+    document.getElementById('editCtaLink').value = d.ctaLink || "#";
+    document.getElementById('ctaBtn').href = d.ctaLink || "#";
+    document.getElementById('editCurrency').value = d.currency || "USD";
+    document.getElementById('editFooter').value = d.footer || "© 2026 YOUR BUSINESS SUITE";
+    document.getElementById('footerText').textContent = d.footer || "© 2026 YOUR BUSINESS SUITE";
+    
+    if(d.logo) document.getElementById('logo').src = d.logo;
+    if(d.banner) {
+        const h = document.getElementById('header');
+        h.style.backgroundImage = d.banner;
+        h.style.backgroundSize = 'cover';
+        h.style.backgroundPosition = 'center';
+    }
+    
+    renderMenu(); 
+    renderEditor();
+}
+
+// Rest of your original script remains the same...
+const DEFAULT_TAG = "..."; // (keep your existing DEFAULT_TAG)
+
+let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
+
+// ... (keep all your other functions: uploadImage, renderMenu, renderEditor, downloadHTML, etc.)
+
+document.addEventListener('DOMContentLoaded', loadDraft);
+</script>
+</body>
+</html>
