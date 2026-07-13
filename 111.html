@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+    :root{--gold: #d4a373;}
+    
+    /* Header restored to standard image display */
+    header {
+        position: relative;
+        min-height: 400px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+    #bannerImg {
+        width: 100%;
+        max-height: 400px;
+        object-fit: cover;
+        display: block;
+    }
+    .logo { 
+        max-width: 180px; 
+        border-radius: 16px; 
+        border: 3px solid var(--gold); 
+        margin-top: -200px; /* Overlays correctly */
+        margin-bottom: 1rem;
+    }
+    h1 { font-family: 'Bebas Neue'; font-size: 4rem; color: var(--gold); }
+    
+    .editor-block { background: #1a1a1a; padding: 1.5rem; border-radius: 14px; margin: 2rem; border: 1px solid #333; }
+    input { width: 100%; padding: 10px; background: #222; color: #fff; border: 1px solid #444; }
+</style>
+</head>
+<body>
+
+<header id="header">
+    <img id="bannerImg" src="">
+    <img id="logo" class="logo" src="">
+    <h1 id="cafeName">Your Business Name</h1>
+</header>
+
+<div id="editor">
+    <div class="editor-block">
+        <label>1. Upload Logo</label>
+        <input type="file" onchange="uploadFile(this, 'logo')">
+        
+        <label>2. Upload Banner</label>
+        <input type="file" onchange="uploadFile(this, 'banner')">
+        
+        <label>3. Business Name</label>
+        <input id="editName" oninput="updateName(this.value)">
+    </div>
+</div>
+
+<script>
+// State handles both images exactly the same way
+let state = { logo: '', banner: '', name: 'Your Business Name' };
+
+function save() {
+    localStorage.setItem('store_data', JSON.stringify(state));
+}
+
+function uploadFile(input, key) {
+    const reader = new FileReader();
+    reader.onload = e => {
+        const data = e.target.result;
+        state[key] = data;
+        updateUI();
+        save();
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+
+function updateName(val) {
+    state.name = val;
+    document.getElementById('cafeName').textContent = val;
+    save();
+}
+
+function updateUI() {
+    if(state.logo) document.getElementById('logo').src = state.logo;
+    if(state.banner) document.getElementById('bannerImg').src = state.banner;
+    document.getElementById('cafeName').textContent = state.name;
+    document.getElementById('editName').value = state.name;
+}
+
+function init() {
+    const saved = localStorage.getItem('store_data');
+    if(saved) {
+        state = JSON.parse(saved);
+        updateUI();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+</body>
+</html>
