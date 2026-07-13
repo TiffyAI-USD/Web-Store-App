@@ -134,6 +134,112 @@
 <script>
 const DEFAULT_TAG = "You dont even need internet to do business anywhere in the world.. Theres not a single third party server used , its totally hack proof. You Set up your store in minutes.. not days.. Send and receive instant payments immediately. Host your business in the Tiffyverse for millions of people to interact with. Built in secure chat to close deals and best of all cut out the middle man.. TiffyAI Business Hub is completely gasless on transactions. Top up your account with a minimum of 10 dollers to use immediately or get 8% interest on your holdings.. The worlds first, truely decentralized sovereign business suite. Keeps track of stock. No need to do any marketing in the Tiffyverse. People search for what they want and businesses pop up. Sell on WhatsApp or receive instant payments directly.";
 
+const DB_NAME = 'TiffyStoreDB';
+const STORE_NAME = 'StoreData';
+
+async function getDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => e.target.result.createObjectStore(STORE_NAME);
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function saveToIDB(key, value) {
+    try {
+        const db = await getDB();
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(value, key);
+        await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = reject; });
+    } catch (e) {
+        console.error("IndexedDB save error:", e);
+    }
+}
+
+async function getFromIDB(key) {
+    try {
+        const db = await getDB();
+        return new Promise(resolve => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).get(key);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => resolve(null);
+        });
+    } catch (e) {
+        console.error("IndexedDB read error:", e);
+        return null;
+    }
+}
+
+async function saveDraft() {
+    const data = { 
+        name: document.getElementById('cafeName').textContent, 
+        tag: document.getElementById('tagline').textContent, 
+        phone: document.getElementById('editPhone').value, 
+        ctaText: document.getElementById('editCtaText').value, 
+        ctaLink: document.getElementById('editCtaLink').value, 
+        footer: document.getElementById('footerText').textContent, 
+        menu: menuSections, 
+        currency: document.getElementById('editCurrency').value, 
+        logo: document.getElementById('logo').src, 
+        banner: document.getElementById('header').style.backgroundImage 
+    };
+
+    try {
+        localStorage.setItem('webstore_pro_draft', JSON.stringify(data));
+    } catch (e) {
+        console.warn("localStorage quota exceeded - using IndexedDB only");
+        localStorage.removeItem('webstore_pro_draft');
+    }
+
+    await saveToIDB('webstore_pro_draft', data);
+
+    document.getElementById('autoSaveStatus').style.display = 'block';
+    setTimeout(() => document.getElementById('autoSaveStatus').style.display = 'none', 2000);
+}
+
+async function loadDraft() {
+    let d = null;
+    const saved = localStorage.getItem('webstore_pro_draft');
+    if (saved) {
+        try { d = JSON.parse(saved); } catch(e){}
+    }
+
+    if (!d || !d.banner) {
+        d = await getFromIDB('webstore_pro_draft');
+    }
+
+    if (!d && typeof INITIAL_STATE !== 'undefined') d = INITIAL_STATE;
+    if (!d || Object.keys(d).length === 0) return;
+  
+    if (d.menu) menuSections = d.menu;
+    
+    document.getElementById('cafeName').textContent = d.name || "Create your Store In Mere Minutes";
+    document.getElementById('tagline').textContent = d.tag || DEFAULT_TAG;
+    document.getElementById('editName').value = d.name || "";
+    document.getElementById('editTag').value = d.tag || DEFAULT_TAG;
+    document.getElementById('editPhone').value = d.phone || "";
+    document.getElementById('editCtaText').value = d.ctaText || "Powered By TiffyAI";
+    document.getElementById('ctaBtn').textContent = d.ctaText || "Powered By TiffyAI";
+    document.getElementById('editCtaLink').value = d.ctaLink || "#";
+    document.getElementById('ctaBtn').href = d.ctaLink || "#";
+    document.getElementById('editCurrency').value = d.currency || "USD";
+    document.getElementById('editFooter').value = d.footer || "© 2026 YOUR BUSINESS SUITE";
+    document.getElementById('footerText').textContent = d.footer || "© 2026 YOUR BUSINESS SUITE";
+    
+    if(d.logo) document.getElementById('logo').src = d.logo;
+    if(d.banner) {
+        const h = document.getElementById('header');
+        h.style.backgroundImage = d.banner;
+        h.style.backgroundSize = 'cover';
+        h.style.backgroundPosition = 'center';
+    }
+    
+    renderMenu(); 
+    renderEditor();
+}
+
 const questionScripts = {
     editLogo: ["Let's begin. Start by uploading your business logo."],
     editBanner: ["Now, upload a banner image for your store header."],
@@ -185,11 +291,13 @@ async function runInterview() {
         await speak(questionScripts[fieldId][0]);
         await new Promise(r => {
             const eventType = (fieldId === 'editLogo' || fieldId === 'editBanner') ? 'change' : 'blur';
-            el.addEventListener(eventType, () => {
+            const handler = () => {
                 window.speechSynthesis.speak(new SpeechSynthesisUtterance(confirmations[i]));
                 parent.classList.add('input-inactive');
+                el.removeEventListener(eventType, handler);
                 r();
-            }, { once: true });
+            };
+            el.addEventListener(eventType, handler);
         });
         el.classList.remove('ai-highlight');
     }
@@ -222,43 +330,18 @@ const CURRENCY_SYMBOLS = { "USD": "$", "ZAR": "R", "EUR": "€", "NGN": "₦", "
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
 let currentTransactionPrice = 0;
 
+function addSection() { menuSections.push({ title: "New Section", items: [] }); renderEditor(); saveDraft(); }
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
-function saveDraft() {
-  const data = { 
-    name: document.getElementById('cafeName').textContent, 
-    tag: document.getElementById('tagline').textContent, 
-    phone: document.getElementById('editPhone').value, 
-    ctaText: document.getElementById('editCtaText').value, 
-    ctaLink: document.getElementById('editCtaLink').value, 
-    footer: document.getElementById('footerText').textContent, 
-    menu: menuSections, 
-    currency: document.getElementById('editCurrency').value, 
-    logo: document.getElementById('logo').src, 
-    banner: document.getElementById('header').style.backgroundImage 
-  };
-  localStorage.setItem('webstore_pro_draft', JSON.stringify(data));
-  document.getElementById('autoSaveStatus').style.display = 'block';
-  setTimeout(() => document.getElementById('autoSaveStatus').style.display = 'none', 2000);
+
+function uploadImage(input, cb) { 
+    const reader = new FileReader(); 
+    reader.onload = e => {
+        cb(e.target.result); 
+        saveDraft();
+    }; 
+    reader.readAsDataURL(input.files[0]); 
 }
-function loadDraft() {
-  const d = (typeof INITIAL_STATE !== 'undefined') ? INITIAL_STATE : JSON.parse(localStorage.getItem('webstore_pro_draft') || '{}');
-  if (d.menu) menuSections = d.menu;
-  document.getElementById('cafeName').textContent = d.name || "Create your Store In Mere Minutes";
-  document.getElementById('tagline').textContent = d.tag || DEFAULT_TAG;
-  document.getElementById('editTag').value = d.tag || DEFAULT_TAG;
-  document.getElementById('editPhone').value = d.phone || "";
-  document.getElementById('editCtaText').value = d.ctaText || "Powered By TiffyAI";
-  document.getElementById('ctaBtn').textContent = d.ctaText || "Powered By TiffyAI";
-  document.getElementById('editCtaLink').value = d.ctaLink || "#";
-  document.getElementById('ctaBtn').href = d.ctaLink || "#";
-  document.getElementById('editCurrency').value = d.currency || "USD";
-  document.getElementById('editFooter').value = d.footer || "© 2026 YOUR BUSINESS SUITE";
-  document.getElementById('footerText').textContent = d.footer || "© 2026 YOUR BUSINESS SUITE";
-  if(d.logo) document.getElementById('logo').src = d.logo;
-  if(d.banner) document.getElementById('header').style.backgroundImage = d.banner;
-  renderMenu(); renderEditor();
-}
-function uploadImage(input, cb) { const reader = new FileReader(); reader.onload = e => cb(e.target.result); reader.readAsDataURL(input.files[0]); }
+
 function renderMenu() {
   const curCode = document.getElementById('editCurrency').value;
   const curSym = CURRENCY_SYMBOLS[curCode];
@@ -280,6 +363,7 @@ function renderMenu() {
   });
   container.innerHTML += `<button onclick="sendWhatsApp()" style="display:block; margin:20px auto; padding:15px 40px; background:var(--whatsapp); color:#000; font-weight:bold;">ORDER ON WHATSAPP</button>`;
 }
+
 function payWithTiffy(price) { currentTransactionPrice = parseFloat(price); const curCode = document.getElementById('editCurrency').value; const curSym = CURRENCY_SYMBOLS[curCode]; document.getElementById('amountDisplay').innerText = "Confirm Payment: " + curSym + currentTransactionPrice.toFixed(2); document.getElementById('scannerModal').style.display = 'flex'; }
 function confirmAndPay() { let bal = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0"); let currency = document.getElementById('editCurrency').value; let rate = CONVERSION_RATES[currency] || 1.0; let deduction = currentTransactionPrice / rate; if (bal < deduction) { alert("Insufficient funds!"); stopScanner(); return; } localStorage.setItem("TUSD_Nitro_Storage", (bal - deduction).toFixed(2)); alert("Payment successful!"); window.location.href = "https://tiffyai-usd.github.io/Transact/Transfer-Cash.html"; }
 function stopScanner() { document.getElementById('scannerModal').style.display = 'none'; }
@@ -326,6 +410,7 @@ function downloadHTML() {
     document.querySelector('#floatingDownload').style.display = 'block';
     document.getElementById('aiBtnContainer').style.display = 'block';
 }
+
 function renderEditor() {
   const me = document.getElementById('menuEditor'); me.innerHTML = '';
   menuSections.forEach((sec, s) => {
@@ -350,7 +435,7 @@ function renderEditor() {
       </div>`;
   });
 }
-function addSection() { menuSections.push({ title: "New", items: [{name:'Item', price:10, desc:'', img:'', qr:'', qty:0}] }); renderEditor(); }
+
 document.addEventListener('DOMContentLoaded', loadDraft);
 </script>
 </body>
