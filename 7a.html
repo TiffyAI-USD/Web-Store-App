@@ -186,15 +186,13 @@ async function saveDraft() {
         banner: document.getElementById('header').style.backgroundImage 
     };
 
-    // Try localStorage (small fallback)
     try {
         localStorage.setItem('webstore_pro_draft', JSON.stringify(data));
     } catch (e) {
-        console.warn("localStorage quota exceeded, using IndexedDB only");
+        console.warn("localStorage quota exceeded - using IndexedDB only");
         localStorage.removeItem('webstore_pro_draft');
     }
 
-    // Always save to IndexedDB for large images
     await saveToIDB('webstore_pro_draft', data);
 
     document.getElementById('autoSaveStatus').style.display = 'block';
@@ -203,21 +201,18 @@ async function saveDraft() {
 
 async function loadDraft() {
     let d = null;
-
-    // Try localStorage first
     const saved = localStorage.getItem('webstore_pro_draft');
     if (saved) {
         try { d = JSON.parse(saved); } catch(e){}
     }
 
-    // Fallback to IndexedDB if needed
     if (!d || !d.banner) {
         d = await getFromIDB('webstore_pro_draft');
     }
 
     if (!d && typeof INITIAL_STATE !== 'undefined') d = INITIAL_STATE;
     if (!d || Object.keys(d).length === 0) return;
-
+  
     if (d.menu) menuSections = d.menu;
     
     document.getElementById('cafeName').textContent = d.name || "Create your Store In Mere Minutes";
@@ -245,9 +240,95 @@ async function loadDraft() {
     renderEditor();
 }
 
+const questionScripts = {
+    editLogo: ["Let's begin. Start by uploading your business logo."],
+    editBanner: ["Now, upload a banner image for your store header."],
+    editName: ["Excellent. What is the name of your business?"],
+    editTag: ["Give me a snappy tagline for your brand."],
+    editPhone: ["I need your WhatsApp number to capture client sales."],
+    editCtaText: ["What should the call-to-action button say?"],
+    editCtaLink: ["Where should that button lead your customers?"],
+    editFooter: ["And finally, what text should go in your footer?"]
+};
+const confirmations = [
+    "Understood, logo updated.", "Perfect, banner applied.", "Got it, name saved.",
+    "Excellent choice, tagline set.", "Understood, WhatsApp number saved.",
+    "Perfect, button text updated.", "Got it, link configured.", "Excellent, footer updated."
+];
+
+async function startAiMode() {
+    window.speechSynthesis.cancel();
+    const video = document.getElementById('aiVideo');
+    const overlay = document.getElementById('aiOverlay');
+    overlay.style.display = 'flex';
+    setTimeout(() => overlay.style.opacity = '1', 50);
+    video.currentTime = 0; video.play();
+    await new Promise(r => setTimeout(r, 5500));
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; video.pause(); video.currentTime = 0; runInterview(); }, 500);
+}
+
+async function speak(text) {
+    document.getElementById('aiMsg').textContent = text;
+    return new Promise(r => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.onend = r;
+        window.speechSynthesis.speak(u);
+    });
+}
+
+async function runInterview() {
+    const fields = ['editLogo', 'editBanner', 'editName', 'editTag', 'editPhone', 'editCtaText', 'editCtaLink', 'editFooter'];
+    fields.forEach(id => document.getElementById(id).parentElement.classList.add('input-inactive'));
+   
+    for (let i = 0; i < fields.length; i++) {
+        const fieldId = fields[i];
+        const el = document.getElementById(fieldId);
+        const parent = el.parentElement;
+        parent.classList.remove('input-inactive');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ai-highlight');
+        await speak(questionScripts[fieldId][0]);
+        await new Promise(r => {
+            const eventType = (fieldId === 'editLogo' || fieldId === 'editBanner') ? 'change' : 'blur';
+            const handler = () => {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(confirmations[i]));
+                parent.classList.add('input-inactive');
+                el.removeEventListener(eventType, handler);
+                r();
+            };
+            el.addEventListener(eventType, handler);
+        });
+        el.classList.remove('ai-highlight');
+    }
+
+    await speak("Storefront configuration complete. Congratulations on setting up your professional storefront!");
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    await speak("Take a look at your beautiful store preview above.");
+   
+    document.getElementById('editor').scrollIntoView({ behavior: 'smooth' });
+    await speak("Now, let's move to your product section. quickly choos your store currency, scroll down, Add your items, prices, and descriptions. You can load two product photos on each section . To add more products, tap the add a section button thats half behind the download button.");
+   
+    const overlay = document.getElementById('aiOverlay');
+    const container = document.getElementById('aiChoiceContainer');
+    container.innerHTML = ''; overlay.style.display = 'flex'; overlay.style.opacity = '1';
+   
+    await speak("Ok cool, quick question. Have you got the hang of this now? see its super easy");
+   
+    const yesBtn = document.createElement('button'); yesBtn.textContent = "YES";
+    yesBtn.onclick = () => { overlay.style.display = 'none'; speak(" great, thats awesome!, you will see the products is very easy to tweak at the bottom there"); };
+    const noBtn = document.createElement('button'); noBtn.textContent = "NO";
+    noBtn.className = "remove";
+    noBtn.onclick = () => { window.open("https://tiffyai-usd.github.io/Info/Intro.html", "_blank"); overlay.style.display = 'none'; };
+    container.appendChild(yesBtn); container.appendChild(noBtn);
+   
+    await speak("after you got your products loaded. Download your store and save it. After that, click next to it, its the support chat icon. Let's get your account topped up and your store hosted already! Theres millions of people in the marketplace");
+}
+
 const CONVERSION_RATES = { "USD": 1.0, "ZAR": 18.5, "EUR": 0.92, "NGN": 1500.0, "INR": 83.0, "CNY": 7.20, "AUD": 1.5 };
 const CURRENCY_SYMBOLS = { "USD": "\( ", "ZAR": "R", "EUR": "€", "NGN": "₦", "INR": "₹", "CNY": "¥", "AUD": " \)" };
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
+let currentTransactionPrice = 0;
 
 function addSection() { menuSections.push({ title: "New Section", items: [] }); renderEditor(); saveDraft(); }
 function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
