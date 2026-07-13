@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+    :root{--gold: #d4a373; --gold-gradient: linear-gradient(180deg,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c);}
+    header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative;width:100%;}
+    header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
+    .logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;position:relative;z-index:2;}
+    h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold);position:relative;z-index:2;}
+    #editor{padding:3rem 5%;background:#111;border-top:3px dashed var(--gold);}
+    .editor-block{background:#1a1a1a;padding:1.5rem;border-radius:14px;margin-bottom:2rem;}
+    label{display:block;margin-top:1rem;color:var(--gold);}
+    input{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;border-radius:6px;}
+    button{background:var(--gold-gradient);border:none;padding:10px 18px;border-radius:30px;cursor:pointer;font-weight:bold;}
+</style>
+</head>
+<body>
+
+<header id="header">
+  <img id="logo" class="logo" src="">
+  <h1 id="cafeName">Create your Store</h1>
+</header>
+
+<div id="editor">
+    <div class="editor-block">
+      <label>1. Business Logo</label>
+      <input type="file" onchange="uploadImage(this, 'logo')">
+      <label>2. Banner Image</label>
+      <input type="file" onchange="uploadImage(this, 'banner')">
+      <label>3. Business Name</label>
+      <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
+    </div>
+</div>
+
+<script>
+// We use a hidden state to store the banner data exactly like the logo
+let storeData = { logo: '', banner: '', name: '' };
+
+function saveDraft() {
+  storeData.name = document.getElementById('cafeName').textContent;
+  localStorage.setItem('webstore_pro_draft', JSON.stringify(storeData));
+}
+
+function uploadImage(input, type) {
+    const reader = new FileReader();
+    reader.onload = e => {
+        const data = e.target.result;
+        if (type === 'logo') {
+            document.getElementById('logo').src = data;
+            storeData.logo = data;
+        } else {
+            document.getElementById('header').style.backgroundImage = `url('${data}')`;
+            storeData.banner = data;
+        }
+        saveDraft();
+    };
+    reader.readAsDataURL(input.files[0]);
+}
+
+function loadDraft() {
+    const saved = localStorage.getItem('webstore_pro_draft');
+    if (saved) {
+        storeData = JSON.parse(saved);
+        if(storeData.logo) document.getElementById('logo').src = storeData.logo;
+        if(storeData.banner) document.getElementById('header').style.backgroundImage = `url('${storeData.banner}')`;
+        if(storeData.name) {
+            document.getElementById('cafeName').textContent = storeData.name;
+            document.getElementById('editName').value = storeData.name;
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', loadDraft);
+</script>
+</body>
+</html>
