@@ -461,10 +461,10 @@ async function runInterview() {
     const container = document.getElementById('aiChoiceContainer');
     container.innerHTML = ''; overlay.style.display = 'flex'; overlay.style.opacity = '1';
    
-    await speak("Ok cool, see its super easy though. Ready to continue?");
+    await speak("Ok cool, see its super easy though. Ready! Tap yes to continue?");
    
     const yesBtn = document.createElement('button'); yesBtn.textContent = "YES";
-    yesBtn.onclick = () => { overlay.style.display = 'none'; speak(" great, thats awesome!, you will see the products is very easy to tweak at the bottom there, tap yes to continue"); };
+    yesBtn.onclick = () => { overlay.style.display = 'none'; speak(" great, thats awesome!, you will see the products is very easy to tweak at the bottom there."); };
     const noBtn = document.createElement('button'); noBtn.textContent = "Full Scope";
     noBtn.className = "remove";
     noBtn.onclick = () => { window.open("https://tiffyai-usd.github.io/Trader/Information.html", "_blank"); overlay.style.display = 'none'; };
