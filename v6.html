@@ -301,6 +301,7 @@ async function loadDraft() {
 
     if (!d || Object.keys(d).length === 0) {
         await resolveClientIP();
+        enterMarketplace();
         return;
     }
   
@@ -333,6 +334,10 @@ async function loadDraft() {
     recordRealtimeSale(0, true);
     renderMenu(); 
     renderEditor();
+    
+    setTimeout(() => {
+        enterMarketplace();
+    }, 400);
 }
 
 const questionScripts = {
