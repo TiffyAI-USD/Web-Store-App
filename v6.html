@@ -259,11 +259,11 @@ async function loadDraft() {
   
     if (d.menu) menuSections = d.menu;
     
-    document.getElementById('cafeName').textContent = d.name || "Create your Store In Mere Minutes";
+    document.getElementById('cafeName').textContent = d.name || "Top up your account and you good to go!";
     document.getElementById('tagline').textContent = d.tag || DEFAULT_TAG;
     document.getElementById('editName').value = d.name || "";
     document.getElementById('editTag').value = d.tag || DEFAULT_TAG;
-    document.getElementById('editPhone').value = d.phone || "";
+    document.getElementById('editPhone').value = d.phone || "27766314246";
     document.getElementById('editCtaText').value = d.ctaText || "Powered By TiffyAI";
     document.getElementById('ctaBtn').textContent = d.ctaText || "Powered By TiffyAI";
     document.getElementById('editCtaLink').value = d.ctaLink || "#";
@@ -375,7 +375,7 @@ async function runInterview() {
     await speak("after you got your products loaded. Download your store and save it. After that, click next to it, its the support chat icon. Let's get your account topped up and your store hosted already! Theres millions of people in the marketplace");
 }
 
-const CONVERSION_RATES = { "USD": 1.0, "ZAR": 18.5, "EUR": 0.92, "NGN": 1500.0, "INR": 83.0, "CNY": 7.20, "AUD": 1.5 };
+const CONVERSION_RATES = { "USD": 1.0, "ZAR": 16.84, "EUR": 0.92, "NGN": 1500.0, "INR": 83.0, "CNY": 7.20, "AUD": 1.5 };
 const CURRENCY_SYMBOLS = { "USD": "$", "ZAR": "R", "EUR": "€", "NGN": "₦", "INR": "₹", "CNY": "¥", "AUD": "$" };
 let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
 let currentTransactionPrice = 0;
@@ -490,7 +490,7 @@ async function confirmAndPay() {
     tiffyChannel.postMessage({ type: 'SOVEREIGN_UNIFIED_SALE', ledger: registry, nodeKey: ledgerKey });
 
     const sellerPhone = document.getElementById('editPhone').value || "";
-    const whatsappMsg = encodeURIComponent(`Hi, I just completed payment of $${paidAmount.toFixed(2)} (TX: ${txId}). Please arrange my shipping details.`);
+    const whatsappMsg = encodeURIComponent(`Hi, I just completed payment of $${paidAmount.toFixed(2)} (Paste this transaction ID in your Store Owner Terminal: ${txId}). Please get in contact to arrange my shipping details.`);
     const whatsappLink = sellerPhone ? `https://wa.me/${sellerPhone}?text=${whatsappMsg}` : "#";
 
     document.getElementById('paymentLanding').innerHTML = `
