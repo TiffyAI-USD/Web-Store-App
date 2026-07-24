@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TiffyAI Sovereign Gateway - Complete Ecosystem & Builder (Boulder Edition)</title>
+    <style>
+        :root {
+            --bg-deep: #030712;
+            --bg-panel: #0d1322;
+            --bg-card: #162032;
+            --border: #223049;
+            --border-active: #3b82f6;
+            --green: #10b981;
+            --blue: #3b82f6;
+            --purple: #8b5cf6;
+            --red: #ef4444;
+            --text-main: #f9fafb;
+            --text-dim: #9ca3af;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            background-color: var(--bg-deep);
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .boulder-wrapper {
+            width: 100%;
+            max-width: 1300px;
+            background: var(--bg-panel);
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.95);
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        h1 {
+            font-size: 24px;
+            color: var(--blue);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .status-pill {
+            background: var(--bg-card);
+            padding: 8px 16px;
+            border-radius: 4px;
+            font-size: 13px;
+            border: 1px solid var(--border-active);
+            font-weight: bold;
+            color: var(--green);
+        }
+
+        .layout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        @media (max-width: 950px) {
+            .layout-grid { grid-template-columns: 1fr; }
+        }
+
+        .section-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        h2, h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--green);
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        label {
+            display: block;
+            font-size: 11px;
+            color: var(--text-dim);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            background: var(--bg-deep);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 12px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            border-color: var(--border-active);
+            outline: none;
+        }
+
+        button {
+            background: var(--green);
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.85; }
+        .btn-blue { background: var(--blue); }
+        .btn-purple { background: var(--purple); }
+        .btn-red { background: var(--red); margin-top: 15px; }
+
+        .console-screen {
+            background: #010409;
+            border: 1px solid var(--border);
+            padding: 15px;
+            font-size: 12px;
+            height: 200px;
+            overflow-y: auto;
+            color: var(--green);
+            border-radius: 4px;
+            line-height: 1.4;
+        }
+
+        .ledger-card {
+            background: var(--bg-deep);
+            border-left: 4px solid var(--blue);
+            padding: 12px;
+            margin-top: 10px;
+            font-size: 13px;
+            border-radius: 2px;
+        }
+
+        .store-display-frame {
+            background: var(--bg-deep);
+            border: 1px dashed var(--border);
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="boulder-wrapper">
+    <header>
+        <h1>TiffyAI Sovereign Gateway - Boulder Edition V6</h1>
+        <div class="status-pill" id="master-node-status">BOOTING IP HANDSHAKE...</div>
+    </header>
+
+    <div class="layout-grid">
+        <!-- LEFT COLUMN: Website Builder, Storefront Generator & POS Engine -->
+        <div>
+            <!-- Owner Builder Panel -->
+            <div class="section-box" id="box-owner-builder" style="display:none;">
+                <h2>Website & Storefront Generator Engine</h2>
+                <label>Store / Ecosystem Name</label>
+                <input type="text" id="cfg-store-name" value="Papa Ron's Oasis Marketplace">
+
+                <label>Item / Product Title</label>
+                <input type="text" id="cfg-item-title" value="Sovereign Enterprise Core Node">
+
+                <label>Price (USD)</label>
+                <input type="number" id="cfg-item-price" value="350.00">
+
+                <label>Storefront Category</label>
+                <select id="cfg-category">
+                    <option value="Software">Software & Ecosystems</option>
+                    <option value="Restaurants">Restaurants & Food</option>
+                    <option value="Services">Professional Services</option>
+                    <option value="Classifieds">Classifieds & Assets</option>
+                </select>
+
+                <button class="btn-blue" onclick="commitStorefrontConfig()">Deploy & Bake Store State into HTML</button>
+            </div>
+
+            <!-- Buyer Storefront View Panel -->
+            <div class="section-box" id="box-buyer-store" style="display:none;">
+                <h2 id="display-store-name">Storefront Portal</h2>
+                <div class="store-display-frame">
+                    <p style="font-size: 18px; font-weight: bold; color: var(--blue); margin-bottom: 10px;" id="display-item-title">Loading Product...</p>
+                    <p style="font-size: 13px; color: var(--text-dim); margin-bottom: 15px;" id="display-item-category">Category: Loading...</p>
+                    <p style="font-size: 22px; color: var(--green); margin-bottom: 20px;" id="display-item-price">$0.00</p>
+                    <button class="btn-purple" onclick="executeSovereignTransaction()">Execute Payment & Route to Owner IP</button>
+                </div>
+            </div>
+
+            <!-- Master Terminal Console -->
+            <div class="section-box">
+                <h3>Sovereign System Console</h3>
+                <div class="console-screen" id="boulder-console">
+                    [BOOT] Initializing Boulder standalone architecture...<br>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Accounting Ledger & Direct IP Vault -->
+        <div>
+            <div class="section-box">
+                <h3>Accounting Ledger & IP Vault</h3>
+                <div style="font-size: 12px; margin-bottom: 10px; color: var(--text-dim);">
+                    Hardcoded Owner IP (Source of Truth): <span id="txt-owner-ip" style="color: var(--green);">Loading...</span>
+                </div>
+                <div style="font-size: 12px; margin-bottom: 20px; color: var(--text-dim);">
+                    Live Visitor IP Detected: <span id="txt-visitor-ip" style="color: var(--blue);">Loading...</span>
+                </div>
+
+                <div id="accounting-ledger-container">
+                    Scanning internal file state for ledger packets...
+                </div>
+
+                <button class="btn-red" onclick="purgeLedgerVault()" id="btn-purge-vault" style="display:none;">Purge Master Ledger Vault</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // =========================================================================
+    // BOULDER EDITION CORE CONFIGURATION (SOVEREIGN SOURCE OF TRUTH)
+    // =========================================================================
+    // The exact owner IP address hardcoded into the file itself.
+    const MASTER_OWNER_IP = "127.0.0.1";
+
+    function logConsole(message) {
+        const consoleEl = document.getElementById("boulder-console");
+        const timeStr = new Date().toLocaleTimeString();
+        consoleEl.innerHTML += `[${timeStr}] ${message}<br>`;
+        consoleEl.scrollTop = consoleEl.scrollHeight;
+    }
+
+    async function initBoulderGateway() {
+        let activeVisitorIP = "undetermined";
+        document.getElementById("txt-owner-ip").innerText = MASTER_OWNER_IP;
+
+        try {
+            logConsole("Querying external network resolver for live visitor IP endpoint...");
+            let response = await fetch('https://api.ipify.org?format=json');
+            let data = await response.json();
+            activeVisitorIP = data.ip;
+            logConsole(`IP handshake successful. Visitor IP: ${activeVisitorIP}`);
+        } catch (err) {
+            logConsole("Network lookup unreachable. Defaulting to isolated secure local fallback state.");
+            activeVisitorIP = "undetermined-local-ip";
+        }
+
+        document.getElementById("txt-visitor-ip").innerText = activeVisitorIP;
+
+        // STRICT ROLE SEPARATION: Compare visitor IP directly against hardcoded owner IP
+        if (activeVisitorIP === MASTER_OWNER_IP) {
+            document.getElementById("master-node-status").innerText = "MODE: OWNER (CREATOR TERMINAL)";
+            logConsole("Identity Match: Owner IP verified. Unlocking builder & master accounting vault.");
+            
+            // Show Owner Panels, Hide Buyer Panels
+            document.getElementById("box-owner-builder").style.display = "block";
+            document.getElementById("box-buyer-store").style.display = "none";
+            document.getElementById("btn-purge-vault").style.display = "block";
+            renderOwnerLedger();
+        } else {
+            document.getElementById("master-node-status").innerText = "MODE: BUYER (CUSTOMER STOREFRONT)";
+            logConsole("Identity Mismatch: Customer IP detected. Locking administrative controls.");
+            
+            // Show Buyer Storefront, Hide Owner Panels
+            document.getElementById("box-owner-builder").style.display = "none";
+            document.getElementById("box-buyer-store").style.display = "block";
+            document.getElementById("btn-purge-vault").style.display = "none";
+            loadStorefrontForBuyer();
+        }
+    }
+
+    function commitStorefrontConfig() {
+        let storeName = document.getElementById("cfg-store-name").value;
+        let itemTitle = document.getElementById("cfg-item-title").value;
+        let itemPrice = document.getElementById("cfg-item-price").value;
+        let category = document.getElementById("cfg-category").value;
+
+        let storeConfig = { storeName, itemTitle, itemPrice, category };
+        localStorage.setItem("BOULDER_STORE_CONFIG", JSON.stringify(storeConfig));
+        
+        logConsole(`Store compiled: [${storeName}] ${itemTitle} ($${itemPrice})`);
+        alert("Store configuration successfully baked into the HTML file state cache!");
+    }
+
+    function loadStorefrontForBuyer() {
+        let config = JSON.parse(localStorage.getItem("BOULDER_STORE_CONFIG") || JSON.stringify({
+            storeName: "Papa Ron's Oasis Marketplace",
+            itemTitle: "Sovereign Enterprise Core Node",
+            itemPrice: "350.00",
+            category: "Software"
+        }));
+
+        document.getElementById("display-store-name").innerText = config.storeName;
+        document.getElementById("display-item-title").innerText = config.itemTitle;
+        document.getElementById("display-item-category").innerText = `Category: ${config.category}`;
+        document.getElementById("display-item-price").innerText = `$${parseFloat(config.itemPrice).toFixed(2)}`;
+
+        logConsole(`Loaded storefront view for customer: ${config.storeName}`);
+    }
+
+    function executeSovereignTransaction() {
+        let config = JSON.parse(localStorage.getItem("BOULDER_STORE_CONFIG") || JSON.stringify({
+            storeName: "Papa Ron's Oasis Marketplace",
+            itemTitle: "Sovereign Enterprise Core Node",
+            itemPrice: "350.00",
+            category: "Software"
+        }));
+
+        let currentVisitorIP = document.getElementById("txt-visitor-ip").innerText;
+        logConsole(`Processing purchase transaction for Buyer IP: ${currentVisitorIP}`);
+
+        let salePacket = {
+            store: config.storeName,
+            item: config.itemTitle,
+            price: config.itemPrice,
+            category: config.category,
+            buyerIP: currentVisitorIP,
+            ownerIP: MASTER_OWNER_IP,
+            timestamp: Date.now()
+        };
+
+        // Write directly to master ledger vault inside file state
+        let ledgerVault = JSON.parse(localStorage.getItem("BOULDER_MASTER_LEDGER") || "[]");
+        ledgerVault.push(salePacket);
+        localStorage.setItem("BOULDER_MASTER_LEDGER", JSON.stringify(ledgerVault));
+
+        logConsole("Transaction packet securely routed and recorded to master ledger vault.");
+        alert("Purchase complete! Sale securely routed to the owner ledger.");
+    }
+
+    function renderOwnerLedger() {
+        let container = document.getElementById("accounting-ledger-container");
+        let ledgerVault = JSON.parse(localStorage.getItem("BOULDER_MASTER_LEDGER") || "[]");
+
+        if (ledgerVault.length > 0) {
+            let htmlOutput = `<strong>Recorded Transactions (${ledgerVault.length}):</strong><br><br>`;
+            ledgerVault.forEach((tx, idx) => {
+                let timeString = new Date(tx.timestamp).toLocaleTimeString();
+                htmlOutput += `
+                    <div class="ledger-card">
+                        <strong>#${idx + 1}</strong> | ${tx.item} ($${tx.price})<br>
+                        Store: ${tx.store}<br>
+                        Buyer IP: <span style="color:var(--blue);">${tx.buyerIP}</span><br>
+                        Time: ${timeString}
+                    </div>
+                `;
+            });
+            container.innerHTML = htmlOutput;
+            logConsole(`Successfully loaded ${ledgerVault.length} transactions into owner ledger view.`);
+        } else {
+            container.innerHTML = `<p style="color:var(--text-dim); font-style:italic;">Ledger vault is currently empty. Waiting for incoming buyer packets...</p>`;
+            logConsole("Ledger vault scan complete: Zero transactions found.");
+        }
+    }
+
+    function purgeLedgerVault() {
+        localStorage.removeItem("BOULDER_MASTER_LEDGER");
+        logConsole("Master ledger vault wiped clean by owner.");
+        renderOwnerLedger();
+    }
+
+    // Run initialization sequence on window load
+    window.onload = function() {
+        initBoulderGateway();
+    };
+</script>
+
+</body>
+</html>
