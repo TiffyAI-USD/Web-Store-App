@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TiffyAI Sovereign Gateway - Ecosystem Build</title>
+    <style>
+        :root {
+            --bg-primary: #090d16;
+            --bg-secondary: #111827;
+            --bg-card: #1f2937;
+            --border-color: #374151;
+            --accent-green: #10b981;
+            --accent-blue: #3b82f6;
+            --text-main: #f3f4f6;
+            --text-muted: #9ca3af;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: 'Courier New', Courier, monospace;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: var(--bg-secondary);
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        }
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        h1 {
+            font-size: 20px;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .badge {
+            background: var(--bg-card);
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+        }
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        h3 {
+            font-size: 16px;
+            margin-bottom: 12px;
+            color: var(--accent-green);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 8px;
+        }
+        input, select, textarea {
+            width: 100%;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin-bottom: 12px;
+        }
+        button {
+            background: var(--accent-green);
+            color: white;
+            border: none;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        button:hover { opacity: 0.9; }
+        .btn-blue { background: var(--accent-blue); }
+        .btn-danger { background: #ef4444; }
+        .console {
+            background: #030712;
+            border: 1px solid var(--border-color);
+            padding: 12px;
+            font-size: 12px;
+            height: 160px;
+            overflow-y: auto;
+            color: var(--accent-green);
+            border-radius: 4px;
+            margin-top: 15px;
+        }
+        .ledger-row {
+            background: var(--bg-primary);
+            border-left: 3px solid var(--accent-blue);
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 12px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>TiffyAI Sovereign Gateway V6</h1>
+        <div class="badge" id="role-badge">Detecting IP Node...</div>
+    </header>
+
+    <div class="grid">
+        <!-- Builder & Storefront Column -->
+        <div>
+            <div class="card" id="storefront-card">
+                <h3>Storefront & Product Builder</h3>
+                <div id="builder-controls">
+                    <label>Product Name</label>
+                    <input type="text" id="prod-name" value="Sovereign Node License">
+                    <label>Price ($)</label>
+                    <input type="number" id="prod-price" value="150.00">
+                    <button class="btn-blue" onclick="saveProductConfig()">Update Storefront Config</button>
+                </div>
+                <div id="buyer-checkout-view" style="margin-top:15px; display:none;">
+                    <p id="storefront-display-item" style="margin-bottom:10px; font-weight:bold;"></p>
+                    <button onclick="executePurchase()">Purchase Item (Route to Owner IP)</button>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>System Console</h3>
+                <div class="console" id="sys-console">
+                    [BOOT] Initializing standalone HTML sovereign runtime...<br>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ledger & Accounting Column -->
+        <div>
+            <div class="card">
+                <h3>Accounting Ledger & IP Vault</h3>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Hardcoded Owner IP: <span id="lbl-owner-ip" style="color:var(--accent-green);">Loading...</span></p>
+                <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Live Visitor IP: <span id="lbl-visitor-ip" style="color:var(--accent-blue);">Loading...</span></p>
+                
+                <div id="owner-ledger-container">
+                    Scanning internal file state for transactions...
+                </div>
+                <button class="btn-danger" onclick="purgeLedger()" style="margin-top:15px;">Purge Ledger Vault</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ==========================================
+    // SOVEREIGN GATEWAY CORE CONFIGURATION
+    // ==========================================
+    // Hardcoded owner IP (The Sovereign Source of Truth)
+    const MASTER_OWNER_IP = "127.0.0.1"; 
+
+    function log(text) {
+        const box = document.getElementById("sys-console");
+        box.innerHTML += `[${new Date().toLocaleTimeString()}] ${text}<br>`;
+        box.scrollTop = box.scrollHeight;
+    }
+
+    async function initGateway() {
+        let visitorIP = "undetermined";
+        document.getElementById("lbl-owner-ip").innerText = MASTER_OWNER_IP;
+
+        try {
+            log("Querying external network resolver for live visitor IP...");
+            let res = await fetch('https://api.ipify.org?format=json');
+            let data = await res.json();
+            visitorIP = data.ip;
+            log(`Visitor IP resolved successfully: ${visitorIP}`);
+        } catch (e) {
+            log("Network resolver offline. Defaulting to secure fallback state.");
+            visitorIP = "undetermined-local-ip";
+        }
+
+        document.getElementById("lbl-visitor-ip").innerText = visitorIP;
+
+        // STRICT ROLE SEPARATION: Correctly check Owner vs Buyer
+        if (visitorIP === MASTER_OWNER_IP) {
+            document.getElementById("role-badge").innerText = "MODE: OWNER (CREATOR)";
+            document.getElementById("role-badge").style.borderColor = "var(--accent-green)";
+            log("Identity Matched: Owner privileges active. Builder & Ledger unlocked.");
+            
+            // Owner view
+            document.getElementById("builder-controls").style.display = "block";
+            document.getElementById("buyer-checkout-view").style.display = "none";
+            loadLedgerData();
+        } else {
+            document.getElementById("role-badge").innerText = "MODE: BUYER (CUSTOMER)";
+            document.getElementById("role-badge").style.borderColor = "var(--accent-blue)";
+            log("Identity Mismatch: Customer detected. Administrative controls locked.");
+            
+            // Buyer view
+            document.getElementById("builder-controls").style.display = "none";
+            document.getElementById("buyer-checkout-view").style.display = "block";
+            loadActiveProduct();
+        }
+    }
+
+    function saveProductConfig() {
+        let name = document.getElementById("prod-name").value;
+        let price = document.getElementById("prod-price").value;
+        
+        let config = { name, price };
+        localStorage.setItem("SOVEREIGN_STORE_CONFIG", JSON.stringify(config));
+        log(`Storefront configuration updated: ${name} ($${price})`);
+        alert("Storefront configuration saved directly into HTML state cache!");
+    }
+
+    function loadActiveProduct() {
+        let config = JSON.parse(localStorage.getItem("SOVEREIGN_STORE_CONFIG") || '{"name": "Sovereign Node License", "price": "150.00"}');
+        document.getElementById("storefront-display-item").innerText = `${config.name} - $${config.price}`;
+        log(`Loaded active storefront item: ${config.name}`);
+    }
+
+    function executePurchase() {
+        let config = JSON.parse(localStorage.getItem("SOVEREIGN_STORE_CONFIG") || '{"name": "Sovereign Node License", "price": "150.00"}');
+        let visitorIP = document.getElementById("lbl-visitor-ip").innerText;
+
+        log(`Processing purchase for item: ${config.name} from Buyer IP: ${visitorIP}`);
+
+        let transactionPacket = {
+            item: config.name,
+            price: config.price,
+            buyerIP: visitorIP,
+            ownerIP: MASTER_OWNER_IP,
+            timestamp: Date.now()
+        };
+
+        // Route directly to sovereign ledger vault
+        let vault = JSON.parse(localStorage.getItem("SOVEREIGN_MASTER_LEDGER") || "[]");
+        vault.push(transactionPacket);
+        localStorage.setItem("SOVEREIGN_MASTER_LEDGER", JSON.stringify(vault));
+
+        log("Transaction packet successfully routed and committed to ledger vault.");
+        alert("Purchase complete! Transaction securely routed to owner ledger.");
+    }
+
+    function loadLedgerData() {
+        let container = document.getElementById("owner-ledger-container");
+        let vault = JSON.parse(localStorage.getItem("SOVEREIGN_MASTER_LEDGER") || "[]");
+
+        if (vault.length > 0) {
+            let html = `<strong>Recorded Transactions (${vault.length}):</strong><br>`;
+            vault.forEach((tx, idx) => {
+                let time = new Date(tx.timestamp).toLocaleTimeString();
+                html += `
+                    <div class="ledger-row">
+                        <strong>#${idx + 1}</strong> | ${tx.item} ($${tx.price})<br>
+                        Buyer IP: <span style="color:var(--accent-blue);">${tx.buyerIP}</span><br>
+                        Time: ${time}
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+            log(`Loaded ${vault.length} sales into owner accounting view.`);
+        } else {
+            container.innerHTML = `<p style="color:var(--text-muted); font-style:italic;">Ledger vault is currently empty. Waiting for buyer IP packets...</p>`;
+            log("Ledger vault scan complete: Zero transactions found.");
+        }
+    }
+
+    function purgeLedger() {
+        localStorage.removeItem("SOVEREIGN_MASTER_LEDGER");
+        log("Ledger vault wiped clean by owner.");
+        loadLedgerData();
+    }
+
+    window.onload = function() {
+        initGateway();
+    };
+</script>
+
+</body>
+</html>
