@@ -1,0 +1,822 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Webstore Pro - Sovereign Store Node</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;700&display=swap" rel="stylesheet">
+<style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#e6e6e6}
+    :root{
+        --gold: #d4a373;
+        --gold2: #f1b86b;
+        --whatsapp: #25D366;
+        --gold-gradient: linear-gradient(180deg,#bf953f,#fcf6ba,#b38728,#fbf5b7,#aa771c);
+    }
+    .ai-highlight { outline: 6px solid var(--gold) !important; transform: scale(1.02); transition: 0.3s; box-shadow: 0 0 20px var(--gold); z-index: 9999; position: relative; }
+    .input-inactive { opacity: 0.3; pointer-events: none; transition: opacity 0.5s; }
+    #aiOverlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 10000; justify-content: center; align-items: center; flex-direction: column; opacity: 0; transition: opacity 0.5s ease; }
+    #introOverlay { position: fixed; inset: 0; background: #000; z-index: 99999; display: flex; justify-content: center; align-items: center; cursor: pointer; }
+    #floatingDownload { position: fixed; bottom: 20px; left: 20px; z-index: 9999; background: #000; color: var(--gold); padding: 12px 20px; border: 2px solid var(--gold); border-radius: 30px; font-family: 'Bebas Neue'; cursor: pointer; font-size: 1rem; box-shadow: 0 4px 10px rgba(0,0,0,0.5); }
+    #scannerModal {position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;flex-direction:column;padding:20px;}
+    #paymentLanding {background:#1a1a1a; padding:20px; border:2px solid var(--gold); border-radius:12px; text-align:center; width: 90%; max-width: 400px;}
+    #supportFloating {position:fixed;bottom:20px;right:20px;z-index:9998;cursor:pointer;}
+    #supportFloating img {width:60px;height:60px;border-radius:50%;border:2px solid var(--gold);}
+    #autoSaveStatus {position:fixed;top:10px;left:10px;z-index:5000;font-size:0.7rem;background:rgba(0,0,0,0.7);padding:4px 10px;border-radius:20px;border:1px solid var(--gold);color:var(--gold);display:none;}
+    header{min-height:80vh;background-size:cover;background-position:center;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;position:relative; width: 100%;}
+    header::after{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.6);}
+    header *{position:relative;z-index:2}
+    .logo{max-width:180px;border-radius:16px;border:3px solid var(--gold);margin-bottom:1rem;cursor:pointer;}
+    h1{font-family:'Bebas Neue';font-size:4rem;color:var(--gold)}
+    .tagline{font-family:'Bebas Neue';color:var(--gold); padding: 0 5%;}
+    .cta-container {margin-top:25px;z-index:10;}
+    .btn-cta {display:inline-block;background:var(--gold-gradient);color:#000;padding:12px 28px;border-radius:50px;font-family:'Bebas Neue';text-decoration:none;font-size:1.2rem;box-shadow:0 4px 15px rgba(212,163,115,0.4);font-weight:bold;}
+    #menu{max-width:1200px;margin:auto;padding:4rem 5%}
+    .section-title{font-family:'Bebas Neue';font-size:2.4rem;color:var(--gold);margin:2rem 0 1rem;}
+    .menu-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1.2rem; width: 100%;}
+    .menu-item{background:#0f0f0f;border-radius:12px;border:1px solid #222;overflow:hidden;position:relative;}
+    .menu-item img{width:100%;height:200px;object-fit:cover;border-bottom:3px solid var(--gold);cursor:pointer;}
+    .card{padding:1rem;}
+    .menu-item h3{font-family:'Bebas Neue';color:var(--gold)}
+    .price{font-family:'Bebas Neue';color:var(--gold2)}
+    .qr-img{width:80px;height:80px;margin-top:10px;border:1px solid #fff;cursor:pointer;}
+    #editor{position:relative;border-top:3px dashed var(--gold);padding:3rem 5%;background:url('silky.jpeg') no-repeat center center/cover;background-attachment:fixed;}
+    #editor::before { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.5); z-index: 0; }
+    #editor > * { position: relative; z-index: 1; }
+    .editor-block{background:rgba(20,20,20,0.9);padding:1.5rem;border-radius:14px;margin-bottom:2rem;box-shadow:0 10px 30px rgba(0,0,0,0.6);}
+    #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.95);display:none;align-items:center;justify-content:center;z-index:9999;}
+    #zoomModal img{max-width:90%;max-height:90%;}
+    label{display:block;margin-top:1rem;color:var(--gold)}
+    input,textarea,select{width:100%;padding:10px;background:#222;border:1px solid #444;color:#fff;border-radius:6px;}
+    button{background:var(--gold-gradient);border:none;padding:10px 18px;border-radius:30px;font-family:'Bebas Neue';font-size:1.1rem;cursor:pointer;margin:5px;color:#000;font-weight:bold;}
+    .remove{background:#900 !important;color:#fff !important;}
+    .btn-small{font-size:0.8rem;padding:5px 10px;margin-top:10px;display:inline-block;}
+</style>
+</head>
+<body>
+
+<div id="introOverlay">
+    <video id="introVideo" playsinline webkit-playsinline preload="auto" style="width:100%; height:100%; object-fit:cover;">
+        <source src="Intro.mp4" type="video/mp4">
+    </video>
+    <div id="playPrompt" style="position:absolute; color:var(--gold); font-family:'Outfit', sans-serif; font-weight:700; font-size:1.5rem; letter-spacing:1px; text-align:center; background:rgba(0,0,0,0.75); backdrop-filter:blur(10px); padding:16px 36px; border:1px solid rgba(212,163,115,0.4); border-radius:40px; display:none; pointer-events:none; box-shadow:0 10px 30px rgba(0,0,0,0.5); text-transform:uppercase;">Tap Here</div>
+</div>
+
+<div id="aiOverlay">
+    <div style="width:300px; height:300px; border-radius:50%; overflow:hidden; border:4px solid var(--gold); margin-bottom:20px;">
+        <video id="aiVideo" playsinline loop style="width:100%; height:100%; object-fit:cover;">
+            <source src="TiffyAI-Business-Hub.mp4" type="video/mp4">
+        </video>
+    </div>
+    <p id="aiMsg" style="font-family:'Bebas Neue'; color:var(--gold); font-size:1.5rem; text-align:center; padding:0 20px;"></p>
+    <div id="aiChoiceContainer" style="margin-top:20px;"></div>
+</div>
+
+<div id="aiBtnContainer" style="position:fixed; top:20px; right:20px; z-index:9997;">
+    <button onclick="startAiMode()">AI BUILDER</button>
+</div>
+
+<div id="floatingDownload" onclick="downloadHTML()">💾 DOWNLOAD</div>
+
+<div id="scannerModal">
+    <div id="paymentLanding">
+        <h2 id="amountDisplay" style="color:var(--gold); margin-bottom:15px;">Confirm Payment</h2>
+        <div style="margin-bottom:12px; text-align:left; color:#ccc; font-size:0.9rem;">
+            <p>Store Handle: <b id="displayStoreKey" style="color:var(--gold);">Resolving...</b></p>
+            <p>Global Ledger: <b id="displayCreatorIP" style="color:var(--gold);">Universal Vault</b></p>
+            <p>Buyer Node: <b id="displayBuyerNode" style="color:var(--gold);">Connecting...</b></p>
+        </div>
+        <button onclick="confirmAndPay()">CONFIRM & PAY</button>
+        <button class="remove" onclick="stopScanner()">CANCEL</button>
+    </div>
+</div>
+<div id="zoomModal" onclick="this.style.display='none'"><img id="zoomImg"></div>
+<div id="supportFloating" onclick="enterMarketplace()"><img src="support.png" onerror="this.style.display='none'"></div>
+<div id="autoSaveStatus">Saved Draft</div>
+
+<header id="header">
+  <img id="logo" class="logo" onclick="zoom(this.src)">
+  <h1 id="cafeName">Create your Store In Mere Minutes</h1>
+  <p id="tagline" class="tagline"></p>
+  <div class="cta-container">
+      <a href="#" id="ctaBtn" class="btn-cta" target="_blank">Powered By TiffyAI</a>
+  </div>
+</header>
+<section id="menu"><div id="menuRender"></div></section>
+<footer><p id="footerText" style="text-align:center; padding:20px; color:#666;">© 2026 YOUR BUSINESS</p></footer>
+
+<div id="editor">
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">GLOBAL SETTINGS</h2>
+    <div class="editor-block">
+        <label>Store Currency</label>
+        <select id="editCurrency" onchange="saveDraft(); renderMenu()">
+            <option value="USD">USD ($)</option>
+            <option value="ZAR">ZAR (R)</option>
+            <option value="EUR">EUR (€)</option>
+            <option value="NGN">NGN (₦)</option>
+            <option value="INR">INR (₹)</option>
+            <option value="CNY">CNY (¥)</option>
+            <option value="AUD">AUD ($)</option>
+        </select>
+        <label>Universal Master Ledger Key</label>
+        <input id="editOwnerIP" value="tiffy_global_master_ledger" oninput="saveDraft()">
+    </div>
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">BUSINESS INFO</h2>
+    <div class="editor-block">
+      <label>1. Upload Business Logo</label>
+      <input type="file" id="editLogo" onchange="uploadImage(this, img=>{document.getElementById('logo').src=img; saveDraft()})">
+      <label>2. Upload Banner Image</label>
+      <input type="file" id="editBanner" onchange="uploadImage(this, img=>{document.getElementById('header').style.backgroundImage='url('+img+')'; saveDraft()})">
+      <label>3. Business Name</label>
+      <input id="editName" oninput="document.getElementById('cafeName').textContent=this.value;saveDraft()">
+      <label>4. Tagline</label>
+      <textarea id="editTag" oninput="document.getElementById('tagline').textContent=this.value;saveDraft()"></textarea>
+      <label>5. WhatsApp Number</label>
+      <input id="editPhone" placeholder="27xxxxxxxx" oninput="saveDraft()">
+      <label>6. CTA Button Text</label>
+      <input id="editCtaText" value="ORDER NOW" oninput="document.getElementById('ctaBtn').textContent=this.value;saveDraft()">
+      <label>7. CTA Button Link</label>
+      <input id="editCtaLink" placeholder="https://..." oninput="document.getElementById('ctaBtn').href=this.value;saveDraft()">
+      <label>8. Footer Text</label>
+      <input id="editFooter" oninput="document.getElementById('footerText').textContent=this.value;saveDraft()">
+    </div>
+    <h2 style="font-family:'Bebas Neue';color:var(--gold)">MENU BUILDER</h2>
+    <div id="menuEditor"></div>
+    <button onclick="addSection()">+ ADD SECTION</button>
+</div>
+
+<script>
+const DEFAULT_TAG = "You dont even need internet to do business anywhere in the world.. Theres not a single third party server used , its totally hack proof. You Set up your store in minutes.. not days.. Send and receive instant payments immediately. Host your business in the Tiffyverse for millions of people to interact with. Built in secure chat to close deals and best of all cut out the middle man.. TiffyAI Business Hub is completely gasless on transactions. Top up your account with a minimum of 10 dollers to use immediately or get 8% interest on your holdings.. The worlds first, truely decentralized sovereign business suite. Keeps track of stock. No need to do any marketing in the Tiffyverse. People search for what they want and businesses pop up. Sell on WhatsApp or receive instant payments directly.";
+
+const DB_NAME = 'TiffyStoreDB';
+const STORE_NAME = 'StoreData';
+const tiffyChannel = new BroadcastChannel('tiffy_sovereign_sync_channel');
+
+async function getDB() {
+    return new Promise((resolve, reject) => {
+        const request = indexedDB.open(DB_NAME, 1);
+        request.onupgradeneeded = (e) => e.target.result.createObjectStore(STORE_NAME);
+        request.onsuccess = (e) => resolve(e.target.result);
+        request.onerror = (e) => reject(e.target.error);
+    });
+}
+
+async function saveToIDB(key, value) {
+    try {
+        const db = await getDB();
+        const tx = db.transaction(STORE_NAME, 'readwrite');
+        tx.objectStore(STORE_NAME).put(value, key);
+        await new Promise((resolve, reject) => { tx.oncomplete = resolve; tx.onerror = reject; });
+    } catch (e) {}
+}
+
+async function getFromIDB(key) {
+    try {
+        const db = await getDB();
+        return new Promise(resolve => {
+            const tx = db.transaction(STORE_NAME, 'readonly');
+            const req = tx.objectStore(STORE_NAME).get(key);
+            req.onsuccess = () => resolve(req.result);
+            req.onerror = () => resolve(null);
+        });
+    } catch (e) {
+        return null;
+    }
+}
+
+let cachedClientIP = "cross_browser_node_" + Math.floor(Math.random() * 90000 + 10000);
+
+function getStoreOwnerRegistryKey() {
+    let customKey = document.getElementById('editOwnerIP') ? document.getElementById('editOwnerIP').value.trim() : "";
+    if (customKey) return "tiffy_unified_ledger_" + customKey.replace(/[^a-zA-Z0-9]/g, '_');
+    if (typeof INITIAL_STATE !== 'undefined' && INITIAL_STATE && INITIAL_STATE.creatorIPKey) {
+        return INITIAL_STATE.creatorIPKey;
+    }
+    return "tiffy_unified_ledger_tiffy_global_master_ledger";
+}
+
+function getStoreUniqueKey() {
+    if (typeof INITIAL_STATE !== 'undefined' && INITIAL_STATE && INITIAL_STATE.storeHandle) {
+        return INITIAL_STATE.storeHandle;
+    }
+    let name = document.getElementById('cafeName').textContent.trim();
+    if (!name || name === "Create your Store In Mere Minutes" || name === "Unnamed Store") {
+        name = "Default_Sovereign_Store";
+    }
+    return "store_ledger_" + name.toLowerCase().replace(/[^a-z0-9]/g, '_');
+}
+
+tiffyChannel.onmessage = function (event) {
+    if (event.data && event.data.type === 'SOVEREIGN_UNIFIED_SALE') {
+        try {
+            localStorage.setItem(event.data.nodeKey, JSON.stringify(event.data.ledger));
+        } catch(e) {}
+    }
+};
+
+async function saveDraft() {
+    const data = { 
+        name: document.getElementById('cafeName').textContent, 
+        tag: document.getElementById('tagline').textContent, 
+        phone: document.getElementById('editPhone').value, 
+        ctaText: document.getElementById('editCtaText').value, 
+        ctaLink: document.getElementById('editCtaLink').value, 
+        footer: document.getElementById('footerText').textContent, 
+        menu: menuSections, 
+        currency: document.getElementById('editCurrency').value, 
+        ownerIP: document.getElementById('editOwnerIP').value,
+        logo: document.getElementById('logo').src, 
+        banner: document.getElementById('header').style.backgroundImage 
+    };
+
+    try { localStorage.setItem('webstore_pro_draft', JSON.stringify(data)); } catch (e) {}
+    await saveToIDB('webstore_pro_draft', data);
+    document.getElementById('autoSaveStatus').style.display = 'block';
+    setTimeout(() => document.getElementById('autoSaveStatus').style.display = 'none', 2000);
+}
+
+async function loadDraft() {
+    let d = null;
+    if (typeof INITIAL_STATE !== 'undefined' && INITIAL_STATE && Object.keys(INITIAL_STATE).length > 0) {
+        d = INITIAL_STATE;
+    }
+
+    if (!d) {
+        const saved = localStorage.getItem('webstore_pro_draft');
+        if (saved) { try { d = JSON.parse(saved); } catch(e){} }
+    }
+
+    if (!d || !d.banner) {
+        const idbData = await getFromIDB('webstore_pro_draft');
+        if (idbData && Object.keys(idbData).length > 0) d = idbData;
+    }
+
+    if (!d || Object.keys(d).length === 0) {
+        return;
+    }
+  
+    if (d.menu) menuSections = d.menu;
+    
+    document.getElementById('cafeName').textContent = d.name || "Create your Store In Mere Minutes";
+    document.getElementById('tagline').textContent = d.tag || DEFAULT_TAG;
+    document.getElementById('editName').value = d.name || "";
+    document.getElementById('editTag').value = d.tag || DEFAULT_TAG;
+    document.getElementById('editPhone').value = d.phone || "";
+    document.getElementById('editCtaText').value = d.ctaText || "Powered By TiffyAI";
+    document.getElementById('ctaBtn').textContent = d.ctaText || "Powered By TiffyAI";
+    document.getElementById('editCtaLink').value = d.ctaLink || "#";
+    document.getElementById('ctaBtn').href = d.ctaLink || "#";
+    document.getElementById('editCurrency').value = d.currency || "USD";
+    document.getElementById('editOwnerIP').value = d.ownerIP || "tiffy_global_master_ledger";
+    document.getElementById('editFooter').value = d.footer || "© 2026 YOUR BUSINESS SUITE";
+    document.getElementById('footerText').textContent = d.footer || "© 2026 YOUR BUSINESS SUITE";
+    
+    if(d.logo) document.getElementById('logo').src = d.logo;
+    if(d.banner) {
+        const h = document.getElementById('header');
+        h.style.backgroundImage = d.banner;
+        h.style.backgroundSize = 'cover';
+        h.style.backgroundPosition = 'center';
+    }
+    
+    renderMenu(); 
+    renderEditor();
+}
+
+const questionScripts = {
+    editLogo: ["Let's begin. Start by uploading your business logo."],
+    editBanner: ["Now, upload a banner image for your store header."],
+    editName: ["Excellent. What is the name of your business?"],
+    editTag: ["Give me a snappy tagline for your brand."],
+    editPhone: ["I need your WhatsApp number to capture client sales."],
+    editCtaText: ["What should the call-to-action button say?"],
+    editCtaLink: ["Where should that button lead your customers?"],
+    editFooter: ["And finally, what text should go in your footer?"]
+};
+const confirmations = [
+    "Understood, logo updated.", "Perfect, banner applied.", "Got it, name saved.",
+    "Excellent choice, tagline set.", "Understood, WhatsApp number saved.",
+    "Perfect, button text updated.", "Got it, link configured.", "Excellent, footer updated."
+];
+
+async function startAiMode() {
+    window.speechSynthesis.cancel();
+    const video = document.getElementById('aiVideo');
+    const overlay = document.getElementById('aiOverlay');
+    overlay.style.display = 'flex';
+    setTimeout(() => overlay.style.opacity = '1', 50);
+    video.currentTime = 0; video.play();
+    await new Promise(r => setTimeout(r, 5500));
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; video.pause(); video.currentTime = 0; runInterview(); }, 500);
+}
+
+async function speak(text) {
+    document.getElementById('aiMsg').textContent = text;
+    return new Promise(r => {
+        const u = new SpeechSynthesisUtterance(text);
+        u.onend = r;
+        window.speechSynthesis.speak(u);
+    });
+}
+
+async function runInterview() {
+    const fields = ['editLogo', 'editBanner', 'editName', 'editTag', 'editPhone', 'editCtaText', 'editCtaLink', 'editFooter'];
+    fields.forEach(id => document.getElementById(id).parentElement.classList.add('input-inactive'));
+   
+    for (let i = 0; i < fields.length; i++) {
+        const fieldId = fields[i];
+        const el = document.getElementById(fieldId);
+        const parent = el.parentElement;
+        parent.classList.remove('input-inactive');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.classList.add('ai-highlight');
+        await speak(questionScripts[fieldId][0]);
+        await new Promise(r => {
+            const eventType = (fieldId === 'editLogo' || fieldId === 'editBanner') ? 'change' : 'blur';
+            const handler = () => {
+                window.speechSynthesis.speak(new SpeechSynthesisUtterance(confirmations[i]));
+                parent.classList.add('input-inactive');
+                el.removeEventListener(eventType, handler);
+                r();
+            };
+            el.addEventListener(eventType, handler);
+        });
+        el.classList.remove('ai-highlight');
+    }
+
+    await speak("Storefront configuration complete. Congratulations on setting up your professional storefront!");
+    window.scrollTo({top: 0, behavior: 'smooth'});
+    await speak("Take a look at your beautiful store preview above.");
+   
+    document.getElementById('editor').scrollIntoView({ behavior: 'smooth' });
+    await speak("Now, let's move to your product section. quickly choos your store currency, scroll down, Add your items, prices, and descriptions. You can load two product photos on each section . To add more products, tap the add a section button thats half behind the download button.");
+   
+    const overlay = document.getElementById('aiOverlay');
+    const container = document.getElementById('aiChoiceContainer');
+    container.innerHTML = ''; overlay.style.display = 'flex'; overlay.style.opacity = '1';
+   
+    await speak("Ok cool, see its super easy though. Ready! Tap yes to continue?");
+   
+    const yesBtn = document.createElement('button'); yesBtn.textContent = "YES";
+    yesBtn.onclick = () => { overlay.style.display = 'none'; speak(" great, thats awesome!, you will see the products is very easy to tweak at the bottom there."); };
+    const noBtn = document.createElement('button'); noBtn.textContent = "Full Scope";
+    noBtn.className = "remove";
+    noBtn.onclick = () => { 
+        const audio = new Audio('TiffyAI-Intro.mp3');
+        audio.play().catch(e => console.log(e));
+        window.open("https://tiffyai-usd.github.io/Trader/Information.html", "_blank"); 
+        overlay.style.display = 'none'; 
+    };
+    container.appendChild(yesBtn); container.appendChild(noBtn);
+   
+    await speak("after you got your products loaded. Download your store and save it. After that, click next to it, its the support chat icon. Let's get your account topped up and your store hosted already! Theres millions of people in the marketplace");
+}
+
+const CONVERSION_RATES = { "USD": 1.0, "ZAR": 18.5, "EUR": 0.92, "NGN": 1500.0, "INR": 83.0, "CNY": 7.20, "AUD": 1.5 };
+const CURRENCY_SYMBOLS = { "USD": "$", "ZAR": "R", "EUR": "€", "NGN": "₦", "INR": "₹", "CNY": "¥", "AUD": "$" };
+let menuSections = [{ title: "Products", items: [{ name: 'Item', price: 10, desc: "Desc", img: "", qr: "", qty: 0 }] }];
+let currentTransactionPrice = 0;
+
+function addSection() { menuSections.push({ title: "New Section", items: [] }); renderEditor(); saveDraft(); }
+function zoom(src) { if(src) { document.getElementById('zoomImg').src = src; document.getElementById('zoomModal').style.display = 'flex'; } }
+
+function uploadImage(input, cb) { 
+    const reader = new FileReader(); 
+    reader.onload = e => { cb(e.target.result); saveDraft(); }; 
+    reader.readAsDataURL(input.files[0]); 
+}
+
+function renderMenu() {
+  const curCode = document.getElementById('editCurrency').value;
+  const curSym = CURRENCY_SYMBOLS[curCode];
+  const container = document.getElementById('menuRender');
+  container.innerHTML = '';
+  menuSections.forEach(sec => {
+    container.innerHTML += `<h2 class="section-title">${sec.title}</h2>`;
+    const grid = document.createElement('div'); grid.className = 'menu-grid';
+    sec.items.forEach((it) => {
+      const displayPrice = parseFloat(it.price).toFixed(2);
+      grid.innerHTML += `<div class="menu-item">${it.img ? `<img src="${it.img}" onclick="zoom(this.src)">` : ''}<div class="card"><h3>${it.name}</h3><p>${it.desc}</p><div class="price">${curSym}${displayPrice}</div>
+      <button class="btn-small" onclick="addToCart('${it.name}', ${it.price})">Add to Cart</button>
+      <button class="btn-small remove" onclick="clearItem('${it.name}')">Clear</button>
+      <button class="btn-small" onclick="payWithTiffy(${it.price})">SCAN TO PAY</button>
+      ${it.qr ? `<br><img src="${it.qr}" class="qr-img" onclick="zoom(this.src)">` : ''}
+      </div></div>`;
+    });
+    container.appendChild(grid);
+  });
+  container.innerHTML += `<button onclick="sendWhatsApp()" style="display:block; margin:20px auto; padding:15px 40px; background:var(--whatsapp); color:#000; font-weight:bold;">ORDER ON WHATSAPP</button>`;
+}
+
+async function payWithTiffy(price) { 
+    currentTransactionPrice = parseFloat(price); 
+    const curCode = document.getElementById('editCurrency').value; 
+    const curSym = CURRENCY_SYMBOLS[curCode]; 
+    document.getElementById('amountDisplay').innerText = "Confirm Payment: " + curSym + currentTransactionPrice.toFixed(2); 
+    
+    document.getElementById('displayStoreKey').innerText = getStoreUniqueKey();
+    document.getElementById('displayCreatorIP').innerText = document.getElementById('editOwnerIP').value || "tiffy_global_master_ledger";
+    document.getElementById('displayBuyerNode').innerText = cachedClientIP;
+    document.getElementById('scannerModal').style.display = 'flex'; 
+}
+
+function hashCode(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = (hash << 5) - hash + str.charCodeAt(i);
+        hash |= 0;
+    }
+    return hash;
+}
+
+async function confirmAndPay() { 
+    if (currentTransactionPrice <= 0) {
+        alert("No active payment amount found.");
+        stopScanner();
+        return;
+    }
+
+    let bal = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0"); 
+    let currency = document.getElementById('editCurrency').value; 
+    let rate = CONVERSION_RATES[currency] || 1.0; 
+    let deduction = currentTransactionPrice / rate; 
+    
+    if (bal < deduction) { 
+        alert("Insufficient funds in this buyer wallet! Please top up first."); 
+        stopScanner(); 
+        return; 
+    } 
+    
+    let newBalance = bal - deduction;
+    localStorage.setItem("TUSD_Nitro_Storage", newBalance.toFixed(2)); 
+
+    let paidAmount = currentTransactionPrice;
+    currentTransactionPrice = 0;
+
+    let buyerStoreName = document.getElementById('cafeName').textContent.trim() || "Remote Buyer Store";
+    let buyerPhoneNum = document.getElementById('editPhone').value || "No Phone Provided";
+    const targetStoreKey = getStoreUniqueKey();
+    
+    let txId = "TX-PAY-" + Math.abs(hashCode(buyerStoreName + paidAmount + Date.now())) % 999999;
+    
+    let ledgerKey = getStoreOwnerRegistryKey();
+    let registry = JSON.parse(localStorage.getItem(ledgerKey) || "{}");
+    
+    if (!registry[targetStoreKey]) {
+        registry[targetStoreKey] = { 
+            name: targetStoreKey.replace('store_ledger_', '').replace(/_/g, ' '), 
+            url: window.location.href.split('?')[0],
+            salesRevenue: 0,
+            claimedTransactions: [],
+            pendingTransactions: {}
+        };
+    }
+    if (!registry[targetStoreKey].pendingTransactions) registry[targetStoreKey].pendingTransactions = {};
+    if (!registry[targetStoreKey].claimedTransactions) registry[targetStoreKey].claimedTransactions = [];
+    
+    registry[targetStoreKey].pendingTransactions[txId] = {
+        amount: paidAmount,
+        buyerName: buyerStoreName,
+        buyerPhone: buyerPhoneNum,
+        buyerNode: cachedClientIP,
+        time: new Date().toLocaleString(),
+        status: 'PENDING'
+    };
+    
+    localStorage.setItem(ledgerKey, JSON.stringify(registry));
+    tiffyChannel.postMessage({ type: 'SOVEREIGN_UNIFIED_SALE', ledger: registry, nodeKey: ledgerKey });
+
+    const sellerPhone = document.getElementById('editPhone').value || "";
+    const whatsappMsg = encodeURIComponent(`Hi, I just completed payment of $${paidAmount.toFixed(2)} (TX: ${txId}). Please arrange my shipping details.`);
+    const whatsappLink = sellerPhone ? `https://wa.me/${sellerPhone}?text=${whatsappMsg}` : "#";
+
+    document.getElementById('paymentLanding').innerHTML = `
+        <h2 style="color:var(--whatsapp); margin-bottom:10px; font-family:'Bebas Neue'; font-size:2rem;">PAYMENT SUCCESSFUL!</h2>
+        <p style="color:#ccc; font-size:0.95rem; margin-bottom:15px;">Deducted $${deduction.toFixed(2)} from your wallet.</p>
+        <div style="background:#111; padding:12px; border-radius:8px; margin-bottom:15px; text-align:left; font-size:0.85rem; border:1px solid #333;">
+            <p style="color:var(--gold);"><b>Transaction ID:</b> ${txId}</p>
+            <p style="color:#aaa;"><b>Store Handle:</b> ${targetStoreKey}</p>
+        </div>
+        <p style="color:#e6e6e6; font-size:0.9rem; margin-bottom:20px; line-height:1.4;">
+            Payment complete! Tap below to send your confirmation and Transaction ID to the seller on WhatsApp.
+        </p>
+        ${sellerPhone ? `<a href="${whatsappLink}" target="_blank" style="display:block; background:var(--whatsapp); color:#000; padding:12px; border-radius:30px; font-family:'Bebas Neue'; text-decoration:none; font-size:1.1rem; font-weight:bold; margin-bottom:10px;">💬 SEND WHATSAPP MESSAGE</a>` : ''}
+        <button onclick="stopScanner()" style="background:#333; color:#fff; width:100%;">CLOSE</button>
+    `;
+}
+
+function stopScanner() { 
+    currentTransactionPrice = 0;
+    document.getElementById('scannerModal').style.display = 'none'; 
+}
+
+function addToCart(name, price) { 
+    menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty++; })); 
+    alert(name + " added!"); 
+    saveDraft(); 
+}
+
+function clearItem(name) { menuSections.forEach(s => s.items.forEach(it => { if(it.name == name) it.qty = 0; })); renderMenu(); saveDraft(); }
+function sendWhatsApp() { let msg = "Order Request:%0A"; let hasItems = false; menuSections.forEach(s => s.items.forEach(it => { if(it.qty > 0) { msg += it.name + " x " + it.qty + "%0A"; hasItems = true; } })); const phone = document.getElementById('editPhone').value; if(hasItems) window.open(`https://wa.me/${phone}?text=${msg}`, '_blank'); else alert("Cart is empty"); }
+
+function enterMarketplace() {
+    const phone = document.getElementById('editPhone').value;
+    const storeKey = getStoreUniqueKey();
+    const ledgerKey = getStoreOwnerRegistryKey();
+    
+    let registry = JSON.parse(localStorage.getItem(ledgerKey) || "{}");
+    if (!registry[storeKey]) {
+        registry[storeKey] = { 
+            name: document.getElementById('cafeName').textContent.trim() || "Sovereign Store", 
+            salesRevenue: 0, 
+            claimedTransactions: [], 
+            pendingTransactions: {} 
+        };
+        localStorage.setItem(ledgerKey, JSON.stringify(registry));
+    }
+    
+    let currentStore = registry[storeKey];
+    let totalRevenueUSD = currentStore.salesRevenue || 0;
+    let claimedListHTML = "";
+    
+    if (currentStore.claimedTransactions && currentStore.claimedTransactions.length > 0) {
+        currentStore.claimedTransactions.forEach(tx => {
+            claimedListHTML += `
+                <div style="background:#111; padding:10px; border-radius:6px; margin-bottom:6px; border-left:4px solid ${tx.status === 'REFUNDED' ? '#f1b86b' : '#25D366'}; text-align:left; font-size:0.85rem;">
+                    <div style="display:flex; justify-content:space-between; color:#d4a373;">
+                        <span><b>${tx.id}</b> (${tx.buyerName})</span>
+                        <span style="color:${tx.status === 'REFUNDED' ? '#f1b86b' : '#25D366'};">${tx.status === 'REFUNDED' ? 'REFUNDED' : '+$' + tx.amount.toFixed(2)}</span>
+                    </div>
+                </div>`;
+        });
+    } else {
+        claimedListHTML = `<p style="color:#666; font-size:0.8rem; text-align:center;">No processed transaction IDs yet.</p>`;
+    }
+
+    let pendingListHTML = "";
+    if (currentStore.pendingTransactions && Object.keys(currentStore.pendingTransactions).length > 0) {
+        Object.keys(currentStore.pendingTransactions).forEach(id => {
+            let tx = currentStore.pendingTransactions[id];
+            if (tx.status === 'PENDING') {
+                pendingListHTML += `
+                    <div style="background:#111; padding:8px; border-radius:6px; margin-bottom:4px; font-size:0.75rem; color:#aaa; display:flex; justify-content:space-between; align-items:center;">
+                        <span><b>${id}</b> ($${tx.amount.toFixed(2)})</span>
+                        <button onclick="document.getElementById('claimTxInput').value='${id}'" style="background:#333; color:#d4a373; border:none; padding:2px 6px; border-radius:4px; cursor:pointer;">Use</button>
+                    </div>`;
+            }
+        });
+    }
+
+    const w = window.open("", "_blank", "width=800,height=950");
+    w.document.write(`
+        <div style="font-family:'Inter', sans-serif; background:#0a0a0a; color:#e6e6e6; text-align:center; padding:30px; min-height:100vh;">
+            <h2 style="color:#d4a373; font-family:'Bebas Neue'; font-size:3rem; margin-bottom:5px;">STORE OWNER TERMINAL</h2>
+            <p style="color:#aaa; font-size:0.9rem; margin-bottom:20px;">Single-Use Transaction ID Claim & Revenue Vault</p>
+            
+            <div style="background:#1a1a1a; padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #333;">
+                <h3 style="color:#d4a373; margin-bottom:5px; font-family:'Bebas Neue';">${currentStore.name}</h3>
+                <div style="font-size:2.5rem; font-family:'Bebas Neue'; color:#25D366; margin-bottom:5px;" id="vaultRevDisplay">$${totalRevenueUSD.toFixed(2)}</div>
+                <div style="font-size:0.85rem; color:#aaa; margin-bottom:15px;">Current Nitro Storage Balance: <b id="nitroDisplay" style="color:#d4a373;">$0.00</b></div>
+                
+                <div style="margin-bottom:12px; text-align:left;">
+                    <label style="color:#d4a373; font-size:0.85rem; display:block; margin-bottom:5px;">Paste Buyer Transaction ID:</label>
+                    <input id="claimTxInput" placeholder="TX-PAY-XXXXXX" style="width:100%; padding:10px; background:#222; border:1px solid #444; color:#fff; border-radius:6px; margin-bottom:8px;">
+                    <button onclick="claimSingleTx()" style="width:100%; background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:12px; border-radius:20px; font-family:'Bebas Neue'; border:none; cursor:pointer; font-weight:bold; font-size:1.1rem; margin-bottom:10px;">SUBMIT TRANSACTION ID</button>
+                    <button onclick="sendVaultToNitro()" style="width:100%; background:#25D366; color:#000; padding:12px; border-radius:20px; font-family:'Bebas Neue'; border:none; cursor:pointer; font-weight:bold; font-size:1.1rem; margin-bottom:10px;">⚡ SEND VAULT REVENUE TO TUSD NITRO</button>
+                </div>
+                ${pendingListHTML ? `<div style="margin-top:10px; text-align:left;"><p style="font-size:0.8rem; color:#d4a373; margin-bottom:4px;">Pending Unclaimed TXs in Ledger:</p>${pendingListHTML}</div>` : ''}
+            </div>
+
+            <div style="background:#1a1a1a; padding:20px; border-radius:15px; margin-bottom:20px; border:1px solid #333; text-align:left;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                    <h3 style="color:#d4a373; font-family:'Bebas Neue'; margin:0;">PROCESSED TRANSACTION HISTORY</h3>
+                    <button onclick="clearTransactions()" style="background:#900; color:#fff; border:none; padding:4px 10px; border-radius:4px; font-size:0.75rem; font-family:'Bebas Neue'; cursor:pointer;">CLEAR TRANSACTIONS</button>
+                </div>
+                <div id="claimedTxContainer" style="max-height:160px; overflow-y:auto; padding-right:4px;">
+                    ${claimedListHTML}
+                </div>
+            </div>
+
+            <div style="background:#1a1a1a; padding:20px; border-radius:15px; margin-bottom:20px; text-align:left; border:1px solid #333;">
+                <h3 style="color:#d4a373; margin-bottom:10px; font-family:'Bebas Neue';">SUPPORT & HOSTING HUB</h3>
+                <a href='https://wa.me/${phone}' target="_blank" style="display:block; margin:10px 0; color:#25D366; font-size:1.1rem; text-decoration:none;">💬 Message Support on WhatsApp</a>
+                <a href='https://tiffyai-usd.github.io/KYC/' target="_blank" style="display:block; margin:10px 0; color:#d4a373; text-decoration:none;">✓ Complete Sovereign KYC</a>
+                <a href='https://tiffyai-usd.github.io/Web-Agent/agent1.html' target="_blank" style="display:block; margin:10px 0; color:#d4a373; text-decoration:none;">🤝 Become a 50% Partner</a>
+                <a href='https://tiffyai-usd.github.io/Trader/Verse6.html' target="_blank" style="display:block; margin:10px 0; color:#d4a373; text-decoration:none;">🌐 Visit the Tiffyverse Marketplace</a>
+            </div>
+            
+            <a href='https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NVPAZWBES9WAS' target="_blank" style="display:block; background:linear-gradient(180deg,#d4a373,#f1b86b); color:#000; padding:15px; text-decoration:none; border-radius:30px; font-weight:bold; font-family:'Bebas Neue'; font-size:1.2rem;">TOP UP ACCOUNT ($10 MIN)</a>
+        </div>
+        <script>
+        function updateNitroDisplay() {
+            let nitroBal = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0");
+            document.getElementById('nitroDisplay').innerText = "$" + nitroBal.toFixed(2);
+        }
+        updateNitroDisplay();
+
+        function sendVaultToNitro() {
+            let registry = JSON.parse(localStorage.getItem("${ledgerKey}") || "{}");
+            let storeKey = "${storeKey}";
+            if (!registry[storeKey]) return;
+            
+            let store = registry[storeKey];
+            let rev = store.salesRevenue || 0;
+            if (rev <= 0) {
+                alert("No revenue in vault to transfer.");
+                return;
+            }
+            
+            let currentNitro = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0");
+            let newNitro = currentNitro + rev;
+            localStorage.setItem("TUSD_Nitro_Storage", newNitro.toFixed(2));
+            
+            store.salesRevenue = 0;
+            localStorage.setItem("${ledgerKey}", JSON.stringify(registry));
+            
+            document.getElementById('vaultRevDisplay').innerText = "$0.00";
+            updateNitroDisplay();
+            alert("Successfully transferred $" + rev.toFixed(2) + " from store vault into your TUSD Nitro Storage!");
+        }
+
+        function clearTransactions() {
+            if (!confirm("Are you sure you want to clear your transaction history?")) return;
+            let registry = JSON.parse(localStorage.getItem("${ledgerKey}") || "{}");
+            let storeKey = "${storeKey}";
+            if (registry[storeKey]) {
+                registry[storeKey].claimedTransactions = [];
+                localStorage.setItem("${ledgerKey}", JSON.stringify(registry));
+            }
+            document.getElementById('claimedTxContainer').innerHTML = '<p style="color:#666; font-size:0.8rem; text-align:center;">No processed transaction IDs yet.</p>';
+        }
+
+        function claimSingleTx() {
+            let txIdInput = document.getElementById('claimTxInput').value.trim();
+            if (!txIdInput) {
+                alert("Please enter a valid Transaction ID.");
+                return;
+            }
+            
+            let registry = JSON.parse(localStorage.getItem("${ledgerKey}") || "{}");
+            let storeKey = "${storeKey}";
+            
+            if (!registry[storeKey]) {
+                registry[storeKey] = { name: "${currentStore.name}", salesRevenue: ${totalRevenueUSD}, claimedTransactions: [], pendingTransactions: {} };
+            }
+            
+            let store = registry[storeKey];
+            if (!store.pendingTransactions) store.pendingTransactions = {};
+            
+            if (!store.pendingTransactions[txIdInput]) {
+                store.pendingTransactions[txIdInput] = {
+                    amount: 10.00,
+                    buyerName: "Cross-Browser Buyer",
+                    time: new Date().toLocaleString(),
+                    status: 'PENDING'
+                };
+            }
+            
+            let txData = store.pendingTransactions[txIdInput];
+            
+            if (txData.status === 'CLAIMED') {
+                alert("⚠️ WARNING: This Transaction ID has ALREADY been used and claimed! Cannot be reused.");
+                return;
+            }
+            
+            if (txData.status === 'REFUNDED') {
+                alert("⚠️ This code has already been used / refunded. You cannot use this. Contact the buyer.");
+                return;
+            }
+            
+            txData.status = 'CLAIMED';
+            store.salesRevenue = (store.salesRevenue || 0) + txData.amount;
+            store.claimedTransactions.unshift({
+                id: txIdInput,
+                amount: txData.amount,
+                buyerName: txData.buyerName,
+                status: 'CLAIMED',
+                time: new Date().toLocaleString()
+            });
+            alert("Success! Claimed $" + txData.amount.toFixed(2) + " into your store vault. Transaction marked as permanently used.");
+            
+            localStorage.setItem("${ledgerKey}", JSON.stringify(registry));
+            document.getElementById('vaultRevDisplay').innerText = "$" + (store.salesRevenue || 0).toFixed(2);
+            
+            let html = "";
+            store.claimedTransactions.forEach(tx => {
+                let color = '#25D366';
+                let label = '+$' + tx.amount.toFixed(2);
+                html += '<div style="background:#111; padding:10px; border-radius:6px; margin-bottom:6px; border-left:4px solid ' + color + '; text-align:left; font-size:0.85rem;">' +
+                    '<div style="display:flex; justify-content:space-between; color:#d4a373;">' +
+                    '<span><b>' + tx.id + '</b> (' + tx.buyerName + ')</span>' +
+                    '<span style="color:' + color + ';">' + label + '</span>' +
+                    '</div></div>';
+            });
+            document.getElementById('claimedTxContainer').innerHTML = html;
+            document.getElementById('claimTxInput').value = "";
+        }
+        <\/script>
+    `);
+}
+
+function downloadHTML() {
+    document.getElementById('aiBtnContainer').style.display = 'none';
+    
+    const storeHandle = getStoreUniqueKey();
+    const creatorIPKey = getStoreOwnerRegistryKey();
+    
+    const currentData = { 
+        name: document.getElementById('cafeName').textContent, 
+        tag: document.getElementById('tagline').textContent, 
+        phone: document.getElementById('editPhone').value, 
+        ctaText: document.getElementById('editCtaText').value, 
+        ctaLink: document.getElementById('editCtaLink').value, 
+        footer: document.getElementById('footerText').textContent, 
+        menu: menuSections, 
+        currency: document.getElementById('editCurrency').value, 
+        ownerIP: document.getElementById('editOwnerIP').value,
+        logo: document.getElementById('logo').src, 
+        banner: document.getElementById('header').style.backgroundImage,
+        storeHandle: storeHandle,
+        creatorIPKey: creatorIPKey
+    };
+    
+    const stateInjection = `<script>const INITIAL_STATE = ${JSON.stringify(currentData)};<\/script>`;
+    document.querySelector('#editor').style.display = 'none';
+    document.querySelector('#floatingDownload').style.display = 'none';
+    
+    const fullHtml = document.documentElement.outerHTML.replace('</head>', stateInjection + '</head>');
+    const blob = new Blob([fullHtml], {type: 'text/html'});
+    const a = document.createElement('a'); 
+    a.href = URL.createObjectURL(blob); 
+    a.download = (currentData.name || 'MyWebStore').replace(/[^a-zA-Z0-9]/g, '_') + '.html'; 
+    a.click();
+    
+    document.querySelector('#editor').style.display = 'block';
+    document.querySelector('#floatingDownload').style.display = 'block';
+    document.getElementById('aiBtnContainer').style.display = 'block';
+}
+
+function renderEditor() {
+  const me = document.getElementById('menuEditor'); me.innerHTML = '';
+  menuSections.forEach((sec, s) => {
+    me.innerHTML += `
+      <div class="editor-block">
+        <div style="display:flex; justify-content:space-between; align-items:center;">
+            <input value="${sec.title}" oninput="menuSections[${s}].title=this.value;saveDraft()">
+            <button class="remove" onclick="menuSections.splice(${s}, 1); renderEditor(); renderMenu(); saveDraft()">Delete Section</button>
+        </div>
+        ${sec.items.map((it, i) => `
+          <div style="border:1px solid #333; padding:10px; margin:5px 0;">
+            <input value="${it.name}" placeholder="Name" oninput="menuSections[${s}].items[${i}].name=this.value;saveDraft()">
+            <input type="number" step="0.01" value="${it.price}" placeholder="Price" oninput="menuSections[${s}].items[${i}].price=parseFloat(this.value);saveDraft()">
+            <label>Description</label>
+            <textarea oninput="menuSections[${s}].items[${i}].desc=this.value;saveDraft()">${it.desc || ''}</textarea>
+            <label>Product Photo</label> <input type="file" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].img=img; renderMenu(); saveDraft()})">
+            <button class="remove" onclick="menuSections[${s}].items[${i}].img=''; renderMenu(); saveDraft()">Remove Photo</button>
+            <label>QR / Secondary Photo</label> <input type="file" onchange="uploadImage(this, img=>{menuSections[${s}].items[${i}].qr=img; renderMenu(); saveDraft()})">
+            <button class="remove" onclick="menuSections[${s}].items[${i}].qr=''; renderMenu(); saveDraft()">Remove Photo</button>
+            </div>
+        `).join('')}
+      </div>`;
+  });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadDraft();
+    const introVid = document.getElementById('introVideo');
+    const introOverlay = document.getElementById('introOverlay');
+    const playPrompt = document.getElementById('playPrompt');
+
+    if (introVid && introOverlay) {
+        const dismissIntro = () => {
+            introOverlay.style.opacity = '0';
+            introOverlay.style.transition = 'opacity 0.5s ease';
+            setTimeout(() => introOverlay.style.display = 'none', 500);
+        };
+
+        introVid.play().then(() => {
+            // Playing successfully with sound
+        }).catch(err => {
+            // Browser blocked autoplay with audio; show click prompt
+            playPrompt.style.display = 'block';
+            console.log("Autoplay blocked, waiting for user click:", err);
+        });
+
+        introOverlay.onclick = () => {
+            playPrompt.style.display = 'none';
+            introVid.muted = false;
+            introVid.play().then(() => {
+                // started successfully
+            }).catch(e => console.log(e));
+        };
+
+        setTimeout(dismissIntro, 6000);
+        introVid.onended = dismissIntro;
+    }
+});
+</script>
+</body>
+</html>
