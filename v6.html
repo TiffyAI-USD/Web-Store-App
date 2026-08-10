@@ -311,9 +311,9 @@ async function startAiMode() {
     overlay.style.display = 'flex';
     setTimeout(() => overlay.style.opacity = '1', 50);
     video.currentTime = 0; video.play();
-    await new Promise(r => setTimeout(r, 10000));
+    await new Promise(r => setTimeout(r, 11000));
     overlay.style.opacity = '0';
-    setTimeout(() => { overlay.style.display = 'none'; video.pause(); video.currentTime = 0; runInterview(); }, 500);
+    setTimeout(() => { overlay.style.display = 'none'; video.pause(); video.currentTime = 0; runInterview(); }, 300);
 }
 
 async function speak(text) {
