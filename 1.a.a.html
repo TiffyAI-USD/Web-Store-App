@@ -575,7 +575,7 @@ async function confirmAndPay() {
     }
 
     // BANKING TERMINAL IS SOURCE OF TRUTH: Read directly from shared TUSD_Nitro_Storage
-    let bal = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0"); 
+    let bal = parseFloat(localStorage.getItem("TUSD_Nitro_Terminal") || "0"); 
     let currency = document.getElementById('editCurrency').value; 
     let rate = CONVERSION_RATES[currency] || 1.0; 
     let deduction = currentTransactionPrice / rate; 
