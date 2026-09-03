@@ -588,7 +588,7 @@ async function confirmAndPay() {
     
     // Deduct and immediately update the shared source of truth
     let newBalance = bal - deduction;
-    localStorage.setItem("TUSD_Nitro_Storage", newBalance.toFixed(2)); 
+    localStorage.setItem("TUSD_Nitro_Terminal", newBalance.toFixed(2)); 
 
     let paidAmount = currentTransactionPrice;
     currentTransactionPrice = 0;
