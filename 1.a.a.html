@@ -588,7 +588,7 @@ async function confirmAndPay() {
     
     // Deduct and immediately update the shared source of truth
     let newBalance = bal - deduction;
-    localStorage.setItem("nitro", newBalance.toFixed(2)); 
+    localStorage.setItem("TUSD_Nitro_Storage", newBalance.toFixed(2)); 
 
     let paidAmount = currentTransactionPrice;
     currentTransactionPrice = 0;
@@ -813,7 +813,7 @@ function enterMarketplace() {
                 return;
             }
             
-            let currentNitro = parseFloat(localStorage.getItem("TUSD_Nitro_Storage") || "0");
+            let currentNitro = parseFloat(localStorage.getItem("nitro") || "0");
             let newNitro = currentNitro + rev;
             localStorage.setItem("TUSD_Nitro_Storage", newNitro.toFixed(2));
             
